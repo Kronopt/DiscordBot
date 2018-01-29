@@ -16,3 +16,6 @@ A Discord Bot (**WIP**)
 * `!ping`
 * `!dice <str>`
 * `!8ball <str>`
+
+#### Note
+If disco v0.0.11 bugs ("Invalid token") when running the disco.cli command, install v0.0.12-rc.4
