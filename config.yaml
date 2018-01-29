@@ -1,0 +1,7 @@
+bot:
+  plugins:
+    - plugins.eight_ball
+    - plugins.dice
+    - plugins.ping
+  commands_require_mention: False
+  commands_prefix: '!'
