@@ -6,16 +6,33 @@ A Discord Bot (**WIP**)
 
 #### How to run
 * Download this repo
-* Create a bot [here](https://discordapp.com/developers/applications/me)
-* Create an app bot user for that bot (on the same page)
-* Use the bot token provided there
+* Create a bot [here](https://discordapp.com/developers/applications/me) and then create an app bot user
+(on the same page)
+* Use the BOT_TOKEN provided there
 * Run `python -m disco.cli --config config.yaml --token <BOT_TOKEN>` on the root of the repo
 * Add the bot to a server using discord
 
 #### Commands
 * `!ping`
-* `!dice <str>`
+  * Bot answers with `Pong`
+* `!dice <str dice>`
+  * Bot rolls one of the specified d4, d6, d8, d10, d12 and d20 dices
+* `!random`
+  * Bot generates a number between 0 and 1 (inclusive)
+* `!random_between <int a> <int b>`
+  * Bot generates a number between a and b (inclusive)
+* `!random_from <str a> <str b> <str c> ...`
+  * Bot randomly returns one of the space separated words/numbers/whatever
+* `!sum <number a> <number b>`
+  * Bot sums a and b
+* `!subtract <number a> <number b>`
+  * Bot subtracts b from a
+* `!divide <number a> <number b>`
+  * Bot divides a and b
+* `!multiply <number a> <number b>`
+  * Bot multiplies a and b
 * `!8ball <str>`
+  * Bot uses it's fortune-telling powers to answer your question
 
 #### Note
 If disco v0.0.11 bugs ("Invalid token") when running the disco.cli command, install v0.0.12-rc.4
