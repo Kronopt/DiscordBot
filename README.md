@@ -2,19 +2,20 @@
 A Discord Bot (**WIP**)
 
 #### Install Dependencies
-`pip install disco-py pyyaml`
+* Python 3.6
+* `pip install discord.py`
 
 #### How to run
 * Download this repo
 * Create a bot [here](https://discordapp.com/developers/applications/me) and then create an app bot user
 (on the same page)
 * Use the BOT_TOKEN provided there
-* Run `python -m disco.cli --config config.yaml --token <BOT_TOKEN>` on the root of the repo
+* Run `python DiscordBot.py <BOT_TOKEN>` on the root of the repo
 * Add the bot to a server using discord
 
 #### Commands
 * `!ping`
-  * Bot answers with `Pong`
+  * Bot answers with `pong`
 * `!dice <str dice>`
   * Bot rolls one of the specified d4, d6, d8, d10, d12 and d20 dices
 * `!random`
@@ -22,17 +23,14 @@ A Discord Bot (**WIP**)
 * `!random_between <int a> <int b>`
   * Bot generates a number between a and b (inclusive)
 * `!random_from <str a> <str b> <str c> ...`
-  * Bot randomly returns one of the space separated words/numbers/whatever
-* `!sum <number a> <number b>`
-  * Bot sums a and b
-* `!subtract <number a> <number b>`
-  * Bot subtracts b from a
-* `!divide <number a> <number b>`
-  * Bot divides a and b
-* `!multiply <number a> <number b>`
-  * Bot multiplies a and b
+  * Bot randomly selects one of the space separated words/numbers/whatever
+* `!sum <number a> <number b> ...`
+  * Bot sums all numbers
+* `!subtract <number a> <number b> ...`
+  * Bot subtracts all numbers
+* `!divide <number a> <number b> ...`
+  * Bot divides all numbers
+* `!multiply <number a> <number b> ...`
+  * Bot multiplies all numbers
 * `!8ball <str>`
-  * Bot uses it's fortune-telling powers to answer your question
-
-#### Note
-If disco v0.0.11 bugs ("Invalid token") when running the disco.cli command, install v0.0.12-rc.4
+  * Bot uses its fortune-telling powers to answer your question

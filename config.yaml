@@ -1,8 +1,0 @@
-bot:
-  plugins:
-    - plugins._math
-    - plugins.eight_ball
-    - plugins.ping
-    - plugins.random_number_generators
-  commands_require_mention: False
-  commands_prefix: '!'
