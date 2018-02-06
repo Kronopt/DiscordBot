@@ -14,6 +14,8 @@ A Discord Bot (**WIP**)
 * Add the bot to a server using discord
 
 #### Commands
+* `!help`
+  * Bot shows the available commands
 * `!ping`
   * Bot answers with `pong`
 * `!dice <str dice>`
@@ -22,8 +24,8 @@ A Discord Bot (**WIP**)
   * Bot generates a number between 0 and 1 (inclusive)
 * `!random_between <int a> <int b>`
   * Bot generates a number between a and b (inclusive)
-* `!random_from <str a> <str b> <str c> ...`
-  * Bot randomly selects one of the space separated words/numbers/whatever
+* `!random_from <str a> <str b> ...`
+  * Bot randomly selects one of the space arguments
 * `!sum <number a> <number b> ...`
   * Bot sums all numbers
 * `!subtract <number a> <number b> ...`
@@ -32,5 +34,5 @@ A Discord Bot (**WIP**)
   * Bot divides all numbers
 * `!multiply <number a> <number b> ...`
   * Bot multiplies all numbers
-* `!8ball <str>`
+* `!8ball <str> ...`
   * Bot uses its fortune-telling powers to answer your question
