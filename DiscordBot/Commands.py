@@ -184,25 +184,27 @@ class Commands:
                 emoji = self.emojis[2]
             return '`' + ' '.join(args) + '`: ' + self.answers[answer] + ' ' + emoji
 
-    # class Poll:  # TODO
-    #     name = 'poll'
-    #     polls = {}
-    #     message_on_fail = '`!poll` takes at least 1 argument.'
-    #
-    #     def command(self, *args):
-    #         pass
-    #         #     votes = {key: list() for key in vote_options}  # dict of poll_option : list_of_users_that_voted
-    #         #     polls[''.join(vote_options)] = votes  # each poll_options combinations is a new distinct poll
-    #         #
-    #         #     await client.send_message(message.channel, message.author.display_name + ' started a poll')
-    #         #     help_string = ''
-    #         #     for option in vote_options:
-    #         #         help_string += '`' + option + '`: ' + str(len(votes[option])) + ' votes'
-    #         #         if len(votes[option]) != 0:
-    #         #             help_string += ' by ' + ', '.join(votes[option]) + '\n'
-    #         #         else:
-    #         #             help_string += '\n'
-    #         #     await client.send_message(message.channel, help_string)
-    #         #
-    #         # else:  # Wrong number of parameters
-    #         #     await client.send_message(message.channel, message_on_fail)
+    class Poll:
+        name = 'poll'
+        n_args = None
+        args_type = str
+        message_on_fail = '`!poll` takes at least 1 argument.'
+        polls = {}  # {channel.id: {poll: [(option, votes)]}}
+
+        def command(self, *args):  # TODO
+            pass
+            #     votes = {key: list() for key in vote_options}  # dict of poll_option : list_of_users_that_voted
+            #     polls[''.join(vote_options)] = votes  # each poll_options combinations is a new distinct poll
+            #
+            #     await client.send_message(message.channel, message.author.display_name + ' started a poll')
+            #     help_string = ''
+            #     for option in vote_options:
+            #         help_string += '`' + option + '`: ' + str(len(votes[option])) + ' votes'
+            #         if len(votes[option]) != 0:
+            #             help_string += ' by ' + ', '.join(votes[option]) + '\n'
+            #         else:
+            #             help_string += '\n'
+            #     await client.send_message(message.channel, help_string)
+            #
+            # else:  # Wrong number of parameters
+            #     await client.send_message(message.channel, message_on_fail)
