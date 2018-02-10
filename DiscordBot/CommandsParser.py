@@ -15,9 +15,9 @@ from .Commands import Commands
 
 
 class CommandsParser:
-    def __init__(self, command_identifier='!'):
+    def __init__(self, command_char='!'):
         # Character at the start of a message that identifies it as a bot command
-        self.command_identifier = command_identifier
+        self.command_char = command_char
 
         # Get all attributes (classes) from Commands and keep only those that do not start with '_'
         commands = filter(lambda attribute: not attribute[0].startswith('_'), Commands.__dict__.items())
@@ -32,8 +32,10 @@ class CommandsParser:
         :param raw_string: str
             message received by discord.Client (message.content)
         """
-        if raw_string.startswith(self.command_identifier) and len(raw_string) > len(self.command_identifier):
-            raw_command, *arguments = raw_string[len(self.command_identifier):].split()
+        if (raw_string.startswith(self.command_char)  # start with '!'
+                and len(raw_string) > len(self.command_char)  # more characters besides '!'
+                and raw_string[len(self.command_char)] != ' '):  # '!' is followed by a command, not a space
+            raw_command, *arguments = raw_string[len(self.command_char):].split()
 
             if raw_command in self.commands_dict:
                 command_class = self.commands_dict[raw_command]
