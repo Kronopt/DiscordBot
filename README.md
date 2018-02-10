@@ -3,7 +3,7 @@ A Discord Bot (**WIP**)
 
 #### Install Dependencies
 * Python 3.6
-* `pip install discord.py`
+* `pip install -r requirements.txt`
 
 #### How to run
 * Download this repo
