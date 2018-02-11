@@ -19,16 +19,12 @@ commands_parser = CommandsParser()
 
 @client.event
 async def on_ready():
-    print('Logged in as:', client.user.name)
-    print('ID:', client.user.id)
+    print('Logged in as:', client.user.name + ',', client.user.id)
     print('Channels connected to:')
     for channel in client.get_all_channels():
-        print(' -', 'id', channel.id + ',',
-              channel.server.name + '.' + channel.name + ',',
-              str(channel.type) + '-channel')
-    print('Available commands:')
-    for command in commands_parser.commands_dict:
-        print(' -', command)
+        print(' -', channel.server.name + '.' + channel.name + ',', str(channel.type) + '-channel,', channel.id)
+    print('Available commands: ', end='')
+    print(*commands_parser.commands_dict, sep=', ')
     print('Ready')
 
 
