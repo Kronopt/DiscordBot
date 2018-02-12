@@ -30,7 +30,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    output_message = commands_parser.parse_args(message.content)
+    output_message = commands_parser.parse_args(message)
     if output_message is not None:
         await client.send_message(message.channel, output_message)
 

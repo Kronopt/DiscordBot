@@ -15,6 +15,8 @@ To add a new command create a class inside the Commands class with the following
         type to which each detected argument is to be converted to
         OR
         a function in the form of 'f(_, string)' that converts strings to the required type
+    - get_message: bool
+        True if the original discord.Message class is needed, False otherwise (will be supplied in args[0])
     - message_on_fail: str
         message to be displayed by the bot if command arguments are wrong
 - functions:
@@ -34,6 +36,7 @@ class Commands:
         name = 'help'
         n_args = 0
         args_type = None
+        get_message = False
         message_on_fail = '`!help` takes no arguments.'
         help_message = '''Available Commands:\n
 `!help` : Bot shows this help message\n
@@ -55,6 +58,7 @@ class Commands:
         name = 'ping'
         n_args = 0
         args_type = None
+        get_message = False
         message_on_fail = '`!ping` takes no arguments.'
 
         @staticmethod
@@ -65,6 +69,7 @@ class Commands:
         name = 'dice'
         n_args = 1
         args_type = Types.Dice
+        get_message = False
         dices = Types.Dice.dices
         message_on_fail = '`!dice` takes one of the following arguments: ' + ', '.join(dices) + '.'
 
@@ -79,6 +84,7 @@ class Commands:
         name = 'random'
         n_args = 0
         args_type = None
+        get_message = False
         message_on_fail = '`!random` takes no arguments.'
 
         @staticmethod
@@ -90,6 +96,7 @@ class Commands:
         name = 'random_between'
         n_args = 2
         args_type = int
+        get_message = False
         message_on_fail = '`!random_between` takes 2 integers as arguments.'
 
         @staticmethod
@@ -106,6 +113,7 @@ class Commands:
         name = 'random_from'
         n_args = None
         args_type = str
+        get_message = False
         message_on_fail = '`!random_from` takes at least 1 argument.'
 
         @staticmethod
@@ -117,6 +125,7 @@ class Commands:
         name = 'sum'
         n_args = None
         args_type = Types.Number
+        get_message = False
         message_on_fail = '`!sum` takes at least 1 number.'
 
         def command(self, *args):
@@ -128,6 +137,7 @@ class Commands:
         name = 'subtract'
         n_args = None
         args_type = Types.Number
+        get_message = False
         message_on_fail = '`!subtract` takes at least 1 number.'
 
         def command(self, *args):
@@ -139,6 +149,7 @@ class Commands:
         name = 'divide'
         n_args = None
         args_type = Types.Number
+        get_message = False
         message_on_fail = '`!divide` takes at least 1 number.'
         divide_by_zero_message_on_fail = '`!divide` can\'t divide by zero.'
 
@@ -155,6 +166,7 @@ class Commands:
         name = 'multiply'
         n_args = None
         args_type = Types.Number
+        get_message = False
         message_on_fail = '`!multiply` takes at least 1 number.'
 
         def command(self, *args):
@@ -166,6 +178,7 @@ class Commands:
         name = '8ball'
         n_args = None
         args_type = str
+        get_message = False
         message_on_fail = '`!8ball` needs a phrase on which to apply its fortune-telling powers.'
         emojis = [":white_check_mark:", ":low_brightness:", ":x:"]
         answers = ["It is certain", "It is decidedly so", "Without a doubt", "Yes, definitely",

@@ -25,13 +25,15 @@ class CommandsParser:
         # Dictionary with command string associated with the correct command class
         self.commands_dict = {command.name: command() for _, command in commands}
 
-    def parse_args(self, raw_string):
+    def parse_args(self, message):
         """
         Parse commands given to bot
 
-        :param raw_string: str
-            message received by discord.Client (message.content)
+        :param message: discord.Message
+            message received by discord.Client
         """
+        raw_string = message.content
+
         if (raw_string.startswith(self.command_char)  # start with '!'
                 and len(raw_string) > len(self.command_char)  # more characters besides '!'
                 and raw_string[len(self.command_char)] != ' '):  # '!' is followed by a command, not a space
@@ -41,10 +43,14 @@ class CommandsParser:
                 command_class = self.commands_dict[raw_command]
                 n_args = command_class.n_args
                 args_type = command_class.args_type
+                get_message = command_class.get_message
 
-                if n_args == 0:
-                    if len(arguments) == 0:
-                        return command_class.command()
+                if n_args == 0:  # Zero args
+                    if len(arguments) == 0:  # OK
+                        if not get_message:
+                            return command_class.command()
+                        else:
+                            return command_class.command(message)
                     else:
                         return command_class.message_on_fail
                 else:
@@ -53,13 +59,19 @@ class CommandsParser:
                     except ValueError:
                         return command_class.message_on_fail
                     else:
-                        if n_args is None:
-                            if len(arguments) > 0:
-                                return command_class.command(*converted_args)
+                        if n_args is None:  # Unlimited args
+                            if len(arguments) > 0:  # OK
+                                if not get_message:
+                                    return command_class.command(*converted_args)
+                                else:
+                                    return command_class.command(message, *converted_args)
                             else:
                                 return command_class.message_on_fail
-                        elif n_args > 0:
-                            if len(arguments) == n_args:
-                                return command_class.command(*converted_args)
+                        elif n_args > 0:  # More than zero args
+                            if len(arguments) == n_args:  # OK
+                                if not get_message:
+                                    return command_class.command(*converted_args)
+                                else:
+                                    return command_class.command(message, *converted_args)
                             else:
                                 return command_class.message_on_fail
