@@ -19,12 +19,31 @@ class Dice:
         return self.dice
 
 
-def number(cls, value):
-    try:
-        value = float(value)
-    except ValueError:
-        raise ValueError(str(value) + ' is not a valid number')
+class Number:
+    def __init__(self, value):
+        if type(value) is Number:
+            self.value = value.value
+        else:
+            try:
+                value = float(value)
+            except ValueError:
+                raise ValueError(str(value) + ' is not a valid number')
 
-    # ex: for 7.0 return 7
-    # ex: for 3.4 return 3.4
-    return int(value) if int(value) == value else value
+            # ex: for 7.0 return 7
+            # ex: for 3.4 return 3.4
+            self.value = int(value) if int(value) == value else value
+
+    def __add__(self, other):
+        return Number(self.value + other.value)
+
+    def __sub__(self, other):
+        return Number(self.value - other.value)
+
+    def __mul__(self, other):
+        return Number(self.value * other.value)
+
+    def __truediv__(self, other):
+        return Number(self.value / other.value)
+
+    def __repr__(self):
+        return str(self.value)

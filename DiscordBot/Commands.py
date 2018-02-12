@@ -48,7 +48,7 @@ class Commands:
 `!multiply <number a> <number b> ...` : Bot multiplies all numbers\n
 `!8ball <str>` : Bot uses its fortune-telling powers to answer your question'''
 
-        def command(self, *args):
+        def command(self):
             return self.help_message
 
     class Ping:
@@ -58,7 +58,7 @@ class Commands:
         message_on_fail = '`!ping` takes no arguments.'
 
         @staticmethod
-        def command(*args):
+        def command():
             return 'pong'
 
     class Dice:
@@ -82,7 +82,7 @@ class Commands:
         message_on_fail = '`!random` takes no arguments.'
 
         @staticmethod
-        def command(*args):
+        def command():
             random_number = random.random()
             return 'Result: **' + str(random_number) + '**'
 
@@ -116,31 +116,31 @@ class Commands:
     class Sum:
         name = 'sum'
         n_args = None
-        args_type = Types.number
+        args_type = Types.Number
         message_on_fail = '`!sum` takes at least 1 number.'
 
         def command(self, *args):
-            result = self.args_type(sum(args))
-            numbers = [str(number) for number in args]
+            result = self.args_type(functools.reduce(operator.add, args))
+            numbers = map(str, args)
             return ' + '.join(numbers) + ' = ' + '**' + str(result) + '**'
 
     class Subtract:
         name = 'subtract'
         n_args = None
-        args_type = Types.number
+        args_type = Types.Number
         message_on_fail = '`!subtract` takes at least 1 number.'
 
         def command(self, *args):
             result = self.args_type(functools.reduce(operator.sub, args))
-            numbers = [str(number) for number in args]
+            numbers = map(str, args)
             return ' - '.join(numbers) + ' = ' + '**' + str(result) + '**'
 
     class Divide:
         name = 'divide'
         n_args = None
-        args_type = Types.number
+        args_type = Types.Number
         message_on_fail = '`!divide` takes at least 1 number.'
-        divide_by_zero_message_on_fail = '`!divide` can\' divide by zero.'
+        divide_by_zero_message_on_fail = '`!divide` can\'t divide by zero.'
 
         def command(self, *args):
             try:
@@ -148,18 +148,18 @@ class Commands:
             except ZeroDivisionError:  # Divided by zero
                 return self.divide_by_zero_message_on_fail
             else:  # OK
-                numbers = [str(number) for number in args]
+                numbers = map(str, args)
                 return ' / '.join(numbers) + ' = ' + '**' + str(result) + '**'
 
     class Multiply:
         name = 'multiply'
         n_args = None
-        args_type = Types.number
+        args_type = Types.Number
         message_on_fail = '`!multiply` takes at least 1 number.'
 
         def command(self, *args):
             result = self.args_type(functools.reduce(operator.mul, args))
-            numbers = [str(number) for number in args]
+            numbers = map(str, args)
             return ' * '.join(numbers) + ' = ' + '**' + str(result) + '**'
 
     class EightBall:
