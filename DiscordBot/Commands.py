@@ -204,14 +204,19 @@ class Commands:
         get_message = True
         message_on_fail = '`!poll` takes at least 1 argument.'
         message_on_fail_poll_ongoing = 'A poll is already ongoing with the following options: '
-        polls = {}  # {channel.id: {poll: [(option, votes)]}}
+        polls = {}  # {channel.id: {option: votes}}
 
         def command(self, *args):
             message, *args = args  # args[0] is a discord.Message
             if message.channel.id in self.polls:  # One active poll per channel
                 return self.message_on_fail_poll_ongoing + '`' + '`, `'.join(self.polls[message.channel.id]) + '`'
-            else:
-                self.polls[message.channel.id] = args
+            else:  # OK
+                self.polls[message.channel.id] = {}
+                for arg in args:  # Set all poll options at zero votes
+                    self.polls[message.channel.id][arg] = 0
+                return 'Poll created with ' + str(len(args)) + ' options: ' + ', '.join(args)
+
+            # TODO - voting method
 
             # TODO
             # !poll vote
