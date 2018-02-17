@@ -1,240 +1,178 @@
 #!python3
 # coding: utf-8
 
-"""
-The 'Commands' class represents all the commands a bot understands.
-Classes inside the 'Commands' class ARE bot commands.
 
-To add a new command create a class inside the Commands class with the following required attributes:
-- class attributes:
-    - name: str
-        command name to be passed by a user to the bot, (ex: ping or 8ball)
-    - n_args: None/int >= 0
-        how many arguments to expect (None=unlimited and at least 1)
-    - args_type: any type
-        type to which each detected argument is to be converted to
-        OR
-        a function in the form of 'f(_, string)' that converts strings to the required type
-    - get_message: bool
-        True if the original discord.Message class is needed, False otherwise (will be supplied in args[0])
-    - message_on_fail: str
-        message to be displayed by the bot if command arguments are wrong
-- functions:
-    - command(*args)
-        the actual command function. Should return the message (str) to be delivered by the bot
 """
+Commands (cogs) .py file.
+Each bot command is decorated with a @command decorator.
+"""
+
 
 import functools
 import operator
 import random
-from . import Types
+from discord.ext import commands
+from DiscordBot import Converters
+
+
+ERROR_MESSAGES = {
+    'ping': 'takes no arguments.',
+    'dice': 'takes one of the following arguments: ' + ', '.join(Converters.DICES) + '.',
+    'random': 'either takes no arguments or one of the predefined ones (type `!help random` for more info).',
+    'between': 'takes 2 integers as arguments.',
+    'from': 'takes at least 1 argument.',
+    'sum': 'takes at least 1 number.',
+    'subtract': 'takes at least 1 number.',
+    'divide': 'takes at least 1 number.',
+    'zero_division_error': 'can\'t divide by zero.',
+    'multiply': 'takes at least 1 number.',
+    '8ball': 'needs a phrase on which to apply its fortune-telling powers.',
+    'poll': 'takes at least 1 argument.',
+    'poll_already_exists': 'A poll is already ongoing with the following options: ',
+    'vote': 'takes 1 existing poll option as argument.'
+}
 
 
 class Commands:
+    def __init__(self, bot):
+        self.bot = bot
 
-    class Help:
-        name = 'help'
-        n_args = 0
-        args_type = None
-        get_message = False
-        message_on_fail = '`!help` takes no arguments.'
-        help_message = '''Available Commands:\n
-`!help` : Bot shows this help message\n
-`!ping` : Bot answers with pong\n
-`!dice <str dice>` : Bot rolls one of the specified d4, d6, d8, d10, d12 and d20 dices\n
-`!random` : Bot generates a number between 0 and 1 (inclusive)\n
-`!random_between <int a> <int b>` : Bot generates a number between a and b (inclusive)\n
-`!random_from <str a> <str b> ...` : Bot randomly selects one of the space separated arguments\n
-`!sum <number a> <number b> ...` : Bot sums all numbers\n
-`!subtract <number a> <number b> ...` : Bot subtracts all numbers\n
-`!divide <number a> <number b> ...` : Bot divides all numbers\n
-`!multiply <number a> <number b> ...` : Bot multiplies all numbers\n
-`!8ball <str>` : Bot uses its fortune-telling powers to answer your question'''
+    # def __unload(self):
+    #     print('cleanup goes here')
+    #
+    # def __check(self, ctx):
+    #     print('cog global check')
+    #     return True
 
-        def command(self):
-            return self.help_message
+    _eightball_emojis = [":white_check_mark:", ":low_brightness:", ":x:"]
+    _eightball_answers = ["It is certain", "It is decidedly so", "Without a doubt", "Yes, definitely",
+                          "You may rely on it", "As I see it, yes", "Most likely", "Outlook good", "Yes",
+                          "Signs point to yes", "Reply hazy, try again", "Ask again later", "Better not tell you now",
+                          "Cannot predict now", "Concentrate and ask again", "Don't count on it",
+                          "My reply is no", "My sources say no", "Outlook not so good", "Very doubtful"]
 
-    class Ping:
-        name = 'ping'
-        n_args = 0
-        args_type = None
-        get_message = False
-        message_on_fail = '`!ping` takes no arguments.'
+    _polls = {}  # {channel.id: {option: votes}}
 
-        @staticmethod
-        def command():
-            return 'pong'
+    # PING
+    @commands.command(name='ping', ignore_extra=False)
+    async def command_ping(self):
+        """Bot answers with pong.
+        Simple command to test if bot is alive."""
+        await self.bot.say('pong')
 
-    class Dice:
-        name = 'dice'
-        n_args = 1
-        args_type = Types.Dice
-        get_message = False
-        dices = Types.Dice.dices
-        message_on_fail = '`!dice` takes one of the following arguments: ' + ', '.join(dices) + '.'
+    # DICE
+    @commands.command(name='dice', ignore_extra=False)
+    async def command_dice(self, dice: Converters.dice):
+        """Bot rolls one of the specified d4, d6, d8, d10, d12 and d20 dices.
+        A dice can either be written as 'D#' or 'd#'."""
+        dice_number = int(dice[1:])
+        dice_roll = random.randint(1, dice_number)
+        await self.bot.say('Rolled a **' + str(dice_roll) + '** with a ' + dice)
 
-        @staticmethod
-        def command(*args):
-            dice = str(args[0])
-            dice_number = int(dice[1:])
-            dice_roll = random.randint(1, dice_number)
-            return 'Rolled a **' + str(dice_roll) + '** with a ' + dice
+    # RANDOM
+    @commands.group(name='random', ignore_extra=False, aliases=['rand'], invoke_without_command=True)
+    async def command_random(self):
+        """Bot generates a number between 0 and 1 (inclusive) if no argument is passed."""
+        random_number = random.random()
+        await self.bot.say('Result: **' + str(random_number) + '**')
 
-    class Random:
-        name = 'random'
-        n_args = 0
-        args_type = None
-        get_message = False
-        message_on_fail = '`!random` takes no arguments.'
+    # RANDOM BETWEEN
+    @command_random.command(name='between', ignore_extra=False, aliases=['b', 'betw', '-b'])
+    async def command_random_between(self, a: int, b: int):
+        """Bot generates a number between a and b (inclusive)."""
+        values = [a, b]
+        values.sort()  # Either value can be the smallest one
+        a, b = values
+        random_number = random.randint(a, b)
+        await self.bot.say('Result: **' + str(random_number) + '**')
 
-        @staticmethod
-        def command():
-            random_number = random.random()
-            return 'Result: **' + str(random_number) + '**'
+    # RANDOM FROM
+    @command_random.command(name='from', ignore_extra=False, aliases=['fr', '-f'])
+    async def command_random_from(self, *args: str):
+        """Bot randomly selects one of the space separated arguments."""
+        if len(args) == 0:    # at least one argument
+            raise commands.MissingRequiredArgument
+        result = random.choice(args)
+        await self.bot.say('Result: **' + result + '**')
 
-    class RandomBetween:
-        name = 'random_between'
-        n_args = 2
-        args_type = int
-        get_message = False
-        message_on_fail = '`!random_between` takes 2 integers as arguments.'
+    # SUM
+    @commands.command(name='sum', ignore_extra=False, aliases=['add', '+'])
+    async def command_sum(self, *numbers: Converters.number):
+        """Bot sums all numbers."""
+        if len(numbers) == 0:    # at least one argument
+            raise commands.MissingRequiredArgument
+        result = Converters.number(functools.reduce(operator.add, numbers))
+        numbers = map(str, numbers)
+        await self.bot.say(' + '.join(numbers) + ' = ' + '**' + str(result) + '**')
 
-        @staticmethod
-        def command(*args):
-            a = args[0]
-            b = args[1]
-            values = [a, b]
-            values.sort()  # Either value can be the smallest one
-            a, b = values
-            random_number = random.randint(a, b)
-            return 'Result: **' + str(random_number) + '**'
+    # SUBTRACT
+    @commands.command(name='subtract', ignore_extra=False, aliases=['-'])
+    async def command_subtract(self, *numbers: Converters.number):
+        """Bot subtracts all numbers."""
+        if len(numbers) == 0:    # at least one argument
+            raise commands.MissingRequiredArgument
+        result = Converters.number(functools.reduce(operator.sub, numbers))
+        numbers = map(str, numbers)
+        await self.bot.say(' - '.join(numbers) + ' = ' + '**' + str(result) + '**')
 
-    class RandomFrom:
-        name = 'random_from'
-        n_args = None
-        args_type = str
-        get_message = False
-        message_on_fail = '`!random_from` takes at least 1 argument.'
+    # DIVIDE
+    @commands.command(name='divide', ignore_extra=False, aliases=['/'])
+    async def command_divide(self, *numbers: Converters.number):
+        """Bot divides all numbers."""
+        if len(numbers) == 0:    # at least one argument
+            raise commands.MissingRequiredArgument
+        result = Converters.number(functools.reduce(operator.truediv, numbers))
+        numbers = map(str, numbers)
+        await self.bot.say(' / '.join(numbers) + ' = ' + '**' + str(result) + '**')
 
-        @staticmethod
-        def command(*args):
-            result = random.choice(args)
-            return'Result: **' + result + '**'
+    # MULTIPLY
+    @commands.command(name='multiply', ignore_extra=False, aliases=['mul', '*'])
+    async def command_multiply(self, *numbers: Converters.number):
+        """Bot multiplies all numbers."""
+        if len(numbers) == 0:    # at least one argument
+            raise commands.MissingRequiredArgument
+        result = Converters.number(functools.reduce(operator.mul, numbers))
+        numbers = map(str, numbers)
+        await self.bot.say(' * '.join(numbers) + ' = ' + '**' + str(result) + '**')
 
-    class Sum:
-        name = 'sum'
-        n_args = None
-        args_type = Types.Number
-        get_message = False
-        message_on_fail = '`!sum` takes at least 1 number.'
+    # 8BALL
+    @commands.command(name='8ball', ignore_extra=False, aliases=['eightball', '8b'])
+    async def command_eightball(self, *args: str):
+        """Bot uses its fortune-telling powers to answer your question."""
+        if len(args) == 0:    # at least one argument
+            raise commands.MissingRequiredArgument
+        answer = random.randint(0, len(self._eightball_answers) - 1)
+        if answer <= 9:  # Affirmative answer
+            emoji = self._eightball_emojis[0]
+        elif answer <= 14:  # Meh answer
+            emoji = self._eightball_emojis[1]
+        else:  # Negative answer
+            emoji = self._eightball_emojis[2]
+        await self.bot.say('`' + ' '.join(args) + '`: ' + self._eightball_answers[answer] + ' ' + emoji)
 
-        def command(self, *args):
-            result = self.args_type(functools.reduce(operator.add, args))
-            numbers = map(str, args)
-            return ' + '.join(numbers) + ' = ' + '**' + str(result) + '**'
+    # POLL
+    @commands.group(name='poll', ignore_extra=False, pass_context=True, invoke_without_command=True)
+    async def command_poll(self, context, *args: str):
+        """Bot creates a poll with the arguments passed as options."""
+        if len(args) == 0:    # at least one argument
+            raise commands.MissingRequiredArgument
+        channel = context.message.channel.id
+        if channel in self._polls:  # One active poll per channel
+            await self.bot.say(
+                ERROR_MESSAGES['poll_already_exists'] + '`' + '`, `'.join(self._polls[channel]) + '`')
+        else:  # OK
+            self._polls[channel] = {}
+            for arg in args:  # Set all poll options at zero votes
+                self._polls[channel][arg] = 0
+            await self.bot.say('Poll created with ' + str(len(args)) + ' options: `' + '`, `'.join(args) + '`')
 
-    class Subtract:
-        name = 'subtract'
-        n_args = None
-        args_type = Types.Number
-        get_message = False
-        message_on_fail = '`!subtract` takes at least 1 number.'
+        # TODO How to end the poll?
 
-        def command(self, *args):
-            result = self.args_type(functools.reduce(operator.sub, args))
-            numbers = map(str, args)
-            return ' - '.join(numbers) + ' = ' + '**' + str(result) + '**'
-
-    class Divide:
-        name = 'divide'
-        n_args = None
-        args_type = Types.Number
-        get_message = False
-        message_on_fail = '`!divide` takes at least 1 number.'
-        divide_by_zero_message_on_fail = '`!divide` can\'t divide by zero.'
-
-        def command(self, *args):
-            try:
-                result = self.args_type(functools.reduce(operator.truediv, args))
-            except ZeroDivisionError:  # Divided by zero
-                return self.divide_by_zero_message_on_fail
-            else:  # OK
-                numbers = map(str, args)
-                return ' / '.join(numbers) + ' = ' + '**' + str(result) + '**'
-
-    class Multiply:
-        name = 'multiply'
-        n_args = None
-        args_type = Types.Number
-        get_message = False
-        message_on_fail = '`!multiply` takes at least 1 number.'
-
-        def command(self, *args):
-            result = self.args_type(functools.reduce(operator.mul, args))
-            numbers = map(str, args)
-            return ' * '.join(numbers) + ' = ' + '**' + str(result) + '**'
-
-    class EightBall:
-        name = '8ball'
-        n_args = None
-        args_type = str
-        get_message = False
-        message_on_fail = '`!8ball` needs a phrase on which to apply its fortune-telling powers.'
-        emojis = [":white_check_mark:", ":low_brightness:", ":x:"]
-        answers = ["It is certain", "It is decidedly so", "Without a doubt", "Yes, definitely",
-                   "You may rely on it", "As I see it, yes", "Most likely", "Outlook good", "Yes",
-                   "Signs point to yes", "Reply hazy, try again", "Ask again later", "Better not tell you now",
-                   "Cannot predict now", "Concentrate and ask again", "Don't count on it",
-                   "My reply is no", "My sources say no", "Outlook not so good", "Very doubtful"]
-
-        def command(self, *args):
-            answer = random.randint(0, len(self.answers) - 1)
-            if answer <= 9:  # Affirmative answer
-                emoji = self.emojis[0]
-            elif answer <= 14:  # Meh answer
-                emoji = self.emojis[1]
-            else:  # Negative answer
-                emoji = self.emojis[2]
-            return '`' + ' '.join(args) + '`: ' + self.answers[answer] + ' ' + emoji
-
-    class Poll:
-        name = 'poll'
-        n_args = None
-        args_type = str
-        get_message = True
-        message_on_fail = '`!poll` takes at least 1 argument.'
-        message_on_fail_poll_ongoing = 'A poll is already ongoing with the following options: '
-        polls = {}  # {channel.id: {option: votes}}
-
-        def command(self, *args):
-            message, *args = args  # args[0] is a discord.Message
-            if message.channel.id in self.polls:  # One active poll per channel
-                return self.message_on_fail_poll_ongoing + '`' + '`, `'.join(self.polls[message.channel.id]) + '`'
-            else:  # OK
-                self.polls[message.channel.id] = {}
-                for arg in args:  # Set all poll options at zero votes
-                    self.polls[message.channel.id][arg] = 0
-                return 'Poll created with ' + str(len(args)) + ' options: ' + ', '.join(args)
-
-            # TODO - voting method
-
-            # TODO
-            # !poll vote
-            # !poll finish
-            # ???
-
-            #     votes = {key: list() for key in vote_options}  # dict of poll_option : list_of_users_that_voted
-            #     polls[''.join(vote_options)] = votes  # each poll_options combinations is a new distinct poll
-            #
-            #     await client.send_message(message.channel, message.author.display_name + ' started a poll')
-            #     help_string = ''
-            #     for option in vote_options:
-            #         help_string += '`' + option + '`: ' + str(len(votes[option])) + ' votes'
-            #         if len(votes[option]) != 0:
-            #             help_string += ' by ' + ', '.join(votes[option]) + '\n'
-            #         else:
-            #             help_string += '\n'
-            #     await client.send_message(message.channel, help_string)
-            #
-            # else:  # Wrong number of parameters
-            #     await client.send_message(message.channel, message_on_fail)
+    # POLL VOTE
+    @command_poll.command(name='vote', ignore_extra=False, aliases=['vt', 'v', '-v'])
+    async def command_poll_vote(self, option: str):
+        """Vote on an option in the current existing poll."""
+        # TODO option doesn't exist
+        # TODO poll doesn't exist yet
+        # TODO limit to one vote per user
+        pass
