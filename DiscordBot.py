@@ -11,11 +11,15 @@ A small command line utility is available so that the bot's token is not hardcod
 import argparse
 import traceback
 from discord.ext import commands
+from DiscordBot import HelpFormatter
 from DiscordBot.Commands import ERROR_MESSAGES
 from DiscordBot.Commands import Commands
 
 
-BOT = commands.Bot(command_prefix='!')
+command_prefix = '!'
+bot_description = 'Commands can be called as follows:\n\n' + command_prefix + '<command> [subcommand] [arguments]\n'
+
+BOT = commands.Bot(command_prefix=command_prefix, formatter=HelpFormatter.HelpFormat(), description=bot_description)
 BOT.add_cog(Commands(BOT))
 
 
@@ -61,6 +65,3 @@ if __name__ == '__main__':
 
 
 # TODO setup logging (log command calls, etc)
-
-# TODO clean help section
-# TODO subcommands don't show up on the '!help' command (only when calling '!help' on the main command)

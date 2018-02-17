@@ -56,14 +56,14 @@ class Commands:
     # PING
     @commands.command(name='ping', ignore_extra=False)
     async def command_ping(self):
-        """Bot answers with pong.
+        """Answers with 'pong'.
         Simple command to test if bot is alive."""
         await self.bot.say('pong')
 
     # DICE
     @commands.command(name='dice', ignore_extra=False)
     async def command_dice(self, dice: Converters.dice):
-        """Bot rolls one of the specified d4, d6, d8, d10, d12 and d20 dices.
+        """Rolls one of the specified d4, d6, d8, d10, d12 and d20 dices.
         A dice can either be written as 'D#' or 'd#'."""
         dice_number = int(dice[1:])
         dice_roll = random.randint(1, dice_number)
@@ -72,14 +72,14 @@ class Commands:
     # RANDOM
     @commands.group(name='random', ignore_extra=False, aliases=['rand'], invoke_without_command=True)
     async def command_random(self):
-        """Bot generates a number between 0 and 1 (inclusive) if no argument is passed."""
+        """Generates a number between 0 and 1 (inclusive)."""
         random_number = random.random()
         await self.bot.say('Result: **' + str(random_number) + '**')
 
     # RANDOM BETWEEN
     @command_random.command(name='between', ignore_extra=False, aliases=['b', 'betw', '-b'])
     async def command_random_between(self, a: int, b: int):
-        """Bot generates a number between a and b (inclusive)."""
+        """Generates a number between a and b (inclusive)."""
         values = [a, b]
         values.sort()  # Either value can be the smallest one
         a, b = values
@@ -89,7 +89,7 @@ class Commands:
     # RANDOM FROM
     @command_random.command(name='from', ignore_extra=False, aliases=['fr', '-f'])
     async def command_random_from(self, *args: str):
-        """Bot randomly selects one of the space separated arguments."""
+        """Randomly selects one of the space separated arguments."""
         if len(args) == 0:    # at least one argument
             raise commands.MissingRequiredArgument
         result = random.choice(args)
@@ -98,7 +98,7 @@ class Commands:
     # SUM
     @commands.command(name='sum', ignore_extra=False, aliases=['add', '+'])
     async def command_sum(self, *numbers: Converters.number):
-        """Bot sums all numbers."""
+        """Sums all numbers."""
         if len(numbers) == 0:    # at least one argument
             raise commands.MissingRequiredArgument
         result = Converters.number(functools.reduce(operator.add, numbers))
@@ -108,7 +108,7 @@ class Commands:
     # SUBTRACT
     @commands.command(name='subtract', ignore_extra=False, aliases=['-'])
     async def command_subtract(self, *numbers: Converters.number):
-        """Bot subtracts all numbers."""
+        """Subtracts all numbers."""
         if len(numbers) == 0:    # at least one argument
             raise commands.MissingRequiredArgument
         result = Converters.number(functools.reduce(operator.sub, numbers))
@@ -118,7 +118,7 @@ class Commands:
     # DIVIDE
     @commands.command(name='divide', ignore_extra=False, aliases=['/'])
     async def command_divide(self, *numbers: Converters.number):
-        """Bot divides all numbers."""
+        """Divides all numbers."""
         if len(numbers) == 0:    # at least one argument
             raise commands.MissingRequiredArgument
         result = Converters.number(functools.reduce(operator.truediv, numbers))
@@ -128,7 +128,7 @@ class Commands:
     # MULTIPLY
     @commands.command(name='multiply', ignore_extra=False, aliases=['mul', '*'])
     async def command_multiply(self, *numbers: Converters.number):
-        """Bot multiplies all numbers."""
+        """Multiplies all numbers."""
         if len(numbers) == 0:    # at least one argument
             raise commands.MissingRequiredArgument
         result = Converters.number(functools.reduce(operator.mul, numbers))
@@ -153,7 +153,7 @@ class Commands:
     # POLL
     @commands.group(name='poll', ignore_extra=False, pass_context=True, invoke_without_command=True)
     async def command_poll(self, context, *args: str):
-        """Bot creates a poll with the arguments passed as options."""
+        """Creates a poll with the arguments passed as options."""
         if len(args) == 0:    # at least one argument
             raise commands.MissingRequiredArgument
         channel = context.message.channel.id
