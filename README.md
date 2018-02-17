@@ -14,18 +14,18 @@ A Discord Bot (**WIP**)
 * Add the bot to a server using discord
 
 #### Commands
-* `!help`
-  * Bot shows the available commands
+* `!help <command>`
+  * Bot shows the available commands or detailed info on a command
 * `!ping`
   * Bot answers with `pong`
 * `!dice <str dice>`
   * Bot rolls one of the specified d4, d6, d8, d10, d12 and d20 dices
 * `!random`
   * Bot generates a number between 0 and 1 (inclusive)
-* `!random_between <int a> <int b>`
+* `!random between <int a> <int b>`
   * Bot generates a number between a and b (inclusive)
-* `!random_from <str a> <str b> ...`
-  * Bot randomly selects one of the space arguments
+* `!random from <str a> <str b> ...`
+  * Bot randomly selects one of the space separated arguments
 * `!sum <number a> <number b> ...`
   * Bot sums all numbers
 * `!subtract <number a> <number b> ...`
@@ -36,3 +36,5 @@ A Discord Bot (**WIP**)
   * Bot multiplies all numbers
 * `!8ball <str> ...`
   * Bot uses its fortune-telling powers to answer your question
+
+Most commands have aliases. Use `!help` to know more.

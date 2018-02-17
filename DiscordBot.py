@@ -1,38 +1,55 @@
 #!python3
 # coding: utf-8
 
+
 """
 Bot main .py file.
-instantiates the discord.py client as well as the CommandsParser class for parsing arguments.
 A small command line utility is available so that the bot's token is not hardcoded in the script.
 """
 
+
 import argparse
-import asyncio
-import discord
-from DiscordBot.CommandsParser import CommandsParser
+import traceback
+from discord.ext import commands
+from DiscordBot.Commands import ERROR_MESSAGES
+from DiscordBot.Commands import Commands
 
 
-client = discord.Client()
-commands_parser = CommandsParser()
+BOT = commands.Bot(command_prefix='!')
+BOT.add_cog(Commands(BOT))
 
 
-@client.event
+@BOT.event
 async def on_ready():
-    print('Logged in as:', client.user.name + ',', client.user.id)
+    print('Logged in as:', BOT.user.name + ',', BOT.user.id)
     print('Channels connected to:')
-    for channel in client.get_all_channels():
+    for channel in BOT.get_all_channels():
         print(' -', channel.server.name + '.' + channel.name + ',', str(channel.type) + '-channel,', channel.id)
     print('Available commands: ', end='')
-    print(*commands_parser.commands_dict, sep=', ')
+    print(*BOT.commands, sep=', ')
     print('Ready')
 
 
-@client.event
-async def on_message(message):
-    output_message = commands_parser.parse_args(message)
-    if output_message is not None:
-        await client.send_message(message.channel, output_message)
+@BOT.event
+async def on_command_error(error, context):
+    if isinstance(error, commands.CommandNotFound):  # Ignore non-existent commands
+        pass
+    elif isinstance(error, (commands.TooManyArguments,
+                            commands.MissingRequiredArgument,
+                            commands.BadArgument,
+                            commands.UserInputError)):
+        await BOT.send_message(context.message.channel,
+                               '`!' + context.command.name + '` ' + ERROR_MESSAGES[context.command.name])
+    elif isinstance(error, commands.CommandInvokeError) and isinstance(error.original, ZeroDivisionError):
+        await BOT.send_message(context.message.channel,
+                               '`!' + context.command.name + '` ' + ERROR_MESSAGES['zero_division_error'])
+    else:
+        print('Ignoring exception in command ' + context.command.name)
+        tb = traceback.format_exception(type(error), error, error.__traceback__)
+        print(''.join(tb))
+
+    # TODO NoPrivateMessage, CheckFailure, DisabledCommand, CommandOnCooldown,
+    # TODO NotOwner, MissingPermissions, BotMissingPermissions
 
 
 if __name__ == '__main__':
@@ -40,7 +57,10 @@ if __name__ == '__main__':
     cli_parser.add_argument('token', help='Bot token')
     cli_parser = cli_parser.parse_args()
 
-    client.run(cli_parser.token)
+    BOT.run(cli_parser.token)
 
 
 # TODO setup logging (log command calls, etc)
+
+# TODO clean help section
+# TODO subcommands don't show up on the '!help' command (only when calling '!help' on the main command)
