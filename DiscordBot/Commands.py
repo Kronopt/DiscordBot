@@ -17,6 +17,7 @@ from DiscordBot import Converters
 
 ERROR_MESSAGES = {
     'ping': 'takes no arguments.',
+    'hi': 'takes no arguments.',
     'dice': 'takes one of the following arguments: ' + ', '.join(Converters.DICES) + '.',
     'random': 'either takes no arguments or one of the predefined ones (type `!help random` for more info).',
     'between': 'takes 2 integers as arguments.',
@@ -44,6 +45,8 @@ class Commands:
     #     print('cog global check')
     #     return True
 
+    _greetings = ['Hi', 'Hello', 'Hey', 'Sup', 'What\'s up', 'Greetings', 'Howdy']
+
     _eightball_emojis = [":white_check_mark:", ":low_brightness:", ":x:"]
     _eightball_answers = ["It is certain", "It is decidedly so", "Without a doubt", "Yes, definitely",
                           "You may rely on it", "As I see it, yes", "Most likely", "Outlook good", "Yes",
@@ -59,6 +62,17 @@ class Commands:
         """Answers with 'pong'.
         Simple command to test if bot is alive."""
         await self.bot.say('pong')
+
+    # HI
+    @commands.command(name='hi', ignore_extra=False, aliases=['hello'], pass_context=True)
+    async def command_hi(self, context):
+        """Answers with a greeting.
+        Greets user directly."""
+        if hasattr(context.message.author, 'nick') and context.message.author.nick is not None:
+            author_name = context.message.author.nick
+        else:
+            author_name = context.message.author.name
+        await self.bot.say(random.choice(self._greetings) + ', ' + author_name)
 
     # DICE
     @commands.command(name='dice', ignore_extra=False)
