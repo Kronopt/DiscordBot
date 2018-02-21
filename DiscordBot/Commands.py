@@ -9,10 +9,14 @@ Each bot command is decorated with a @command decorator.
 
 
 import functools
+import logging
 import operator
 import random
 from discord.ext import commands
 from DiscordBot import Converters
+
+
+logger = logging.getLogger('discord')
 
 
 ERROR_MESSAGES = {
@@ -56,11 +60,22 @@ class Commands:
 
     _polls = {}  # {channel.id: {option: votes}}
 
+    @staticmethod
+    def log_command_call(command):
+        """
+        Logs calls to command as INFO
+
+        :param command: str
+            name of command
+        """
+        logger.info('command called: ' + command)
+
     # PING
     @commands.command(name='ping', ignore_extra=False)
     async def command_ping(self):
         """Answers with 'pong'.
         Simple command to test if bot is alive."""
+        self.log_command_call('ping')
         await self.bot.say('pong')
 
     # HI
@@ -72,6 +87,7 @@ class Commands:
             author_name = context.message.author.nick
         else:
             author_name = context.message.author.name
+        self.log_command_call('hi')
         await self.bot.say(random.choice(self._greetings) + ', ' + author_name)
 
     # DICE
@@ -81,6 +97,7 @@ class Commands:
         A dice can either be written as 'D#' or 'd#'."""
         dice_number = int(dice[1:])
         dice_roll = random.randint(1, dice_number)
+        self.log_command_call('dice')
         await self.bot.say('Rolled a **' + str(dice_roll) + '** with a ' + dice)
 
     # RANDOM
@@ -88,6 +105,7 @@ class Commands:
     async def command_random(self):
         """Generates a number between 0 and 1 (inclusive)."""
         random_number = random.random()
+        self.log_command_call('random')
         await self.bot.say('Result: **' + str(random_number) + '**')
 
     # RANDOM BETWEEN
@@ -98,6 +116,7 @@ class Commands:
         values.sort()  # Either value can be the smallest one
         a, b = values
         random_number = random.randint(a, b)
+        self.log_command_call('random between')
         await self.bot.say('Result: **' + str(random_number) + '**')
 
     # RANDOM FROM
@@ -107,6 +126,7 @@ class Commands:
         if len(args) == 0:    # at least one argument
             raise commands.MissingRequiredArgument
         result = random.choice(args)
+        self.log_command_call('random from')
         await self.bot.say('Result: **' + result + '**')
 
     # SUM
@@ -117,6 +137,7 @@ class Commands:
             raise commands.MissingRequiredArgument
         result = Converters.number(functools.reduce(operator.add, numbers))
         numbers = map(str, numbers)
+        self.log_command_call('sum')
         await self.bot.say(' + '.join(numbers) + ' = ' + '**' + str(result) + '**')
 
     # SUBTRACT
@@ -127,6 +148,7 @@ class Commands:
             raise commands.MissingRequiredArgument
         result = Converters.number(functools.reduce(operator.sub, numbers))
         numbers = map(str, numbers)
+        self.log_command_call('subtract')
         await self.bot.say(' - '.join(numbers) + ' = ' + '**' + str(result) + '**')
 
     # DIVIDE
@@ -137,6 +159,7 @@ class Commands:
             raise commands.MissingRequiredArgument
         result = Converters.number(functools.reduce(operator.truediv, numbers))
         numbers = map(str, numbers)
+        self.log_command_call('divide')
         await self.bot.say(' / '.join(numbers) + ' = ' + '**' + str(result) + '**')
 
     # MULTIPLY
@@ -147,6 +170,7 @@ class Commands:
             raise commands.MissingRequiredArgument
         result = Converters.number(functools.reduce(operator.mul, numbers))
         numbers = map(str, numbers)
+        self.log_command_call('multiply')
         await self.bot.say(' * '.join(numbers) + ' = ' + '**' + str(result) + '**')
 
     # 8BALL
@@ -162,6 +186,7 @@ class Commands:
             emoji = self._eightball_emojis[1]
         else:  # Negative answer
             emoji = self._eightball_emojis[2]
+        self.log_command_call('8ball')
         await self.bot.say('`' + ' '.join(args) + '`: ' + self._eightball_answers[answer] + ' ' + emoji)
 
     # POLL
@@ -181,6 +206,7 @@ class Commands:
             await self.bot.say('Poll created with ' + str(len(args)) + ' options: `' + '`, `'.join(args) + '`')
 
         # TODO How to end the poll?
+        # TODO log call
 
     # POLL VOTE
     @command_poll.command(name='vote', ignore_extra=False, aliases=['vt', 'v', '-v'])
