@@ -10,6 +10,7 @@ Changes the way the 'help' command works
 
 import inspect
 import itertools
+import logging
 from discord.ext import commands
 
 
@@ -19,6 +20,8 @@ class HelpFormat(commands.HelpFormatter):
     - Add subcommands recursively to each command that has them."""
 
     def format(self):
+        logging.info('command called: help')
+
         self._paginator = commands.Paginator()
 
         description = self.command.description if not self.is_cog() else inspect.getdoc(self.command)
@@ -77,4 +80,3 @@ class HelpFormat(commands.HelpFormatter):
 
             if isinstance(command, commands.core.Group) and len(command.commands) != 0:  # add subcommands recursively
                 self._add_subcommands_to_page(max_width, command.commands.items(), recursive_level+1)
-
