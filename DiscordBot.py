@@ -13,7 +13,7 @@ import logging
 import traceback
 from discord.ext import commands
 from DiscordBot import HelpFormatter
-from DiscordBot.Commands import ERROR_MESSAGES
+from DiscordBot.ErrorMessages import ERROR_MESSAGES
 from DiscordBot.Commands import Commands
 
 
@@ -51,13 +51,13 @@ async def on_command_error(error, context):
         logging.info('bad arguments for command %s: %s',
                      context.command.name,
                      context.message.content[len(context.prefix) + (len(context.command.name) + 1):])
-        await BOT.send_message(context.message.channel,
-                               '`!' + context.command.name + '` ' + ERROR_MESSAGES[context.command.name])
+        await BOT.send_message(context.message.channel, '`' + command_prefix +
+                               context.command.name + '` ' + ERROR_MESSAGES[context.command.name])
 
     elif isinstance(error, commands.CommandInvokeError) and isinstance(error.original, ZeroDivisionError):
         logging.info('zero division error on command %s', context.command.name)
-        await BOT.send_message(context.message.channel,
-                               '`!' + context.command.name + '` ' + ERROR_MESSAGES['zero_division_error'])
+        await BOT.send_message(context.message.channel, '`' + command_prefix +
+                               context.command.name + '` ' + ERROR_MESSAGES['zero_division_error'])
 
     else:
         print('Ignoring exception in command ' + context.command.name)

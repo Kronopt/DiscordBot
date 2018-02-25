@@ -14,36 +14,15 @@ import logging
 import operator
 import random
 from discord.ext import commands
-from DiscordBot import Converters
-
-
-logger = logging.getLogger('discord')
-
-
-ERROR_MESSAGES = {
-    'ping': 'takes no arguments.',
-    'hi': 'takes no arguments.',
-    'dice': 'takes one of the following arguments: ' + ', '.join(Converters.DICES) + '.',
-    'random': 'either takes no arguments or one of the predefined ones (`!help random` for more information).',
-    'between': 'takes 2 integers as arguments.',
-    'from': 'takes at least 1 argument.',
-    'sum': 'takes at least 1 number.',
-    'subtract': 'takes at least 1 number.',
-    'divide': 'takes at least 1 number.',
-    'zero_division_error': 'can\'t divide by zero.',
-    'multiply': 'takes at least 1 number.',
-    '8ball': 'needs a phrase on which to apply its fortune-telling powers.',
-    'poll': 'takes a poll name as first argument and at least 2 options (`!help poll` for more information).',
-    'poll_already_exists': 'A poll is already ongoing with the same name having the following options: ',
-    'poll_non_unique_options': 'Poll options must be different from each other.',
-    'vote': 'takes 1 existing poll name and 1 existing option as arguments.',
-    'status': 'takes either no arguments or 1 existing poll name as argument.'
-}
+from . import Converters
+from .Polls import Polls
 
 
 class Commands:
     def __init__(self, bot):
         self.bot = bot
+        self.logger = logging.getLogger('discord')
+        self.polls = Polls()
 
     # def __unload(self):
     #     print('cleanup goes here')
@@ -61,18 +40,14 @@ class Commands:
                           "Cannot predict now", "Concentrate and ask again", "Don't count on it",
                           "My reply is no", "My sources say no", "Outlook not so good", "Very doubtful"]
 
-    _polls = {}  # {channel_id: {poll_name: {option: set(user_name)}}}  # TODO maybe create a class to handle this...
-    _poll_creator = {}  # {channel_id: {poll_name: author.id}}  # TODO also class to handle this, maybe...
-
-    @staticmethod
-    def log_command_call(command):
+    def log_command_call(self, command):
         """
         Logs calls to command as INFO
 
         :param command: str
             name of command
         """
-        logger.info('command called: ' + command)
+        self.logger.info('command called: ' + command)
 
     # PING
     @commands.command(name='ping', ignore_extra=False)
@@ -217,36 +192,17 @@ class Commands:
 
         Each vote option must be unique.
         A poll ends when the subcommand 'end' is passed with the poll's name as argument.
-        Within 5 minutes of the poll's creation only the original author can close the poll."""
+        Within 10 minutes of the poll's creation only the original author can close the poll."""
         if len(options) < 2:    # at least two poll options
             raise commands.MissingRequiredArgument
         self.log_command_call('poll')
 
-        channel = context.message.channel.id
-        if channel not in self._polls:
-            self._polls[channel] = {}
-        if poll_name in self._polls[channel]:  # Polls must have unique names
-            await self.bot.say(ERROR_MESSAGES['poll_already_exists'] +
-                               '`' + '`, `'.join(self._polls[channel][poll_name]) + '`')
-        elif len(options) != len(set(options)):  # Options must be different from each other
-            await self.bot.say(ERROR_MESSAGES['poll_non_unique_options'])
-        else:
-            self._polls[channel][poll_name] = {}
-            for option in options:  # Set all poll options at zero votes
-                self._polls[channel][poll_name][option] = set()  # TODO id for each option (for voting)
-
-            if hasattr(context.message.author, 'nick') and context.message.author.nick is not None:
-                author_name = context.message.author.nick
-            else:
-                author_name = context.message.author.name
-
-            await self.bot.say(author_name + ' created poll `' + poll_name + '` with ' +
-                               str(len(options)) + ' options: `' + '`, `'.join(options) + '`')
-            await self.bot.say('Say `!poll end <poll_name>` to end poll')  # TODO more interesting text
-
-            self._poll_creator[channel][poll_name] = context.message.author.id
-            await asyncio.sleep(10*60)  # 10 minutes timer
-            del self._poll_creator[channel][poll_name]  # every user can now end the poll
+        is_poll_created, message = self.polls.new_poll(context, poll_name, *options)
+        await self.bot.say(message)
+        if is_poll_created:
+            await asyncio.sleep(60*10)  # 10 minutes timer
+            self.polls.allow_user_delete_poll(context.message.channel.id, poll_name)  # every user can now end the poll
+            await self.bot.say('ok')
 
     # POLL VOTE
     @command_poll.command(name='vote', ignore_extra=False, aliases=['v', '-v', 'vt'])
