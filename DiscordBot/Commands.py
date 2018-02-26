@@ -182,15 +182,15 @@ class Commands:
     # POLL
     @commands.group(name='poll', ignore_extra=False, pass_context=True, invoke_without_command=True)
     async def command_poll(self, context, poll_name: str, *options: str):
-        """Creates a poll with the arguments passed as vote options.
-        The first argument is the name of the poll.
-        It can be a single word or any number of space-separated words if enclosed within quotation marks.
+        """Creates a poll. First argument is its name, remaining arguments are options.
+        A poll is confined to the channel where it was created.
+        All arguments can be a single word or any number of space-separated words if enclosed within quotation marks.
         ex:
-            poll
-            poll_name
-            "Is this the poll name?"
+            name option1 option2
+            poll_name "option 1" option2
+            "Is this the poll name?" "options 1 is reeeeaaally long" option2
 
-        Each vote option must be unique.
+        Each voting option must be unique.
         A poll ends when the subcommand 'end' is passed with the poll's name as argument.
         Within 10 minutes of the poll's creation only the original author can close the poll."""
         if len(options) < 2:    # at least two poll options
@@ -202,18 +202,15 @@ class Commands:
         if is_poll_created:
             await asyncio.sleep(60*10)  # 10 minutes timer
             self.polls.allow_user_delete_poll(context.message.channel.id, poll_name)  # every user can now end the poll
-            await self.bot.say('ok')
 
     # POLL VOTE
-    @command_poll.command(name='vote', ignore_extra=False, aliases=['v', '-v', 'vt'])
-    async def command_poll_vote(self, poll: str, option: str):
+    @command_poll.command(name='vote', ignore_extra=False, pass_context=True, aliases=['v', '-v', 'vt'])
+    async def command_poll_vote(self, context, poll: str, option: str):
         """Vote on an option of a certain poll."""
         self.log_command_call('poll vote')
 
-        # TODO poll doesn't exist
-        # TODO option doesn't exist
-        # TODO limit to one vote per user
-        pass
+        message = self.polls.vote(context, poll, option)
+        await self.bot.say(message)
 
     # POLL STATUS
     @command_poll.command(name='status', ignore_extra=False, aliases=['s', '-s', 'stat'])
