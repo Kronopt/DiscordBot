@@ -14,29 +14,32 @@ import traceback
 from discord.ext import commands
 from DiscordBot import HelpFormatter
 from DiscordBot.ErrorMessages import ERROR_MESSAGES
-from DiscordBot.Commands import Commands
+from DiscordBot.Cogs.GeneralCommands import GeneralCommands
+# from DiscordBot.Cogs.Polls import Polls
 
 
 logging.basicConfig(level=logging.INFO)
 
 command_prefix = '!'
-bot_description = 'Commands can be called as follows:\n\n' + command_prefix + '<command> [subcommand] [arguments]\n'
+bot_description = 'Commands can be called as follows:\n\n%s<command> [subcommand] [arguments]\n' % command_prefix
 
 BOT = commands.Bot(command_prefix=command_prefix, formatter=HelpFormatter.HelpFormat(), description=bot_description)
-BOT.add_cog(Commands(BOT))
+
+# Add cogs
+BOT.add_cog(GeneralCommands(BOT))
+# BOT.add_cog(Polls(BOT))  # TODO not implemented yet
 
 
 @BOT.event
 async def on_ready():
     logging.info('started on_ready')
 
-    print('Logged in as:', BOT.user.name + ',', BOT.user.id)
-    print('Channels connected to:')
+    logging.info('Logged in as: %s, %s' % (BOT.user.name, BOT.user.id))
+    logging.info('Channels connected to:')
     for channel in BOT.get_all_channels():
-        print(' -', channel.server.name + '.' + channel.name + ',', str(channel.type) + '-channel,', channel.id)
-    print('Available commands: ', end='')
-    print(*BOT.commands, sep=', ')
-    print('Ready')
+        logging.info(' -%s.%s, %s-channel %s' % (channel.server.name, channel.name, str(channel.type), channel.id))
+    print('Bot is ready')
+    print('------------')
 
 
 @BOT.event
@@ -60,7 +63,7 @@ async def on_command_error(error, context):
                                ERROR_MESSAGES['zero_division_error'] % (command_prefix, context.command.name))
 
     else:
-        print('Ignoring exception in command ' + context.command.name)
+        print('Ignoring exception in command', context.command.name)
         tb = traceback.format_exception(type(error), error, error.__traceback__)
         print(''.join(tb))
 

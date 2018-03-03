@@ -3,51 +3,31 @@
 
 
 """
-Commands (cogs) .py file.
+General Commands.
 Each bot command is decorated with a @command decorator.
 """
 
 
-import asyncio
 import functools
-import logging
 import operator
 import random
 from discord.ext import commands
-from . import Converters
-from .Polls import Polls
+from .BaseCog import Cog
+from DiscordBot import Converters
 
 
-class Commands:
+class GeneralCommands(Cog):
     def __init__(self, bot):
-        self.bot = bot
-        self.logger = logging.getLogger('discord')
-        self.polls = Polls()
+        super(GeneralCommands, self).__init__(bot)
 
-    # def __unload(self):
-    #     print('cleanup goes here')
-    #
-    # def __check(self, ctx):
-    #     print('cog global check')
-    #     return True
-
-    _greetings = ['Hi', 'Hello', 'Hey', 'Sup', 'What\'s up', 'Greetings', 'Howdy']
-
-    _eightball_emojis = [":white_check_mark:", ":low_brightness:", ":x:"]
-    _eightball_answers = ["It is certain", "It is decidedly so", "Without a doubt", "Yes, definitely",
-                          "You may rely on it", "As I see it, yes", "Most likely", "Outlook good", "Yes",
-                          "Signs point to yes", "Reply hazy, try again", "Ask again later", "Better not tell you now",
-                          "Cannot predict now", "Concentrate and ask again", "Don't count on it",
-                          "My reply is no", "My sources say no", "Outlook not so good", "Very doubtful"]
-
-    def log_command_call(self, command):
-        """
-        Logs calls to command as INFO
-
-        :param command: str
-            name of command
-        """
-        self.logger.info('command called: ' + command)
+        self._greetings = ['Hi', 'Hello', 'Hey', 'Sup', 'What\'s up', 'Greetings', 'Howdy']
+        self._eightball_emojis = [":white_check_mark:", ":low_brightness:", ":x:"]
+        self._eightball_answers = ["It is certain", "It is decidedly so", "Without a doubt", "Yes, definitely",
+                                   "You may rely on it", "As I see it, yes", "Most likely", "Outlook good", "Yes",
+                                   "Signs point to yes", "Reply hazy, try again", "Ask again later",
+                                   "Better not tell you now", "Cannot predict now", "Concentrate and ask again",
+                                   "Don't count on it", "My reply is no", "My sources say no", "Outlook not so good",
+                                   "Very doubtful"]
 
     # PING
     @commands.command(name='ping', ignore_extra=False)
@@ -178,69 +158,3 @@ class Commands:
         else:  # Negative answer
             emoji = self._eightball_emojis[2]
         await self.bot.say('`' + ' '.join(args) + '`: ' + self._eightball_answers[answer] + ' ' + emoji)
-
-    # POLL
-    @commands.group(name='poll', ignore_extra=False, pass_context=True, invoke_without_command=True)
-    async def command_poll(self, context, poll_name: str, *options: str):
-        """Creates a poll. First argument is its name, remaining arguments are options.
-        A poll is confined to the channel where it was created.
-        All arguments can be a single word or any number of space-separated words if enclosed within quotation marks.
-        ex:
-            name option1 option2
-            poll_name "option 1" option2
-            "Is this the poll name?" "options 1 is reeeeaaally long" option2
-
-        Each voting option must be unique.
-        A poll ends when the subcommand 'end' is passed with the poll's name as argument.
-        Within 10 minutes of the poll's creation only the original author can close the poll."""
-        if len(options) < 2:    # at least two poll options
-            raise commands.MissingRequiredArgument
-        self.log_command_call('poll')
-
-        is_poll_created, message = self.polls.new_poll(context, poll_name, *options)
-        await self.bot.say(message)
-        if is_poll_created:
-            await asyncio.sleep(60*10)  # 10 minutes timer
-            self.polls.allow_user_delete_poll(context.message.channel.id, poll_name)  # every user can now end the poll
-
-    # POLL VOTE
-    @command_poll.command(name='vote', ignore_extra=False, pass_context=True, aliases=['v', '-v', 'vt'])
-    async def command_poll_vote(self, context, poll: str, option: str):
-        """Vote on an option of a certain poll."""
-        self.log_command_call('poll vote')
-
-        message = self.polls.vote(context, poll, option)
-        await self.bot.say(message)
-
-    # POLL STATUS
-    @command_poll.command(name='status', ignore_extra=False, aliases=['s', '-s', 'stat'])
-    async def command_poll_status(self, *poll: str):
-        """Status of all polls or just the one specified.
-        Shows who voted for each option."""
-        if len(poll) > 1:    # maximum one option
-            raise commands.TooManyArguments
-        self.log_command_call('poll status')
-
-        if len(poll) == 0:
-            # TODO show all poll status
-            pass
-        else:
-            # TODO poll doesn't exist
-            # TODO show only the one poll status
-            pass
-
-    # POLL END
-    @command_poll.command(name='end', ignore_extra=False, pass_context=True, aliases=['e', '-e'])
-    async def command_poll_end(self, context, poll_name: str):
-        """Ends specified poll and shows results.
-        For the first 10 minutes after starting a poll only it's author is able to end it."""
-        self.log_command_call('poll end')
-
-        channel = context.message.channel.id
-        if poll_name in self._poll_creator[channel]:  # poll created under 10 minutes ago
-            if context.message.author.id != self._poll_creator[channel][poll_name]:  # is not original author
-                # TODO ERROR: Only the poll author can end the poll during the first 10 minutes
-                return
-        # TODO show poll results
-        del self._poll_creator[channel][poll_name]
-        del self._polls[channel][poll_name]
