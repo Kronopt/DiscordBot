@@ -17,6 +17,8 @@ from DiscordBot import Converters
 
 
 class GeneralCommands(Cog):
+    """General Commands"""
+
     def __init__(self, bot):
         super(GeneralCommands, self).__init__(bot)
 

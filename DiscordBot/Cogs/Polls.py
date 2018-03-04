@@ -15,6 +15,8 @@ from DiscordBot.ErrorMessages import ERROR_MESSAGES
 
 
 class Polls(Cog):
+    """Poll related commands"""
+
     def __init__(self, bot):
         """
         _polls = {

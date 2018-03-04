@@ -15,7 +15,8 @@ from discord.ext import commands
 from DiscordBot import HelpFormatter
 from DiscordBot.ErrorMessages import ERROR_MESSAGES
 from DiscordBot.Cogs.GeneralCommands import GeneralCommands
-# from DiscordBot.Cogs.Polls import Polls
+from DiscordBot.Cogs.Gifs import Gifs
+from DiscordBot.Cogs.AsciiEmojis import AsciiEmojis
 
 
 logging.basicConfig(level=logging.INFO)
@@ -28,6 +29,8 @@ BOT = commands.Bot(command_prefix=command_prefix, formatter=HelpFormatter.HelpFo
 # Add cogs
 BOT.add_cog(GeneralCommands(BOT))
 # BOT.add_cog(Polls(BOT))  # TODO not implemented yet
+BOT.add_cog(Gifs(BOT))
+BOT.add_cog(AsciiEmojis(BOT))
 
 
 @BOT.event
