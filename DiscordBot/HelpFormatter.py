@@ -15,9 +15,16 @@ from discord.ext import commands
 
 
 class HelpFormat(commands.HelpFormatter):
-    """The code is mostly the same except for a few details:
+    """The code is mostly the same as in the original except for a few details:
     - 'No Category' category is now just the 'Help' category.
-    - Add subcommands recursively to each command that has them."""
+    - Category names are altered based on their class name ('ClassName' becomes 'Class Name')
+    - Add subcommands recursively to each command that has them.
+    - The ending note is altered"""
+
+    def get_ending_note(self):
+        command_name = self.context.invoked_with
+        return "Type {0}{1} <command> for more info on a command.\n" \
+               "Type {0}{1} <category> for more info on a category.".format(self.clean_prefix, command_name)
 
     def format(self):
         logging.info('command called: help')
@@ -47,8 +54,14 @@ class HelpFormat(commands.HelpFormatter):
 
         def category(tup):
             cog = tup[1].cog_name
-            # we insert the zero width space there to give it approximate last place sorting position.
-            return cog + ':' if cog is not None else '\u200bHelp:'  # Previously 'No Category'
+
+            if cog is not None:  # Space before capital letters
+                cog_name = ''.join(' ' + char if char.isupper() else char for char in cog).strip()
+            else:
+                # Zero width space to give approximate last place sorting position to help section
+                cog_name = '\u200bHelp'  # Previously 'No Category'
+
+            return cog_name + ':'
 
         if self.is_bot():
             data = sorted(self.filter_command_list(), key=category)

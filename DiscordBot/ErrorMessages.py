@@ -13,7 +13,7 @@ from . import Converters
 ERROR_MESSAGES = {
     'ping': '`%s%s` takes no arguments.',
     'hi': '`%s%s` takes no arguments.',
-    'dice': '`%s%s` takes one of the following arguments: ' + ', '.join(Converters.DICES) + '.',
+    'dice': '`%s%s` takes no arguments or one of the following: ' + ', '.join(Converters.DICES) + '.',
     'random': '`%s%s` takes no arguments or one of the predefined ones (use `help random` for more information).',
     'between': '`%s%s` takes 2 integers as arguments.',
     'from': '`%s%s` takes at least 1 argument.',

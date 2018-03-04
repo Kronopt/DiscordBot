@@ -53,10 +53,19 @@ class GeneralCommands(Cog):
 
     # DICE
     @commands.command(name='dice', ignore_extra=False)
-    async def command_dice(self, dice: Converters.dice):
-        """Rolls one of the specified d4, d6, d8, d10, d12 and d20 dices.
+    async def command_dice(self, *dice: Converters.dice):
+        """Rolls a six sided die by default. Other dices can be rolled if specified.
+
+        Possible dices: d4, d6, d8, d10, d12 and d20.
         A dice can either be written as 'D#' or 'd#'."""
+        if len(dice) > 1:    # At most one argument
+            raise commands.TooManyArguments
         self.log_command_call('dice')
+
+        if len(dice) == 0:
+            dice = 'd6'  # default
+        else:
+            dice = dice[0]
 
         dice_number = int(dice[1:])
         dice_roll = random.randint(1, dice_number)
