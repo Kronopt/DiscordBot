@@ -60,3 +60,13 @@ class Gifs(Cog):
         gif = self.embed_gif('https://media.giphy.com/media/12XMGIWtrHBl5e/giphy.gif',
                              footer_message='Noooooooooooooooooooooooooo')
         await self.bot.say(embed=gif)
+
+    # REKT
+    @commands.command(name='rekt', ignore_extra=False)
+    async def command_rekt(self):
+        """Rekt."""
+        self.log_command_call('rekt')
+
+        gif = self.embed_gif('https://media.giphy.com/media/11yKQ9fN3c06fC/giphy.gif',
+                             footer_message='rekt')
+        await self.bot.say(embed=gif)
