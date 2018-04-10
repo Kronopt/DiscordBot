@@ -57,7 +57,7 @@ A Discord Bot
 | ------- | ---------- |
 | `!tableflip` | (╯°□°）╯︵ ┻━┻ |
 | `!tableunflip` | ┬─┬ ノ(゜-゜ノ) |
-| `!shrug` | ¯\_(ツ)_/¯ |
+| `!shrug` | ¯\\\_(ツ)_/¯ |
 
 
 ## Note
