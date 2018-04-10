@@ -169,3 +169,9 @@ class GeneralCommands(Cog):
         else:  # Negative answer
             emoji = self._eightball_emojis[2]
         await self.bot.say('`' + ' '.join(args) + '`: ' + self._eightball_answers[answer] + ' ' + emoji)
+
+    # TODO COMMAND send message with delay
+    # TODO COMMAND !joke
+    # TODO COMMAND !info (author, framework, github page)
+    # TODO rich presence or "playing 'type !help'"
+    # TODO !xkcd (latest, random, id)

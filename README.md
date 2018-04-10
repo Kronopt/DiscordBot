@@ -1,5 +1,5 @@
-# DiscordBot
-A Discord Bot (**WIP**)
+# DiscordBot  (Work in Progress)
+A Discord Bot
 
 #### Install Dependencies
 * Python 3.6
@@ -7,34 +7,59 @@ A Discord Bot (**WIP**)
 
 #### How to run
 * Download this repo
+* Install dependencies
 * Create a bot [here](https://discordapp.com/developers/applications/me) and then create an app bot user
 (on the same page)
 * Use the BOT_TOKEN provided there
 * Run `python DiscordBot.py <BOT_TOKEN>` on the root of the repo
 * Add the bot to a server using discord
 
-#### Commands
-* `!help <command>`
-  * Bot shows the available commands or detailed info on a command
-* `!ping`
-  * Bot answers with `pong`
-* `!dice <str dice>`
-  * Bot rolls one of the specified d4, d6, d8, d10, d12 and d20 dices
-* `!random`
-  * Bot generates a number between 0 and 1 (inclusive)
-* `!random between <int a> <int b>`
-  * Bot generates a number between a and b (inclusive)
-* `!random from <str a> <str b> ...`
-  * Bot randomly selects one of the space separated arguments
-* `!sum <number a> <number b> ...`
-  * Bot sums all numbers
-* `!subtract <number a> <number b> ...`
-  * Bot subtracts all numbers
-* `!divide <number a> <number b> ...`
-  * Bot divides all numbers
-* `!multiply <number a> <number b> ...`
-  * Bot multiplies all numbers
-* `!8ball <str> ...`
-  * Bot uses its fortune-telling powers to answer your question
+## Commands
 
-Most commands have aliases. Use `!help` to know more.
+### General
+
+| command | descripion |
+| ------- | ---------- |
+| `!help <command>` | Shows the available commands or detailed info on a given command |
+| `!ping` | Answers with `pong` |
+| `!hi` | Greets user |
+| `!dice <str dice>` | Rolls one of the specified d4, d6, d8, d10, d12 and d20 dices |
+| `!random` | Generates a number between 0 and 1 (inclusive) |
+| `!random between <int a> <int b>` | Generates a number between a and b (inclusive) |
+| `!random from <str a> <str b> ...` | Randomly selects one of the space separated arguments |
+
+### Math
+
+| command | descripion |
+| ------- | ---------- |
+| `!sum <number a> <number b> ...` | Sums all given numbers |
+| `!subtract <number a> <number b> ...` | Subtracts all given numbers |
+| `!divide <number a> <number b> ...` | Divides all given numbers |
+| `!multiply <number a> <number b> ...` | Multiplies all given numbers |
+
+### Funny
+
+| command | descripion |
+| ------- | ---------- |
+| `!8ball <str> ...` | Uses its fortune-telling powers to answer your question |
+
+### Gifs
+
+| command | descripion |
+| ------- | ---------- |
+| `!rickroll` | Shows a Rick Roll gif |
+| `!ohgodno` | Shows "Oh God No" gif from 'The Office' |
+| `!rekt` | Shows a rekt themed giff |
+
+### Ascii based emojis
+
+| command | descripion |
+| ------- | ---------- |
+| `!tableflip` | (╯°□°）╯︵ ┻━┻ |
+| `!tableunflip` | ┬─┬ ノ(゜-゜ノ) |
+| `!shrug` | ¯\_(ツ)_/¯ |
+
+
+## Note
+
+Most commands have aliases. Use `!help <command>` to know more.
