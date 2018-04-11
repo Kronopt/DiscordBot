@@ -17,6 +17,7 @@ from DiscordBot.ErrorMessages import ERROR_MESSAGES
 from DiscordBot.Cogs.GeneralCommands import GeneralCommands
 from DiscordBot.Cogs.Gifs import Gifs
 from DiscordBot.Cogs.AsciiEmojis import AsciiEmojis
+from DiscordBot.Cogs.Xkcd import Xkcd
 
 
 logging.basicConfig(level=logging.INFO)
@@ -27,10 +28,11 @@ bot_description = 'Commands can be called as follows:\n\n%s<command> [subcommand
 BOT = commands.Bot(command_prefix=command_prefix, formatter=HelpFormatter.HelpFormat(), description=bot_description)
 
 # Add cogs
-BOT.add_cog(GeneralCommands(BOT))
 # BOT.add_cog(Polls(BOT))  # TODO not implemented yet
+BOT.add_cog(GeneralCommands(BOT))
 BOT.add_cog(Gifs(BOT))
 BOT.add_cog(AsciiEmojis(BOT))
+BOT.add_cog(Xkcd(BOT))
 
 
 @BOT.event

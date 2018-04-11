@@ -174,4 +174,3 @@ class GeneralCommands(Cog):
     # TODO COMMAND !joke
     # TODO COMMAND !info (author, framework, github page)
     # TODO rich presence or "playing 'type !help'"
-    # TODO !xkcd (latest, random, id)

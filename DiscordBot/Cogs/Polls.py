@@ -14,6 +14,9 @@ from .BaseCog import Cog
 from DiscordBot.ErrorMessages import ERROR_MESSAGES
 
 
+# TODO use postgres data base
+
+
 class Polls(Cog):
     """Poll related commands"""
 

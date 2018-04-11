@@ -51,13 +51,21 @@ A Discord Bot
 | `!ohgodno` | Shows "Oh God No" gif from 'The Office' |
 | `!rekt` | Shows a rekt themed giff |
 
-### Ascii based emojis
+### Ascii-based Emojis
 
 | command | descripion |
 | ------- | ---------- |
 | `!tableflip` | (╯°□°）╯︵ ┻━┻ |
 | `!tableunflip` | ┬─┬ ノ(゜-゜ノ) |
 | `!shrug` | ¯\\\_(ツ)_/¯ |
+
+### XKCD Comics
+
+| command | descripion |
+| ------- | ---------- |
+| `!xkcd` | Shows a random xkcd comic |
+| `!xkcd latest` | Shows the latest xkcd comic |
+| `!xkcd <number id>` | Shows the requested xkcd comic, if it exists |
 
 
 ## Note

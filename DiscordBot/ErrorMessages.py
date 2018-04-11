@@ -29,5 +29,8 @@ ERROR_MESSAGES = {
     'vote': '`%s%s` takes 1 existing poll name and 1 existing option as arguments.',
     'vote_no_poll': 'No poll named `%s` exists on this channel.',
     'vote_no_option': 'No option `%s` exists on poll `%s`.',
-    'status': '`%s%s` takes either no arguments or 1 existing poll name as argument.'
+    'status': '`%s%s` takes either no arguments or 1 existing poll name as argument.',
+    'xkcd': '`%s%s` takes no arguments or one of the predefined ones (use `help xkcd` for more information).',
+    'latest': '`%s%s` takes no arguments.',
+    'id': '`%s%s` takes exactly 1 number.'
 }
