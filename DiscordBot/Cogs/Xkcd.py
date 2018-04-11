@@ -49,13 +49,25 @@ class Xkcd(Cog):
         self.log_command_call('xkcd')
 
         # get the latest comic number and generate a number between 1 and that number
-        latest_comic_number = self.xkcd_api_client.get_comic(uid=-1)[0].num
-        random_comic_number = random.randint(1, latest_comic_number)
+        try:
+            latest_comic_number = self.xkcd_api_client.get_comic(uid=-1)[0].num
+        except InvalidStatusCodeError as error:
+            await self.bot.say("Can't reach xkcd.com at the moment.")
+            self.logger.error('%s: %s' % ('InvalidStatusCodeError', error.status_code))
+        else:
 
-        # retrieve the random comic
-        random_comic = self.xkcd_api_client.get_comic(uid=random_comic_number)
-        embed_comic = self.embed_comic(random_comic[0].img, random_comic[0].alt)
-        await self.bot.say(embed=embed_comic)
+            random_comic_number = random.randint(1, latest_comic_number)
+
+            # retrieve the random comic
+            try:
+                random_comic = self.xkcd_api_client.get_comic(uid=random_comic_number)
+            except InvalidStatusCodeError as error:
+                await self.bot.say("Can't reach xkcd.com at the moment.")
+                self.logger.error('%s: %s' % ('InvalidStatusCodeError', error.status_code))
+            else:
+
+                embed_comic = self.embed_comic(random_comic[0].img, random_comic[0].alt)
+                await self.bot.say(embed=embed_comic)
 
     # XKCD LATEST
     @command_xkcd.command(name='latest', ignore_extra=False, aliases=['l', '-l', 'last'])
@@ -63,9 +75,14 @@ class Xkcd(Cog):
         """Retrieves the latest xkcd comic from xkcd.com"""
         self.log_command_call('xkcd latest')
 
-        comic = self.xkcd_api_client.get_comic(uid=-1)
-        embed_comic = self.embed_comic(comic[0].img, comic[0].alt)
-        await self.bot.say(embed=embed_comic)
+        try:
+            comic = self.xkcd_api_client.get_comic(uid=-1)
+        except InvalidStatusCodeError as error:
+            await self.bot.say("Can't reach xkcd.com at the moment.")
+            self.logger.error('%s: %s' % ('InvalidStatusCodeError', error.status_code))
+        else:
+            embed_comic = self.embed_comic(comic[0].img, comic[0].alt)
+            await self.bot.say(embed=embed_comic)
 
     # XKCD ID
     @command_xkcd.command(name='id', ignore_extra=False, aliases=['n', '-n', 'number'])
@@ -75,8 +92,13 @@ class Xkcd(Cog):
 
         try:
             comic = self.xkcd_api_client.get_comic(uid=comic_id)
-        except InvalidStatusCodeError:
-            await self.bot.say("That comic doesn't exist.")
+        except InvalidStatusCodeError as error:
+            if error.status_code == 404:  # Not found (for whatever reason)
+                await self.bot.say("xkcd comic with id `%s` was not found." % comic_id)
+            elif str(error.status_code).startswith("5"):  # server error
+                await self.bot.say("Can't reach xkcd.com at the moment.")
+            else:  # log error if it is not a 404 or a 5XX
+                self.logger.error('%s: %s' % ('InvalidStatusCodeError', error.status_code))
         else:
             embed_comic = self.embed_comic(comic[0].img, comic[0].alt)
             await self.bot.say(embed=embed_comic)
