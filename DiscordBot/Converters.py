@@ -24,3 +24,13 @@ def number(argument):
         # ex: for 7.0 return 7
         # ex: for 3.4 return 3.4
         return int(value) if int(value) == value else value
+
+
+def positive_int(argument):
+    try:
+        value = int(argument)
+    except ValueError:
+        raise ValueError(str(argument) + ' is not a valid positive integer')
+    else:
+        if value < 1:
+            raise ValueError(str(argument) + ' is not a valid positive integer')

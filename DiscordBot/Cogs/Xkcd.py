@@ -15,6 +15,7 @@ from beckett.clients import BaseClient
 from beckett.exceptions import InvalidStatusCodeError
 from beckett.resources import BaseResource
 from .BaseCog import Cog
+from DiscordBot import Converters
 
 
 class Xkcd(Cog):
@@ -70,7 +71,7 @@ class Xkcd(Cog):
 
     # XKCD ID
     @command_xkcd.command(name='id', ignore_extra=False, aliases=['n', '-n', 'number'])
-    async def command_xkcd_id(self, comic_id: int):
+    async def command_xkcd_id(self, comic_id: Converters.positive_int):
         """Retrieves the selected xkcd comic from xkcd.com"""
         self.log_command_call('xkcd id')
 
