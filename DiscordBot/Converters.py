@@ -34,3 +34,5 @@ def positive_int(argument):
     else:
         if value < 1:
             raise ValueError(str(argument) + ' is not a valid positive integer')
+        else:
+            return value
