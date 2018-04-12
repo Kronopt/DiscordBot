@@ -61,7 +61,7 @@ class Jokes(Cog):
         if api is self.api_list[0]:  # ICanHazDadJokeClient
             full_joke = joke.joke
         else:
-            full_joke = '%s %s' % (joke.setup, joke.punchline)
+            full_joke = '%s\n%s' % (joke.setup, joke.punchline)
         await self.bot.say(full_joke)
 
 
