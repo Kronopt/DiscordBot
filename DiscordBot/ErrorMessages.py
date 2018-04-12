@@ -32,6 +32,6 @@ ERROR_MESSAGES = {
     'status': '`%spoll %s` takes either no arguments or 1 existing poll name as argument.',
     'xkcd': '`%s%s` takes no arguments or one of the predefined ones (use `help xkcd` for more information).',
     'latest': '`%sxkcd %s` takes no arguments.',
-    'id': '`%sxkcd %s` takes exactly 1 number.',
+    'id': '`%sxkcd %s` takes exactly 1 positive number.',
     'joke': '`%s%s` takes no arguments.'
 }
