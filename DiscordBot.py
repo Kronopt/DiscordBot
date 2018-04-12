@@ -19,6 +19,7 @@ from DiscordBot.Cogs.GeneralCommands import GeneralCommands
 from DiscordBot.Cogs.Gifs import Gifs
 from DiscordBot.Cogs.AsciiEmojis import AsciiEmojis
 from DiscordBot.Cogs.Xkcd import Xkcd
+from DiscordBot.Cogs.Jokes import Jokes
 
 
 logging.basicConfig(level=logging.INFO)
@@ -34,6 +35,7 @@ BOT.add_cog(GeneralCommands(BOT))
 BOT.add_cog(Gifs(BOT))
 BOT.add_cog(AsciiEmojis(BOT))
 BOT.add_cog(Xkcd(BOT))
+BOT.add_cog(Jokes(BOT))
 
 
 @BOT.event

@@ -42,6 +42,7 @@ A Discord Bot
 | command | descripion |
 | ------- | ---------- |
 | `!8ball <str> ...` | Uses its fortune-telling powers to answer your question |
+| `!joke` | Tells a (bad) joke |
 
 ### Gifs
 
