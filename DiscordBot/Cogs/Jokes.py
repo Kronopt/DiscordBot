@@ -104,7 +104,7 @@ class ICanHazDadJokeClient(BaseClient):
         """Overwrite to add Accept and User-Agent headers"""
         headers = super().get_http_headers(client_name, method_name, **kwargs)
         headers['Accept'] = 'application/json'
-        headers['User-Agent'] = 'Python %s.%s.%s, Discord.py library. bot: https://github.com/Kronopt/DiscordBot'\
+        headers['User-Agent'] = 'Python %s.%s.%s, requests 2.10.0. bot: https://github.com/Kronopt/DiscordBot'\
                                 % (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
 
         return headers

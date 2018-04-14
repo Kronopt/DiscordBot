@@ -26,8 +26,9 @@ logging.basicConfig(level=logging.INFO)
 
 command_prefix = '!'
 bot_description = 'Commands can be called as follows:\n\n%s<command> [subcommand] [arguments]\n' % command_prefix
-
-BOT = commands.Bot(command_prefix=command_prefix, formatter=HelpFormatter.HelpFormat(), description=bot_description)
+BOT = commands.Bot(command_prefix=commands.when_mentioned_or(command_prefix),
+                   formatter=HelpFormatter.HelpFormat(),
+                   description=bot_description)
 
 # Add cogs
 # BOT.add_cog(Polls(BOT))  # TODO not implemented yet
