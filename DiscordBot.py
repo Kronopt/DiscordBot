@@ -12,6 +12,7 @@ import argparse
 import logging
 import traceback
 import beckett.exceptions
+import discord
 from discord.ext import commands
 from DiscordBot import HelpFormatter
 from DiscordBot.ErrorMessages import ERROR_MESSAGES
@@ -25,7 +26,8 @@ from DiscordBot.Cogs.Jokes import Jokes
 logging.basicConfig(level=logging.INFO)
 
 command_prefix = '!'
-bot_description = 'Commands can be called as follows:\n\n%s<command> [subcommand] [arguments]\n' % command_prefix
+bot_description = 'Commands can be called as follows:\n\n%s<command> [subcommand] [arguments]' \
+                  '\nOR\n@Bot <command> [subcommand] [arguments]' % command_prefix
 BOT = commands.Bot(command_prefix=commands.when_mentioned_or(command_prefix),
                    formatter=HelpFormatter.HelpFormat(),
                    description=bot_description)
@@ -49,6 +51,8 @@ async def on_ready():
         logging.info(' -%s.%s, %s-channel %s' % (channel.server.name, channel.name, str(channel.type), channel.id))
     print('Bot is ready')
     print('------------')
+
+    await BOT.change_presence(game=discord.Game(name='Type %shelp' % command_prefix))
 
 
 @BOT.event
@@ -97,3 +101,5 @@ if __name__ == '__main__':
     cli_parser = cli_parser.parse_args()
 
     BOT.run(cli_parser.token)
+
+    # https://discordapp.com/developers/applications/me
