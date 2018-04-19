@@ -14,7 +14,6 @@ import traceback
 import beckett.exceptions
 import discord
 from discord.ext import commands
-from DiscordBot import HelpFormatter
 from DiscordBot.ErrorMessages import ERROR_MESSAGES
 from DiscordBot.Cogs.General import General
 from DiscordBot.Cogs.Math import Math
@@ -27,11 +26,10 @@ from DiscordBot.Cogs.Xkcd import Xkcd
 logging.basicConfig(level=logging.INFO)
 
 command_prefix = '!'
-bot_description = 'Commands can be called as follows:\n\n%s<command> [subcommand] [arguments]' \
-                  '\nOR\n@Bot <command> [subcommand] [arguments]' % command_prefix
-BOT = commands.Bot(command_prefix=commands.when_mentioned_or(command_prefix),
-                   formatter=HelpFormatter.HelpFormat(),
-                   description=bot_description)
+BOT = commands.Bot(command_prefix=commands.when_mentioned_or(command_prefix))
+
+# remove default help command
+BOT.remove_command('help')
 
 # Add cogs
 BOT.add_cog(General(BOT))
