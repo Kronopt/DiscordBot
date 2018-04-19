@@ -16,11 +16,12 @@ import discord
 from discord.ext import commands
 from DiscordBot import HelpFormatter
 from DiscordBot.ErrorMessages import ERROR_MESSAGES
-from DiscordBot.Cogs.GeneralCommands import GeneralCommands
+from DiscordBot.Cogs.General import General
+from DiscordBot.Cogs.Math import Math
+from DiscordBot.Cogs.Funny import Funny
 from DiscordBot.Cogs.Gifs import Gifs
 from DiscordBot.Cogs.AsciiEmojis import AsciiEmojis
 from DiscordBot.Cogs.Xkcd import Xkcd
-from DiscordBot.Cogs.Jokes import Jokes
 
 
 logging.basicConfig(level=logging.INFO)
@@ -33,12 +34,13 @@ BOT = commands.Bot(command_prefix=commands.when_mentioned_or(command_prefix),
                    description=bot_description)
 
 # Add cogs
-# BOT.add_cog(Polls(BOT))  # TODO not implemented yet
-BOT.add_cog(GeneralCommands(BOT))
+BOT.add_cog(General(BOT))
+BOT.add_cog(Math(BOT))
+BOT.add_cog(Funny(BOT))
 BOT.add_cog(Gifs(BOT))
 BOT.add_cog(AsciiEmojis(BOT))
 BOT.add_cog(Xkcd(BOT))
-BOT.add_cog(Jokes(BOT))
+# BOT.add_cog(Polls(BOT))  # TODO not implemented yet
 
 
 @BOT.event
@@ -103,3 +105,6 @@ if __name__ == '__main__':
     BOT.run(cli_parser.token)
 
     # https://discordapp.com/developers/applications/me
+
+
+# TODO COMMAND send message with delay

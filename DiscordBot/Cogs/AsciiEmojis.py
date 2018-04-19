@@ -4,7 +4,6 @@
 
 """
 Ascii emojis Commands.
-Each bot command is decorated with a @command decorator.
 """
 
 
@@ -12,14 +11,11 @@ from discord.ext import commands
 from .BaseCog import Cog
 
 
-# TODO more emojis
-
-
 class AsciiEmojis(Cog):
     """Ascii based emojis"""
 
     def __init__(self, bot):
-        super(AsciiEmojis, self).__init__(bot)
+        super().__init__(bot)
 
     # TABLEFLIP
     @commands.command(name='tableflip', ignore_extra=False, aliases=['tf', 'flip'])
@@ -44,3 +40,6 @@ class AsciiEmojis(Cog):
         self.log_command_call('shrug')
 
         await self.bot.say('¯\_(ツ)_/¯')  # Discord already has this emoji implemented
+
+
+# TODO more emojis

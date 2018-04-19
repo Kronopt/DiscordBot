@@ -4,7 +4,6 @@
 
 """
 Gif Commands.
-Each bot command is decorated with a @command decorator.
 """
 
 
@@ -13,15 +12,11 @@ from discord.ext import commands
 from .BaseCog import Cog
 
 
-# TODO maybe use Giphy API if this gets rate limited
-# TODO more gifs
-
-
 class Gifs(Cog):
     """Gifs"""
 
     def __init__(self, bot):
-        super(Gifs, self).__init__(bot)
+        super().__init__(bot)
 
     @staticmethod
     def embed_gif(gif_url, footer_message=discord.Embed.Empty, colour=0xe74c3c):
@@ -70,3 +65,7 @@ class Gifs(Cog):
         gif = self.embed_gif('https://media.giphy.com/media/11yKQ9fN3c06fC/giphy.gif',
                              footer_message='rekt')
         await self.bot.say(embed=gif)
+
+
+# TODO maybe use Giphy API if this gets rate limited
+# TODO more gifs

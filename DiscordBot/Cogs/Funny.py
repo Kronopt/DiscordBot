@@ -3,8 +3,7 @@
 
 
 """
-Joke Commands.
-Each bot command is decorated with a @command decorator.
+Funny Commands.
 """
 
 
@@ -17,13 +16,36 @@ from beckett.resources import BaseResource
 from .BaseCog import Cog
 
 
-class Jokes(Cog):
-    """Joke commands"""
+class Funny(Cog):
+    """Funny commands"""
 
     def __init__(self, bot):
         super().__init__(bot)
         self.api_list = [ICanHazDadJokeClient(), OfficialJokeApiClient()]
+        self.eightball_emojis = [":white_check_mark:", ":low_brightness:", ":x:"]
+        self.eightball_answers = ["It is certain", "It is decidedly so", "Without a doubt", "Yes, definitely",
+                                  "You may rely on it", "As I see it, yes", "Most likely", "Outlook good", "Yes",
+                                  "Signs point to yes", "Reply hazy, try again", "Ask again later",
+                                  "Better not tell you now", "Cannot predict now", "Concentrate and ask again",
+                                  "Don't count on it", "My reply is no", "My sources say no", "Outlook not so good",
+                                  "Very doubtful"]
 
+    # 8BALL
+    @commands.command(name='8ball', ignore_extra=False, aliases=['eightball', '8b'])
+    async def command_eightball(self, *args: str):
+        """Bot uses its fortune-telling powers to answer your question."""
+        if len(args) == 0:  # at least one argument
+            raise commands.MissingRequiredArgument
+        self.log_command_call('8ball')
+
+        answer = random.randint(0, len(self.eightball_answers) - 1)
+        if answer <= 9:  # Affirmative answer
+            emoji = self.eightball_emojis[0]
+        elif answer <= 14:  # Meh answer
+            emoji = self.eightball_emojis[1]
+        else:  # Negative answer
+            emoji = self.eightball_emojis[2]
+        await self.bot.say('`' + ' '.join(args) + '`: ' + self.eightball_answers[answer] + ' ' + emoji)
 
     # JOKE
     @commands.command(name='joke', ignore_extra=False, invoke_without_command=True)

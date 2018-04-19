@@ -5,6 +5,7 @@
 """
 Base Cog class.
 Each Cog should inherit from this.
+Each bot command should be decorated with a @command decorator.
 """
 
 

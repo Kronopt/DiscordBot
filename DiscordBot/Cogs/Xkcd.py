@@ -4,7 +4,6 @@
 
 """
 XKCD comic Commands.
-Each bot command is decorated with a @command decorator.
 """
 
 
@@ -12,17 +11,16 @@ import random
 import discord
 from discord.ext import commands
 from beckett.clients import BaseClient
-from beckett.exceptions import InvalidStatusCodeError
 from beckett.resources import BaseResource
 from .BaseCog import Cog
 from DiscordBot import Converters
 
 
 class Xkcd(Cog):
-    """xkcd commic commands"""
+    """xkcd comic commands"""
 
     def __init__(self, bot):
-        super(Xkcd, self).__init__(bot)
+        super().__init__(bot)
         self.xkcd_api_client = XkcdClient()
 
     @staticmethod

@@ -20,7 +20,6 @@ A Discord Bot
 
 | command | descripion |
 | ------- | ---------- |
-| `!help <command>` | Shows the available commands or detailed info on a given command |
 | `!ping` | Answers with `pong` |
 | `!hi` | Greets user |
 | `!dice <str dice>` | Rolls one of the specified d4, d6, d8, d10, d12 and d20 dices |
@@ -52,7 +51,7 @@ A Discord Bot
 | `!ohgodno` | Shows "Oh God No" gif from 'The Office' |
 | `!rekt` | Shows a rekt themed giff |
 
-### Ascii-based Emojis
+### Ascii Emojis
 
 | command | descripion |
 | ------- | ---------- |
@@ -68,7 +67,9 @@ A Discord Bot
 | `!xkcd latest` | Shows the latest xkcd comic |
 | `!xkcd <number id>` | Shows the requested xkcd comic, if it exists |
 
+### Info
 
-## Note
-
-Most commands have aliases. Use `!help <command>` to know more.
+| command | descripion |
+| ------- | ---------- |
+| `!help <command>` | Shows all available commands, detailed info on a given command or info on a given command group |
+| `!info` | Shows bot author, relevant frameworks used and github page |

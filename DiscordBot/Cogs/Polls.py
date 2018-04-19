@@ -4,7 +4,6 @@
 
 """
 Poll related commands.
-Each bot command is decorated with a @command decorator.
 """
 
 
@@ -47,7 +46,7 @@ class Polls(Cog):
             ...
         }
         """
-        super(Polls, self).__init__(bot)
+        super().__init__(bot)
         self._polls = {}
         self._poll_creator = {}
 
