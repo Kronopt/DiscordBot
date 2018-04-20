@@ -35,6 +35,7 @@ class Info(Cog):
     #     await self.bot.say('')
     #     TODO copy most logic from HelpFormatter.format
     #     TODO output help as embed
+    #     TODO don't forget aliases
 
     #     TODO '!help' shows all commands
     #     TODO '!help <command>' shows detailed info on command
