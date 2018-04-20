@@ -44,7 +44,9 @@ ERROR_MESSAGES = {
     'xkcd': '`%s%s` takes no arguments or one of the predefined ones (use `help xkcd` for more information).',
     'latest': '`%sxkcd %s` takes no arguments.',
     'id': '`%sxkcd %s` takes exactly 1 positive number.',
-    # TODO HELP
+    # INFO
+    'info': '`%s%s` takes no arguments.',
+    # TODO HELP command
     # TODO POLL
     'poll': '`%s%s` takes a poll name as first argument and at least 2 options (use `help poll` for more information).',
     'poll_already_exists': 'A poll is already ongoing with the same name having the following options: `%s`.',
