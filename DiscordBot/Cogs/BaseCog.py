@@ -16,7 +16,7 @@ from discord.ext import commands
 
 class Cog:
 
-    all_commands = []  # list of name-object of all commands from all instantiated Cogs
+    all_commands = []  # [(Cog_name, [(command_name, object), ...]), ...] of all commands from all instantiated Cogs
 
     def __init__(self, bot):
         """
@@ -25,7 +25,7 @@ class Cog:
         self.bot = bot
         self.logger = logging.getLogger('discord')
         self.commands = inspect.getmembers(self, lambda x: issubclass(x.__class__, commands.core.Command))
-        Cog.all_commands += self.commands
+        Cog.all_commands.append((self.__class__.__name__, self.commands))
 
         self.logger.info('loaded commands from Cog %s: %s' % (self.__class__.__name__,
                                                               ', '.join(command[0] for command in self.commands)))
