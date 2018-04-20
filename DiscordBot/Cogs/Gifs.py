@@ -18,8 +18,7 @@ class Gifs(Cog):
     def __init__(self, bot):
         super().__init__(bot)
 
-    @staticmethod
-    def embed_gif(gif_url, footer_message=discord.Embed.Empty, colour=0xe74c3c):
+    def embed_gif(self, gif_url, footer_message=discord.Embed.Empty, colour=None):
         """
         Creates the embed object to be sent by the bot.
 
@@ -27,10 +26,12 @@ class Gifs(Cog):
             url of the gif
         :param footer_message: str
             message to show at the bottom of the gif (optional)
-        :param colour: str
-            colour string
+        :param colour: int
+            colour int
         :return: discord.Embed
         """
+        if colour is None:
+            colour = self.embed_colour
         gif = discord.Embed(colour=colour)
         gif.set_image(url=gif_url)
         gif.set_footer(text=footer_message)

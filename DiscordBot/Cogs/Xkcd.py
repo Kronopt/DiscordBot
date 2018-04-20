@@ -23,8 +23,7 @@ class Xkcd(Cog):
         super().__init__(bot)
         self.xkcd_api_client = XkcdClient()
 
-    @staticmethod
-    def embed_comic(comic_url, footer_message=discord.Embed.Empty, colour=0xe74c3c):
+    def embed_comic(self, comic_url, footer_message=discord.Embed.Empty, colour=None):
         """
         Creates the embed object to be sent by the bot.
 
@@ -32,10 +31,12 @@ class Xkcd(Cog):
             url of the xkcd comic
         :param footer_message: str
             message to show at the bottom of the comic (optional)
-        :param colour: str
-            colour string
+        :param colour: int
+            colour int
         :return: discord.Embed
         """
+        if colour is None:
+            colour = self.embed_colour
         comic = discord.Embed(colour=colour)
         comic.set_image(url=comic_url)
         comic.set_footer(text=footer_message)

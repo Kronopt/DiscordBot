@@ -26,6 +26,7 @@ class Cog:
         self.logger = logging.getLogger('discord')
         self.commands = inspect.getmembers(self, lambda x: issubclass(x.__class__, commands.core.Command))
         Cog.all_commands.append((self.__class__.__name__, self.commands))
+        self.embed_colour = 0xe74c3c
 
         self.logger.info('loaded commands from Cog %s: %s' % (self.__class__.__name__,
                                                               ', '.join(command[0] for command in self.commands)))
