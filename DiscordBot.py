@@ -108,3 +108,4 @@ if __name__ == '__main__':
 
 
 # TODO COMMAND send message with delay
+# TODO TESTS!

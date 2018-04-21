@@ -23,14 +23,12 @@ class Xkcd(Cog):
         super().__init__(bot)
         self.xkcd_api_client = XkcdClient()
 
-    def embed_comic(self, comic_url, footer_message=discord.Embed.Empty, colour=None):
+    def embed_comic(self, xkcd_comic, colour=None):
         """
         Creates the embed object to be sent by the bot.
 
-        :param comic_url: str
-            url of the xkcd comic
-        :param footer_message: str
-            message to show at the bottom of the comic (optional)
+        :param xkcd_comic: XkcdComic
+            XkcdComic object
         :param colour: int
             colour int
         :return: discord.Embed
@@ -38,8 +36,10 @@ class Xkcd(Cog):
         if colour is None:
             colour = self.embed_colour
         comic = discord.Embed(colour=colour)
-        comic.set_image(url=comic_url)
-        comic.set_footer(text=footer_message)
+        comic.set_author(name='xkcd #%s: %s' % (xkcd_comic.num, xkcd_comic.safe_title),
+                         url='https://xkcd.com/%s' % xkcd_comic.num)
+        comic.set_image(url=xkcd_comic.img)
+        comic.set_footer(text=xkcd_comic.alt)
         return comic
 
     # XKCD
@@ -53,9 +53,9 @@ class Xkcd(Cog):
         random_comic_number = random.randint(1, latest_comic_number)
 
         # retrieve the random comic
-        random_comic = self.xkcd_api_client.get_comic(uid=random_comic_number)
+        random_comic = self.xkcd_api_client.get_comic(uid=random_comic_number)[0]
 
-        embed_comic = self.embed_comic(random_comic[0].img, random_comic[0].alt)
+        embed_comic = self.embed_comic(random_comic)
         await self.bot.say(embed=embed_comic)
 
     # XKCD LATEST
@@ -64,8 +64,8 @@ class Xkcd(Cog):
         """Retrieves the latest xkcd comic from xkcd.com"""
         self.log_command_call('xkcd latest')
 
-        comic = self.xkcd_api_client.get_comic(uid=-1)
-        embed_comic = self.embed_comic(comic[0].img, comic[0].alt)
+        comic = self.xkcd_api_client.get_comic(uid=-1)[0]
+        embed_comic = self.embed_comic(comic)
         await self.bot.say(embed=embed_comic)
 
     # XKCD ID
@@ -74,8 +74,8 @@ class Xkcd(Cog):
         """Retrieves the selected xkcd comic from xkcd.com"""
         self.log_command_call('xkcd id')
 
-        comic = self.xkcd_api_client.get_comic(uid=comic_id)
-        embed_comic = self.embed_comic(comic[0].img, comic[0].alt)
+        comic = self.xkcd_api_client.get_comic(uid=comic_id)[0]
+        embed_comic = self.embed_comic(comic)
         await self.bot.say(embed=embed_comic)
 
 
