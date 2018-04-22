@@ -28,6 +28,7 @@ logging.basicConfig(level=logging.INFO)
 
 command_prefix = '!'
 BOT = commands.Bot(command_prefix=commands.when_mentioned_or(command_prefix))
+BOT.command_prefix_simple = command_prefix
 
 # remove default help command
 BOT.remove_command('help')

@@ -34,20 +34,42 @@ class Info(Cog):
 
         await self.bot.say(embed=embed_info)
 
-    # # HELP
-    # @commands.command(name='help', ignore_extra=False)
-    # async def command_help(self):
-    #     """Shows help message."""
-    #     self.log_command_call('help')
-    #
-    #     await self.bot.say('')
-    #     TODO copy most logic from HelpFormatter.format
-    #     TODO output help as embed
-    #     TODO don't forget aliases
+    # HELP
+    @commands.group(name='help', ignore_extra=False)
+    async def command_help(self):
+        """Shows help message."""
+        self.log_command_call('help')
 
-    #     TODO '!help' shows all commands
-    #     TODO '!help <command>' shows detailed info on command
-    #     TODO '!help <command group>' shows info on command group and associated commands
+        bot_prefix = self.bot.command_prefix_simple
+        title = 'Commands can be called as follows:'
+        description = '\n```{0}{1}``````@Bot {1}```\n**COMMANDS**:'.format(
+            bot_prefix, '<command> [subcommand] [arguments]')
+
+        embed_help = discord.Embed(title=title, description=description, colour=self.embed_colour)
+
+        for cog_name, cog_commands in Cog.all_commands:
+            commands_listing = ''
+
+            for command_name, command_object in cog_commands:
+                command_name = command_name.split('_')[-1]  # named as follows: command_<command>_<subcommand>
+                if command_object.parent is not None:
+                    prefix = '\t\t'
+                else:
+                    prefix = bot_prefix
+                commands_listing += '%s%s\t %s\n' % (prefix, command_name, command_object.short_doc)
+
+            commands_listing += '\n\u200b'  # separates fields a bit
+            embed_help.add_field(name=cog_name + ':', value=commands_listing)
+
+        await self.bot.say(embed=embed_help)
+
+        # TODO do something about the uneven tab indents on the description of each command
+        # TODO reduce the size of each command's small description (directly on the command code)
+
+    # TODO '!help <command>' shows detailed info on command (don't forget aliases)
+    # TODO '!help <command group>' shows info on command group and associated commands
+
+    # TODO in the end delete the HelpFormatter.py
 
 
 # TODO add Cog to BOT in DiscordBot.py
