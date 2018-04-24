@@ -31,6 +31,7 @@ ERROR_MESSAGES = {
     'multiply': '`%s%s` takes at least 1 number.',
     # FUNNY
     '8ball': '`%s%s` needs a phrase on which to apply its fortune-telling powers.',
+    'poop':  '`%s%s` takes no arguments or 1 positive number.',
     'joke': '`%s%s` takes no arguments.',
     # GIFS
     'rickroll': '`%s%s` takes no arguments.',

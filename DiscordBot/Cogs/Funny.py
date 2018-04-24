@@ -14,6 +14,7 @@ from beckett.clients import BaseClient
 from beckett.exceptions import InvalidStatusCodeError
 from beckett.resources import BaseResource
 from .BaseCog import Cog
+from DiscordBot import Converters
 
 
 class Funny(Cog):
@@ -46,6 +47,22 @@ class Funny(Cog):
         else:  # Negative answer
             emoji = self.eightball_emojis[2]
         await self.bot.say('`' + ' '.join(args) + '`: ' + self.eightball_answers[answer] + ' ' + emoji)
+
+    # POOP
+    @commands.command(name='poop', ignore_extra=False)
+    async def command_poop(self, *how_many_poops: Converters.positive_int):
+        """Sends poop."""
+        if len(how_many_poops) > 1:    # At most one argument
+            raise commands.TooManyArguments
+        self.log_command_call('poop')
+
+        if len(how_many_poops) == 0:
+            how_many_poops = 1  # default
+        else:
+            how_many_poops = how_many_poops[0]
+            if how_many_poops > 333:  # character limit
+                how_many_poops = 333
+        await self.bot.say(':poop:' * how_many_poops)
 
     # JOKE
     @commands.command(name='joke', ignore_extra=False, invoke_without_command=True)
