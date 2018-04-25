@@ -22,26 +22,26 @@ A Discord Bot
 | ------- | ---------- |
 | `!ping` | Answers with `pong` |
 | `!hi` | Greets user |
-| `!dice <str dice>` | Rolls one of the specified d4, d6, d8, d10, d12 and d20 dices |
+| `!dice [str dice]` | Rolls one of the following dices: d4, d6, d8, d10, d12 and d20 |
 | `!random` | Generates a number between 0 and 1 (inclusive) |
 | `!random between <int a> <int b>` | Generates a number between a and b (inclusive) |
-| `!random from <str a> <str b> ...` | Randomly selects one of the space separated arguments |
+| `!random from <str args> ...` | Randomly selects one of the space separated arguments |
 
 ### Math
 
 | command | descripion |
 | ------- | ---------- |
-| `!sum <number a> <number b> ...` | Sums all given numbers |
-| `!subtract <number a> <number b> ...` | Subtracts all given numbers |
-| `!divide <number a> <number b> ...` | Divides all given numbers |
-| `!multiply <number a> <number b> ...` | Multiplies all given numbers |
+| `!sum <number args> ...` | Sums all given numbers |
+| `!subtract <number args> ...` | Subtracts all given numbers |
+| `!divide <number args> ...` | Divides all given numbers |
+| `!multiply <number args> ...` | Multiplies all given numbers |
 
 ### Funny
 
 | command | descripion |
 | ------- | ---------- |
-| `!8ball <str> ...` | Uses its fortune-telling powers to answer your question |
-| `!poop <number>` | Sends poop |
+| `!8ball <str args> ...` | Uses its fortune-telling powers to answer your question |
+| `!poop [number n]` | Sends n poops |
 | `!joke` | Tells a (bad) joke |
 
 ### Gifs
@@ -66,11 +66,11 @@ A Discord Bot
 | ------- | ---------- |
 | `!xkcd` | Shows a random xkcd comic |
 | `!xkcd latest` | Shows the latest xkcd comic |
-| `!xkcd <number id>` | Shows the requested xkcd comic, if it exists |
+| `!xkcd id <number id>` | Shows the requested xkcd comic, if it exists |
 
 ### Info
 
 | command | descripion |
 | ------- | ---------- |
-| `!help <command>` | Shows all available commands, detailed info on a given command or info on a given command group |
+| `!help [str command/group]` | Shows all available commands, detailed info on a given command or info on a given command group |
 | `!info` | Shows bot author, relevant frameworks used and github page |
