@@ -27,11 +27,18 @@ class Xkcd(Cog):
         """
         Creates the embed object to be sent by the bot.
 
-        :param xkcd_comic: XkcdComic
+        Parameters
+        ----------
+        Creates the embed object to be sent by the bot.
+
+        xkcd_comic: XkcdComic
             XkcdComic object
-        :param colour: int
-            colour int
-        :return: discord.Embed
+        colour: int
+            an int or hex representing a valid colour (optional)
+
+        Returns
+        -------
+        discord.Embed
         """
         if colour is None:
             colour = self.embed_colour
@@ -45,7 +52,7 @@ class Xkcd(Cog):
     # XKCD
     @commands.group(name='xkcd', ignore_extra=False, invoke_without_command=True)
     async def command_xkcd(self):
-        """Retrieves a random xkcd comic from xkcd.com"""
+        """Retrieves a random xkcd comic from xkcd.com."""
         self.log_command_call('xkcd')
 
         # get the latest comic number and generate a number between 1 and that number
@@ -61,7 +68,7 @@ class Xkcd(Cog):
     # XKCD LATEST
     @command_xkcd.command(name='latest', ignore_extra=False, aliases=['l', '-l', 'last'])
     async def command_xkcd_latest(self):
-        """Retrieves the latest xkcd comic from xkcd.com"""
+        """Retrieves the latest xkcd comic from xkcd.com."""
         self.log_command_call('xkcd latest')
 
         comic = self.xkcd_api_client.get_comic(uid=-1)[0]
@@ -71,7 +78,7 @@ class Xkcd(Cog):
     # XKCD ID
     @command_xkcd.command(name='id', ignore_extra=False, aliases=['n', '-n', 'number'])
     async def command_xkcd_id(self, comic_id: Converters.positive_int):
-        """Retrieves the selected xkcd comic from xkcd.com"""
+        """Retrieves the selected xkcd comic from xkcd.com."""
         self.log_command_call('xkcd id')
 
         comic = self.xkcd_api_client.get_comic(uid=comic_id)[0]

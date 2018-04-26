@@ -11,25 +11,32 @@ Each bot command should be decorated with a @command decorator.
 
 import inspect
 import logging
+from collections import OrderedDict
 from discord.ext import commands
 
 
 class Cog:
 
-    all_commands = []  # [(Cog_name, [(command_name, object), ...]), ...] of all commands from all instantiated Cogs
+    # {Cog_object: {command_function_name: command_object, ...}, ...} of all commands from all instantiated Cogs
+    all_commands = OrderedDict()
 
     def __init__(self, bot):
         """
-        :param bot: discord.ext.commands.Bot
+        Parameters
+        ----------
+        bot: discord.ext.commands.Bot
         """
         self.bot = bot
+        self.name = self.__class__.__name__
         self.logger = logging.getLogger('discord')
-        self.commands = inspect.getmembers(self, lambda x: issubclass(x.__class__, commands.core.Command))
-        Cog.all_commands.append((self.__class__.__name__, self.commands))
         self.embed_colour = 0xe74c3c
 
-        self.logger.info('loaded commands from Cog %s: %s' % (self.__class__.__name__,
-                                                              ', '.join(command[0] for command in self.commands)))
+        # {command_function_name: command_object, ...}
+        self.commands = OrderedDict(inspect.getmembers(self, lambda x: issubclass(x.__class__, commands.core.Command)))
+        Cog.all_commands[self] = self.commands
+
+        self.logger.info('loaded commands from Cog %s: %s' % (self.name,
+                                                              ', '.join(command for command in self.commands)))
 
     def __unload(self):
         """Cleanup goes here"""
@@ -43,7 +50,9 @@ class Cog:
         """
         Logs calls to a command as INFO
 
-        :param command: str
+        Parameters
+        ----------
+        command: str
             name of command
         """
         self.logger.info('command called: ' + command)

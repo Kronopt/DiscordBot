@@ -67,7 +67,7 @@ class Funny(Cog):
     # JOKE
     @commands.command(name='joke', ignore_extra=False, invoke_without_command=True)
     async def command_joke(self):
-        """Tells a random (bad) joke
+        """Tells a random (bad) joke.
         from one of the available apis: icanhazdadjoke.com and official_joke_api @ github)"""
         # I don't really know if the InvalidStatusCodeErrors are caught correctly.
         # These errors are all caught on DiscordBot.py on_command_error, but I wanted to be able to catch a first error

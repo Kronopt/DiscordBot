@@ -22,13 +22,18 @@ class Gifs(Cog):
         """
         Creates the embed object to be sent by the bot.
 
-        :param gif_url: str
+        Parameters
+        ----------
+        gif_url: str
             url of the gif
-        :param footer_message: str
+        footer_message: str
             message to show at the bottom of the gif (optional)
-        :param colour: int
-            colour int
-        :return: discord.Embed
+        colour: int
+            an int or hex representing a valid colour (optional)
+
+        Returns
+        -------
+        discord.Embed
         """
         if colour is None:
             colour = self.embed_colour

@@ -54,9 +54,13 @@ class Polls(Cog):
         """
         Allow every user to delete a poll.
 
-        :param channel_id: str
+        Parameters
+        ----------
+        Allow every user to delete a poll.
+
+        channel_id: str
             channel id
-        :param poll_name:
+        poll_name:
             name of the poll
         """
         del self._poll_creator[channel_id][poll_name]
