@@ -47,7 +47,7 @@ ERROR_MESSAGES = {
     'id': '`%sxkcd %s` takes exactly 1 positive number.',
     # INFO
     'info': '`%s%s` takes no arguments.',
-    'help': '`%s%s` found no command or group with the given name.',
+    'help': '`%s%s` takes just one command or group as argument.',
     # TODO HELP command
     # TODO POLL
     'poll': '`%s%s` takes a poll name as first argument and at least 2 options (use `help poll` for more information).',
