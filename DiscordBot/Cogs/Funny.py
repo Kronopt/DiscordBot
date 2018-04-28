@@ -34,7 +34,9 @@ class Funny(Cog):
     # 8BALL
     @commands.command(name='8ball', ignore_extra=False, aliases=['eightball', '8b'])
     async def command_eightball(self, *args: str):
-        """Bot uses its fortune-telling powers to answer your question."""
+        """Bot uses its fortune-telling powers to answer your question.
+
+        Ask a question and get one of the classic magic 8 ball answers."""
         if len(args) == 0:  # at least one argument
             raise commands.MissingRequiredArgument
         self.log_command_call('8ball')
@@ -51,7 +53,9 @@ class Funny(Cog):
     # POOP
     @commands.command(name='poop', ignore_extra=False)
     async def command_poop(self, *how_many_poops: Converters.positive_int):
-        """Sends poop."""
+        """Sends n poops.
+
+        Sends as much poop as discord allows."""
         if len(how_many_poops) > 1:    # At most one argument
             raise commands.TooManyArguments
         self.log_command_call('poop')
@@ -68,7 +72,10 @@ class Funny(Cog):
     @commands.command(name='joke', ignore_extra=False, invoke_without_command=True)
     async def command_joke(self):
         """Tells a random (bad) joke.
-        from one of the available apis: icanhazdadjoke.com and official_joke_api @ github)"""
+
+        Jokes are randomly sourced from one of these APIs:
+        icanhazdadjoke.com
+        official_joke_api @ github"""
         # I don't really know if the InvalidStatusCodeErrors are caught correctly.
         # These errors are all caught on DiscordBot.py on_command_error, but I wanted to be able to catch a first error
         # here so that I could switch apis on the fly in case one of them stops working.

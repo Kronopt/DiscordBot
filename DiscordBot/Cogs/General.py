@@ -24,6 +24,7 @@ class General(Cog):
     @commands.command(name='ping', ignore_extra=False)
     async def command_ping(self):
         """'pong'.
+
         Simple command to test if bot is alive."""
         self.log_command_call('ping')
 
@@ -45,6 +46,7 @@ class General(Cog):
     @commands.command(name='dice', ignore_extra=False)
     async def command_dice(self, *dice: Converters.dice):
         """Rolls a die.
+
         Possible dices: d4, d6, d8, d10, d12 and d20.
         A dice can either be written as 'D#' or 'd#'."""
         if len(dice) > 1:    # At most one argument
@@ -64,6 +66,7 @@ class General(Cog):
     @commands.group(name='random', ignore_extra=False, aliases=['rand'], invoke_without_command=True)
     async def command_random(self):
         """Generates a number between 0 and 1.
+
         (inclusive)"""
         self.log_command_call('random')
 
@@ -74,6 +77,7 @@ class General(Cog):
     @command_random.command(name='between', ignore_extra=False, aliases=['b', '-b', 'betw'])
     async def command_random_between(self, a: int, b: int):
         """Generates a number between a and b.
+
         (inclusive)"""
         self.log_command_call('random between')
 
@@ -87,6 +91,7 @@ class General(Cog):
     @command_random.command(name='from', ignore_extra=False, aliases=['f', '-f', 'fr'])
     async def command_random_from(self, *args: str):
         """Randomly selects one of the given arguments.
+
         Arguments cen be either space-separated or enclosed in quotes"""
         if len(args) == 0:    # at least one argument
             raise commands.MissingRequiredArgument

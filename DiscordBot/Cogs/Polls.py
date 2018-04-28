@@ -68,7 +68,9 @@ class Polls(Cog):
     # POLL
     @commands.group(name='poll', ignore_extra=False, pass_context=True, invoke_without_command=True)
     async def command_poll(self, context, poll_name: str, *options: str):
-        """Creates a poll. First argument is its name, remaining arguments are options.
+        """Creates a poll.
+
+        First argument is its name, remaining arguments are options.
         A poll is confined to the channel where it was created.
         All arguments can be a single word or any number of space-separated words if enclosed within quotation marks.
         ex:
@@ -174,6 +176,7 @@ class Polls(Cog):
     @command_poll.command(name='end', ignore_extra=False, pass_context=True, aliases=['e', '-e'])
     async def command_poll_end(self, context, poll_name: str):
         """Ends specified poll and shows results.
+
         For the first 10 minutes after starting a poll only it's author is able to end it."""
         self.log_command_call('poll end')
 

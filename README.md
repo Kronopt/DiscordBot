@@ -72,5 +72,5 @@ A Discord Bot
 
 | command | descripion |
 | ------- | ---------- |
-| `!help [str command/group]` | Shows all available commands, detailed info on a given command or info on a given command group |
+| `!help [str command]` | Shows all available commands or detailed info on a given command |
 | `!info` | Shows bot author, relevant frameworks used and github page |

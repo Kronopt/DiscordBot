@@ -35,16 +35,20 @@ class Info(Cog):
         await self.bot.say(embed=embed_info)
 
     # HELP
-    @commands.command(name='help', ignore_extra=False)
-    async def command_help(self, *command_or_group_name):
+    @commands.group(name='help', ignore_extra=False, invoke_without_command=True)
+    async def command_help(self, *command_name):
         """Shows help message."""
-        if len(command_or_group_name) > 1:  # at most one argument
+        # I should redo this...
+        # It's pretty hacky...
+        # It works, I guess...
+        if len(command_name) > 1:  # at most one argument
             raise commands.TooManyArguments
 
         self.log_command_call('help')
 
-        if len(command_or_group_name) == 0:  # show all commands
-            bot_prefix = self.bot.command_prefix_simple
+        bot_prefix = self.bot.command_prefix_simple
+
+        if len(command_name) == 0:  # show all commands
             title = 'Commands can be called as follows:'
             description = '\n```{0}{1}``````@Bot {1}```\n**COMMANDS**:'.format(
                 bot_prefix, '<command> [subcommand] [arguments]')
@@ -55,54 +59,65 @@ class Info(Cog):
                 commands_listing = ''
 
                 for command_object in cog_commands.values():
-                    command_name = command_object.name
-
                     # assumes commands are always followed by their subcommands inside the cog class
                     if command_object.parent is not None:
                         prefix = '\t\t'
                     else:
                         prefix = bot_prefix
-                    commands_listing += '%s%s\t\t%s\n' % (prefix, command_name, command_object.short_doc)
+                    commands_listing += '%s%s\t\t%s\n' % (prefix, command_object.name, command_object.short_doc)
 
                 commands_listing += '\n\u200b'  # separates fields a bit
                 embed_help.add_field(name=cog_object.name + ':', value=commands_listing)
 
             await self.bot.say(embed=embed_help)
 
-        else:  # show info on a command or group
-            command_or_group_name = command_or_group_name[0].lower()
+        else:  # show info on a command
+            command_name = command_name[0].lower()
 
-            # check if argument is a command or cog
+            # check if argument is an existing command
             found_command = None
-            for cog_object, cog_commands in Cog.all_commands.items():
+            for cog_commands in Cog.all_commands.values():
                 if found_command:
                     break
 
-                if command_or_group_name == cog_object.name.lower():
-                    found_command = cog_object
-                    break
-
                 for command_object in cog_commands.values():
-                    if command_or_group_name == command_object.name.lower():
+                    if command_name == command_object.name.lower():
                         found_command = command_object
                         break
 
-            if not found_command:  # argument is neither a command nor group
+            if not found_command:  # argument is not a command
                 raise commands.BadArgument
-            else:
-                pass
-                # TODO identify if is either a command or a group
-                # TODO build embed
 
+            else:  # is a command
+                if found_command.parent is not None:  # is subcommand
+                    bot_prefix = '%s%s ' % (bot_prefix, found_command.parent)
 
+                # aliases
+                if len(found_command.aliases) == 0:
+                    title = bot_prefix + found_command.name
+                else:
+                    title = '%s[%s | %s]' % (bot_prefix, found_command.name, ' | '.join(found_command.aliases))
 
+                description = found_command.help
 
-    # TODO '!help <command>' shows detailed info on command (don't forget aliases)
-    # TODO '!help <command group>' shows info on command group and associated commands
-    # TODO include this subcommand in the help answer
+                # add subcommands, if there are any
+                if isinstance(found_command, commands.core.Group):
+                    description += '\n\n**subcommands:**\n'
 
-    # TODO in the end delete the HelpFormatter.py
+                    command_set = set()
+                    for subcommand in found_command.walk_commands():
+                        if subcommand not in command_set:
+                            description += '%s\t\t%s\n' % (subcommand.name, subcommand.short_doc)
+                        command_set.add(subcommand)
 
+                embed_help_command = discord.Embed(title=title, description=description, colour=self.embed_colour)
 
-# TODO add Cog to BOT in DiscordBot.py
-# TODO add errors in ErrorMessages.py
+                await self.bot.say(embed=embed_help_command)
+
+    # HELP <command>
+    @command_help.command(name='<command>')
+    async def command_help_command(self):
+        """Shows help message for a command."""
+        # This command only exists to enable the creation of an entry on the help message
+        # The logic for this command is included in the !help command
+        raise commands.BadArgument
