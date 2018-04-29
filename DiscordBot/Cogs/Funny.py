@@ -52,21 +52,21 @@ class Funny(Cog):
 
     # POOP
     @commands.command(name='poop', ignore_extra=False)
-    async def command_poop(self, *how_many_poops: Converters.positive_int):
+    async def command_poop(self, *n: Converters.positive_int):
         """Sends n poops.
 
         Sends as much poop as discord allows."""
-        if len(how_many_poops) > 1:    # At most one argument
+        if len(n) > 1:    # At most one argument
             raise commands.TooManyArguments
         self.log_command_call('poop')
 
-        if len(how_many_poops) == 0:
-            how_many_poops = 1  # default
+        if len(n) == 0:
+            n = 1  # default
         else:
-            how_many_poops = how_many_poops[0]
-            if how_many_poops > 333:  # character limit
-                how_many_poops = 333
-        await self.bot.say(':poop:' * how_many_poops)
+            n = n[0]
+            if n > 333:  # character limit
+                n = 333
+        await self.bot.say(':poop:' * n)
 
     # JOKE
     @commands.command(name='joke', ignore_extra=False, invoke_without_command=True)

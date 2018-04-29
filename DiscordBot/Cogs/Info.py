@@ -62,13 +62,13 @@ class Info(Cog):
 
     # HELP
     @commands.group(name='help', ignore_extra=False, invoke_without_command=True)
-    async def command_help(self, *command_name):
+    async def command_help(self, *command):
         """Shows help message."""
         self.log_command_call('help')
 
         bot_prefix = self.bot.command_prefix_simple
 
-        if len(command_name) == 0:  # show all commands
+        if len(command) == 0:  # show all commands
             title = 'Commands can be called as follows:'
             description = '\n```{0}{1}``````@Bot {1}```\n**COMMANDS**:'.format(
                 bot_prefix, '<command> [subcommand] [arguments]')
@@ -90,7 +90,7 @@ class Info(Cog):
             await self.bot.say(embed=embed_help)
 
         else:  # show info on a command
-            main_command_name = command_name[0].lower()
+            main_command_name = command[0].lower()
 
             # check if argument is an existing command (plus aliases)
             found_command = None
@@ -116,9 +116,26 @@ class Info(Cog):
 
                 # aliases
                 if len(found_command.aliases) == 0:
-                    title = bot_prefix + found_command.name
+                    title = '%s%s' % (bot_prefix, found_command.name)
                 else:
                     title = '%s[%s | %s]' % (bot_prefix, found_command.name, ' | '.join(found_command.aliases))
+
+                # arguments (logic retrieved from HelpFormatter.get_command_signature()
+                arguments = found_command.clean_params
+                if len(arguments) > 0:
+                    for argument_name, argument in arguments.items():
+                        title += ' '
+                        if argument.default is not argument.empty:
+                            should_print = argument.default if isinstance(argument.default,
+                                                                          str) else argument.default is not None
+                            if should_print:
+                                title += '[%s=%s]' % (argument_name, argument.default)
+                            else:
+                                title += '[%s]' % argument_name
+                        elif argument.kind == argument.VAR_POSITIONAL:
+                            title += '[%s...]' % argument_name
+                        else:
+                            title += '<%s>' % argument_name
 
                 description = found_command.help
                 description += self.add_subcommands(found_command, '\n\n**subcommands:**\n', '%s\t\t%s\n')
