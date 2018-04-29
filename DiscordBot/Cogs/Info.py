@@ -18,6 +18,32 @@ class Info(Cog):
     def __init__(self, bot):
         super().__init__(bot)
 
+    @staticmethod
+    def add_subcommands(command_object, string_before, base_string):
+        """
+        add subcommands, if there are any
+
+        Args:
+            command_object: commands.core.Command
+                command to check for subcommands
+            string_before: str
+                string to be inserted before everything
+            base_string: str
+                string to be repeated for each subcommand found (must have two '%s')
+
+        Returns: str
+            String with subcommands of command_object
+        """
+        commands_listing = ''
+        if isinstance(command_object, commands.core.Group):
+            commands_listing += string_before
+            command_set = set()
+            for subcommand in command_object.walk_commands():
+                if subcommand not in command_set:
+                    commands_listing += base_string % (subcommand.name, subcommand.short_doc)
+                command_set.add(subcommand)
+        return commands_listing
+
     # INFO
     @commands.command(name='info', ignore_extra=False)
     async def command_info(self):
@@ -38,12 +64,6 @@ class Info(Cog):
     @commands.group(name='help', ignore_extra=False, invoke_without_command=True)
     async def command_help(self, *command_name):
         """Shows help message."""
-        # I should redo this...
-        # It's pretty hacky...
-        # It works, I guess...
-        if len(command_name) > 1:  # at most one argument
-            raise commands.TooManyArguments
-
         self.log_command_call('help')
 
         bot_prefix = self.bot.command_prefix_simple
@@ -58,13 +78,11 @@ class Info(Cog):
             for cog_object, cog_commands in Cog.all_commands.items():
                 commands_listing = ''
 
+                # Command Groups
                 for command_object in cog_commands.values():
-                    # assumes commands are always followed by their subcommands inside the cog class
-                    if command_object.parent is not None:
-                        prefix = '\t\t'
-                    else:
-                        prefix = bot_prefix
-                    commands_listing += '%s%s\t\t%s\n' % (prefix, command_object.name, command_object.short_doc)
+                    if command_object.parent is None:  # not a subcommand
+                        commands_listing += '%s%s\t\t%s\n' % (bot_prefix, command_object.name, command_object.short_doc)
+                        commands_listing += self.add_subcommands(command_object, '', '\t\t%s\t\t%s\n')
 
                 commands_listing += '\n\u200b'  # separates fields a bit
                 embed_help.add_field(name=cog_object.name + ':', value=commands_listing)
@@ -72,23 +90,27 @@ class Info(Cog):
             await self.bot.say(embed=embed_help)
 
         else:  # show info on a command
-            command_name = command_name[0].lower()
+            main_command_name = command_name[0].lower()
 
-            # check if argument is an existing command
+            # check if argument is an existing command (plus aliases)
             found_command = None
             for cog_commands in Cog.all_commands.values():
                 if found_command:
                     break
 
                 for command_object in cog_commands.values():
-                    if command_name == command_object.name.lower():
+                    if (main_command_name == command_object.name.lower() or
+                            main_command_name in [alias.lower() for alias in command_object.aliases]):
                         found_command = command_object
                         break
 
             if not found_command:  # argument is not a command
                 raise commands.BadArgument
 
-            else:  # is a command
+            # argument is a command
+            else:
+                # TODO be able to do '!help random between' instead of the current '!help between'...
+                # TODO should be done in this else statement
                 if found_command.parent is not None:  # is subcommand
                     bot_prefix = '%s%s ' % (bot_prefix, found_command.parent)
 
@@ -99,16 +121,7 @@ class Info(Cog):
                     title = '%s[%s | %s]' % (bot_prefix, found_command.name, ' | '.join(found_command.aliases))
 
                 description = found_command.help
-
-                # add subcommands, if there are any
-                if isinstance(found_command, commands.core.Group):
-                    description += '\n\n**subcommands:**\n'
-
-                    command_set = set()
-                    for subcommand in found_command.walk_commands():
-                        if subcommand not in command_set:
-                            description += '%s\t\t%s\n' % (subcommand.name, subcommand.short_doc)
-                        command_set.add(subcommand)
+                description += self.add_subcommands(found_command, '\n\n**subcommands:**\n', '%s\t\t%s\n')
 
                 embed_help_command = discord.Embed(title=title, description=description, colour=self.embed_colour)
 
