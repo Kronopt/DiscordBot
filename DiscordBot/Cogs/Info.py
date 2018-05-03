@@ -61,9 +61,12 @@ class Info(Cog):
         await self.bot.say(embed=embed_info)
 
     # HELP
-    @commands.group(name='help', ignore_extra=False, invoke_without_command=True)
+    @commands.command(name='help', ignore_extra=False, invoke_without_command=True)
     async def command_help(self, *command):
-        """Shows help message."""
+        """Shows all commands or info on a command.
+
+        Call without arguments to show all commands.
+        Pass a command name as argument for more detailed information on that command."""
         self.log_command_call('help')
 
         bot_prefix = self.bot.command_prefix_simple
@@ -143,11 +146,3 @@ class Info(Cog):
                 embed_help_command = discord.Embed(title=title, description=description, colour=self.embed_colour)
 
                 await self.bot.say(embed=embed_help_command)
-
-    # HELP <command>
-    @command_help.command(name='<command>')
-    async def command_help_command(self):
-        """Shows help message for a command."""
-        # This command only exists to enable the creation of an entry on the help message
-        # The logic for this command is included in the !help command
-        raise commands.BadArgument

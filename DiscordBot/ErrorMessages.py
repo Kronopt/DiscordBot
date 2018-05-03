@@ -48,7 +48,6 @@ ERROR_MESSAGES = {
     # INFO
     'info': '`%s%s` takes no arguments.',
     'help': '`%s%s` takes none or just one command name as argument.',
-    '<command>': '`%shelp %s` takes none or just one command name as argument.',
     # TODO POLL
     'poll': '`%s%s` takes a poll name as first argument and at least 2 options (use `help poll` for more information).',
     'poll_already_exists': 'A poll is already ongoing with the same name having the following options: `%s`.',
