@@ -61,12 +61,12 @@ class Info(Cog):
         await self.bot.say(embed=embed_info)
 
     # HELP
-    @commands.command(name='help', ignore_extra=False, invoke_without_command=True)
+    @commands.command(name='help', ignore_extra=False)
     async def command_help(self, *command):
         """Shows all commands or info on a command.
 
         Call without arguments to show all commands.
-        Pass a command name as argument for more detailed information on that command."""
+        Pass a command name (and possible subcommands) as argument for more detailed information on that command."""
         self.log_command_call('help')
 
         bot_prefix = self.bot.command_prefix_simple
