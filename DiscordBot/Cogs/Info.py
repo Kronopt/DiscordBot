@@ -34,15 +34,17 @@ class Info(Cog):
         Returns: str
             String with subcommands of command_object
         """
-        commands_listing = ''
-        if isinstance(command_object, commands.core.Group):
-            commands_listing += string_before
-            command_set = set()
-            for subcommand in command_object.walk_commands():
-                if subcommand not in command_set:
-                    commands_listing += base_string % (subcommand.name, subcommand.short_doc)
-                command_set.add(subcommand)
-        return commands_listing
+        if command_object.enabled:
+            commands_listing = ''
+            if isinstance(command_object, commands.core.Group):
+                commands_listing += string_before
+                command_set = set()
+                for subcommand in command_object.walk_commands():
+                    if subcommand not in command_set:
+                        commands_listing += base_string % (subcommand.name, subcommand.short_doc)
+                    command_set.add(subcommand)
+            return commands_listing
+        return ''
 
     # INFO
     @commands.command(name='info', ignore_extra=False)
@@ -83,7 +85,7 @@ class Info(Cog):
 
                 # Command Groups
                 for command_object in cog_commands.values():
-                    if command_object.parent is None:  # not a subcommand
+                    if command_object.parent is None and command_object.enabled:  # not a subcommand and enabled
                         commands_listing += '%s%s\t\t%s\n' % (bot_prefix, command_object.name, command_object.short_doc)
                         commands_listing += self.add_subcommands(command_object, '', '\t\t%s\t\t%s\n')
 
@@ -112,37 +114,38 @@ class Info(Cog):
 
             # argument is a command
             else:
-                # TODO be able to do '!help random between' instead of the current '!help between'...
-                # TODO should be done in this else statement
-                if found_command.parent is not None:  # is subcommand
-                    bot_prefix = '%s%s ' % (bot_prefix, found_command.parent)
+                if found_command.enabled:
+                    # TODO be able to do '!help random between' instead of the current '!help between'...
+                    # TODO should be done in this else statement
+                    if found_command.parent is not None:  # is subcommand
+                        bot_prefix = '%s%s ' % (bot_prefix, found_command.parent)
 
-                # aliases
-                if len(found_command.aliases) == 0:
-                    title = '%s%s' % (bot_prefix, found_command.name)
-                else:
-                    title = '%s[%s | %s]' % (bot_prefix, found_command.name, ' | '.join(found_command.aliases))
+                    # aliases
+                    if len(found_command.aliases) == 0:
+                        title = '%s%s' % (bot_prefix, found_command.name)
+                    else:
+                        title = '%s[%s | %s]' % (bot_prefix, found_command.name, ' | '.join(found_command.aliases))
 
-                # arguments (logic retrieved from HelpFormatter.get_command_signature()
-                arguments = found_command.clean_params
-                if len(arguments) > 0:
-                    for argument_name, argument in arguments.items():
-                        title += ' '
-                        if argument.default is not argument.empty:
-                            should_print = argument.default if isinstance(argument.default,
-                                                                          str) else argument.default is not None
-                            if should_print:
-                                title += '[%s=%s]' % (argument_name, argument.default)
+                    # arguments (logic retrieved from HelpFormatter.get_command_signature()
+                    arguments = found_command.clean_params
+                    if len(arguments) > 0:
+                        for argument_name, argument in arguments.items():
+                            title += ' '
+                            if argument.default is not argument.empty:
+                                should_print = argument.default if isinstance(argument.default,
+                                                                              str) else argument.default is not None
+                                if should_print:
+                                    title += '[%s=%s]' % (argument_name, argument.default)
+                                else:
+                                    title += '[%s]' % argument_name
+                            elif argument.kind == argument.VAR_POSITIONAL:
+                                title += '[%s...]' % argument_name
                             else:
-                                title += '[%s]' % argument_name
-                        elif argument.kind == argument.VAR_POSITIONAL:
-                            title += '[%s...]' % argument_name
-                        else:
-                            title += '<%s>' % argument_name
+                                title += '<%s>' % argument_name
 
-                description = found_command.help
-                description += self.add_subcommands(found_command, '\n\n**subcommands:**\n', '%s\t\t%s\n')
+                    description = found_command.help
+                    description += self.add_subcommands(found_command, '\n\n**subcommands:**\n', '%s\t\t%s\n')
 
-                embed_help_command = discord.Embed(title=title, description=description, colour=self.embed_colour)
+                    embed_help_command = discord.Embed(title=title, description=description, colour=self.embed_colour)
 
-                await self.bot.say(embed=embed_help_command)
+                    await self.bot.say(embed=embed_help_command)

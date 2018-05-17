@@ -47,7 +47,6 @@ BOT.add_cog(Info(BOT))
 @BOT.event
 async def on_ready():
     logging.info('started on_ready')
-
     logging.info('Logged in as: %s, %s' % (BOT.user.name, BOT.user.id))
     logging.info('Channels connected to:')
     for channel in BOT.get_all_channels():
@@ -60,7 +59,8 @@ async def on_ready():
 
 @BOT.event
 async def on_command_error(error, context):
-    if isinstance(error, commands.CommandNotFound):  # Ignore non-existent commands
+    # Ignore non-existent and disabled commands
+    if isinstance(error, (commands.CommandNotFound, commands.DisabledCommand)):
         pass
 
     elif isinstance(error, (commands.TooManyArguments,
