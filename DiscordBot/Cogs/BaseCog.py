@@ -32,9 +32,8 @@ def logging_wrapper(command):
     -------
     Wrapper function of command callback
     """
-    # TODO redo command_name with recursion (to take into account any number of subcommands)
-    command_name = '%s %s' % (command.parent, command.name) if command.parent else command.name
     command_callback = command.callback
+    command_name = '%s %s' % (command.full_parent_name, command.name) if command.parent else command.name
 
     @functools.wraps(command_callback)
     async def inner(*args, **kwargs):
