@@ -50,8 +50,6 @@ class Info(Cog):
     @commands.command(name='info', ignore_extra=False)
     async def command_info(self):
         """Shows author, github page and framework."""
-        self.log_command_call('info')
-
         bot_info = await self.bot.application_info()
         bot_owner = bot_info.owner.display_name + '#' + str(bot_info.owner.discriminator)
 
@@ -69,8 +67,6 @@ class Info(Cog):
 
         Call without arguments to show all commands.
         Pass a command name (and possible subcommands) as argument for more detailed information on that command."""
-        self.log_command_call('help')
-
         bot_prefix = self.bot.command_prefix_simple
 
         if len(command) == 0:  # show all commands

@@ -26,7 +26,6 @@ class Math(Cog):
         """Sums all numbers."""
         if len(numbers) == 0:  # at least one argument
             raise commands.MissingRequiredArgument
-        self.log_command_call('sum')
 
         result = Converters.number(functools.reduce(operator.add, numbers))
         numbers = map(str, numbers)
@@ -38,7 +37,6 @@ class Math(Cog):
         """Subtracts all numbers."""
         if len(numbers) == 0:  # at least one argument
             raise commands.MissingRequiredArgument
-        self.log_command_call('subtract')
 
         result = Converters.number(functools.reduce(operator.sub, numbers))
         numbers = map(str, numbers)
@@ -50,7 +48,6 @@ class Math(Cog):
         """Divides all numbers."""
         if len(numbers) == 0:  # at least one argument
             raise commands.MissingRequiredArgument
-        self.log_command_call('divide')
 
         result = Converters.number(functools.reduce(operator.truediv, numbers))
         numbers = map(str, numbers)
@@ -62,7 +59,6 @@ class Math(Cog):
         """Multiplies all numbers."""
         if len(numbers) == 0:  # at least one argument
             raise commands.MissingRequiredArgument
-        self.log_command_call('multiply')
 
         result = Converters.number(functools.reduce(operator.mul, numbers))
         numbers = map(str, numbers)

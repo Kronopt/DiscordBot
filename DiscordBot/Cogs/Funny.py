@@ -39,7 +39,6 @@ class Funny(Cog):
         Ask a question and get one of the classic magic 8 ball answers."""
         if len(args) == 0:  # at least one argument
             raise commands.MissingRequiredArgument
-        self.log_command_call('8ball')
 
         answer = random.randint(0, len(self.eightball_answers) - 1)
         if answer <= 9:  # Affirmative answer
@@ -58,7 +57,6 @@ class Funny(Cog):
         Sends as much poop as discord allows."""
         if len(n) > 1:    # At most one argument
             raise commands.TooManyArguments
-        self.log_command_call('poop')
 
         if len(n) == 0:
             n = 1  # default
@@ -85,8 +83,6 @@ class Funny(Cog):
 
         # randomly choose one api
         api = random.choice(self.api_list)
-
-        self.log_command_call('joke, with %s' % api.Meta.name)
 
         # retrieve random joke from the selected api
         try:

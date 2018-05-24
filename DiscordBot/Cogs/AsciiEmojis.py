@@ -23,8 +23,6 @@ class AsciiEmojis(Cog):
         """(╯°□°）╯︵ ┻━┻
 
         tableflip emoji."""
-        self.log_command_call('tableflip')
-
         await self.bot.say('(╯°□°）╯︵ ┻━┻')  # Discord already has this emoji implemented
 
     # TABLEUNFLIP
@@ -33,8 +31,6 @@ class AsciiEmojis(Cog):
         """┬─┬ ノ(゜-゜ノ)
 
         tableunflip emoji."""
-        self.log_command_call('tableunflip')
-
         await self.bot.say('┬─┬ ノ( ゜-゜ノ)')  # Discord already has this emoji implemented
 
     # SHRUG
@@ -43,8 +39,6 @@ class AsciiEmojis(Cog):
         """¯\_(ツ)_/¯
 
         shrug emoji."""
-        self.log_command_call('shrug')
-
         await self.bot.say('¯\_(ツ)_/¯')  # Discord already has this emoji implemented
 
 

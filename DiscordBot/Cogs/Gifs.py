@@ -46,8 +46,6 @@ class Gifs(Cog):
     @commands.command(name='rickroll', ignore_extra=False, aliases=['rr'])
     async def command_rickroll(self):
         """Never gonna give you up."""
-        self.log_command_call('rickroll')
-
         gif = self.embed_gif('https://media.giphy.com/media/LXONhtCmN32YU/giphy.gif',
                              footer_message='You\'ve been rick rolled')
         await self.bot.say(embed=gif)
@@ -56,8 +54,6 @@ class Gifs(Cog):
     @commands.command(name='ohgodno', ignore_extra=False, aliases=['godno'])
     async def command_ohgodno(self):
         """Oh god no (The Office)."""
-        self.log_command_call('ohgodno')
-
         gif = self.embed_gif('https://media.giphy.com/media/12XMGIWtrHBl5e/giphy.gif',
                              footer_message='Noooooooooooooooooooooooooo')
         await self.bot.say(embed=gif)
@@ -66,8 +62,6 @@ class Gifs(Cog):
     @commands.command(name='rekt', ignore_extra=False)
     async def command_rekt(self):
         """Rekt."""
-        self.log_command_call('rekt')
-
         gif = self.embed_gif('https://media.giphy.com/media/11yKQ9fN3c06fC/giphy.gif',
                              footer_message='rekt')
         await self.bot.say(embed=gif)

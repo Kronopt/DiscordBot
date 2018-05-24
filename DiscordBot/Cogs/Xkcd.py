@@ -53,7 +53,6 @@ class Xkcd(Cog):
     @commands.group(name='xkcd', ignore_extra=False, invoke_without_command=True)
     async def command_xkcd(self):
         """Retrieves a random xkcd comic from xkcd.com."""
-        self.log_command_call('xkcd')
 
         # get the latest comic number and generate a number between 1 and that number
         latest_comic_number = self.xkcd_api_client.get_comic(uid=-1)[0].num
@@ -69,7 +68,6 @@ class Xkcd(Cog):
     @command_xkcd.command(name='latest', ignore_extra=False, aliases=['l', '-l', 'last'])
     async def command_xkcd_latest(self):
         """Retrieves the latest xkcd comic from xkcd.com."""
-        self.log_command_call('xkcd latest')
 
         comic = self.xkcd_api_client.get_comic(uid=-1)[0]
         embed_comic = self.embed_comic(comic)
@@ -79,7 +77,6 @@ class Xkcd(Cog):
     @command_xkcd.command(name='id', ignore_extra=False, aliases=['n', '-n', 'number'])
     async def command_xkcd_id(self, comic_id: Converters.positive_int):
         """Retrieves the selected xkcd comic from xkcd.com."""
-        self.log_command_call('xkcd id')
 
         comic = self.xkcd_api_client.get_comic(uid=comic_id)[0]
         embed_comic = self.embed_comic(comic)

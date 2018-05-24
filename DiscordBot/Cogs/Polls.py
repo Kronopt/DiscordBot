@@ -83,7 +83,6 @@ class Polls(Cog):
         Within 10 minutes of the poll's creation only the original author can close the poll."""
         if len(options) < 2:  # at least two poll options
             raise commands.MissingRequiredArgument
-        self.log_command_call('poll')
 
         channel = context.message.channel.id
         if channel not in self._polls:
@@ -124,7 +123,6 @@ class Polls(Cog):
     @command_poll.command(name='vote', ignore_extra=False, pass_context=True, aliases=['v', '-v', 'vt'])
     async def command_poll_vote(self, context, poll_name: str, option: str):
         """Vote on option of a certain poll named poll_name."""
-        self.log_command_call('poll vote')
 
         channel = context.message.channel.id
         if channel not in self._polls:  # No poll yet exists on this channel
@@ -161,7 +159,6 @@ class Polls(Cog):
     @command_poll.command(name='status', ignore_extra=False, aliases=['s', '-s', 'stat'])
     async def command_poll_status(self, *poll: str):
         """Shows active polls or status of passed polls."""
-        self.log_command_call('poll status')
 
         if len(poll) == 0:
             # TODO show all poll (names only)
@@ -178,7 +175,6 @@ class Polls(Cog):
         """Ends specified poll and shows results.
 
         For the first 10 minutes after starting a poll only it's author is able to end it."""
-        self.log_command_call('poll end')
 
         channel = context.message.channel.id
         if poll_name in self._poll_creator[channel]:  # poll created under 10 minutes ago

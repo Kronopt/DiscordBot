@@ -26,16 +26,12 @@ class General(Cog):
         """'pong'.
 
         Simple command to test if bot is alive."""
-        self.log_command_call('ping')
-
         await self.bot.say('pong')
 
     # HI
     @commands.command(name='hi', ignore_extra=False, aliases=['hello'], pass_context=True)
     async def command_hi(self, context):
         """Greets user."""
-        self.log_command_call('hi')
-
         if hasattr(context.message.author, 'nick') and context.message.author.nick is not None:
             author_name = context.message.author.nick
         else:
@@ -51,7 +47,6 @@ class General(Cog):
         A dice can either be written as 'D#' or 'd#'."""
         if len(dice) > 1:    # At most one argument
             raise commands.TooManyArguments
-        self.log_command_call('dice')
 
         if len(dice) == 0:
             dice = 'd6'  # default
@@ -68,8 +63,6 @@ class General(Cog):
         """Generates a number between 0 and 1.
 
         (inclusive)"""
-        self.log_command_call('random')
-
         random_number = random.random()
         await self.bot.say('Result: **' + str(random_number) + '**')
 
@@ -79,8 +72,6 @@ class General(Cog):
         """Generates a number between a and b.
 
         (inclusive)"""
-        self.log_command_call('random between')
-
         values = [a, b]
         values.sort()  # Either value can be the smallest one
         a, b = values
@@ -95,7 +86,6 @@ class General(Cog):
         Arguments cen be either space-separated or enclosed in quotes"""
         if len(args) == 0:    # at least one argument
             raise commands.MissingRequiredArgument
-        self.log_command_call('random from')
 
         result = random.choice(args)
         await self.bot.say('Result: **' + result + '**')

@@ -9,13 +9,50 @@ Each bot command should be decorated with a @command decorator.
 """
 
 
+import functools
 import inspect
 import logging
 from collections import OrderedDict
 from discord.ext import commands
 
 
-class Cog:
+logger = logging.getLogger('discord')
+
+
+def logging_wrapper(command):
+    """
+    Logging wrapper for command callback
+
+    Parameters
+    ----------
+    command: commands.core.Command
+        Command whose callback is to be wrapped
+
+    Returns
+    -------
+    Wrapper function of command callback
+    """
+    # TODO redo command_name with recursion (to take into account any number of subcommands)
+    command_name = '%s %s' % (command.parent, command.name) if command.parent else command.name
+    command_callback = command.callback
+
+    @functools.wraps(command_callback)
+    async def inner(*args, **kwargs):
+        logger.info('command called: ' + command_name)
+        await command_callback(*args, **kwargs)
+    return inner
+
+
+class CogMeta(type):
+
+    def __new__(mcs, name, bases, body):
+        for attribute in body.values():
+            if isinstance(attribute, commands.core.Command):  # Wrap every command inside a Cog in a logging function
+                attribute.callback = logging_wrapper(attribute)
+        return super().__new__(mcs, name, bases, body)
+
+
+class Cog(metaclass=CogMeta):
 
     # {Cog_object: {command_function_name: command_object, ...}, ...} of all commands from all instantiated Cogs
     all_commands = OrderedDict()
@@ -28,7 +65,7 @@ class Cog:
         """
         self.bot = bot
         self.name = self.__class__.__name__
-        self.logger = logging.getLogger('discord')
+        self.logger = logger
         self.embed_colour = 0xe74c3c
 
         # {command_function_name: command_object, ...}
@@ -45,14 +82,3 @@ class Cog:
     def __check(self, context):
         """Cog global check goes here"""
         return True
-
-    def log_command_call(self, command):
-        """
-        Logs calls to a command as INFO
-
-        Parameters
-        ----------
-        command: str
-            name of command
-        """
-        self.logger.info('command called: ' + command)
