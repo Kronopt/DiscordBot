@@ -11,6 +11,7 @@ A small command line utility is available so that the bot's token is not hardcod
 import argparse
 import logging
 import traceback
+import sys
 import beckett.exceptions
 import discord
 from discord.ext import commands
@@ -90,9 +91,8 @@ async def on_command_error(error, context):
             await BOT.send_message(context.message.channel, 'Can\'t retrieve a joke from the server at the moment.')
 
     else:
-        print('Ignoring exception in command', context.invoked_with)
-        tb = traceback.format_exception(type(error), error, error.__traceback__)
-        print(''.join(tb))
+        print('Ignoring exception in command', context.invoked_with, file=sys.stderr)
+        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
     # TODO NoPrivateMessage, CheckFailure, DisabledCommand, CommandOnCooldown,
     # TODO NotOwner, MissingPermissions, BotMissingPermissions
