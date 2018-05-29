@@ -45,6 +45,10 @@ ERROR_MESSAGES = {
     'xkcd': '`%s%s` takes no arguments or one of the predefined ones (use `help xkcd` for more information).',
     'latest': '`%sxkcd %s` takes no arguments.',
     'id': '`%sxkcd %s` takes exactly 1 positive number.',
+    #AWESOMENAUTS
+    'awesomenaut': '`%s%s` takes a name of an awesomenaut (or part of it) as argument (use quotation marks to enclose'
+                   'space separated names).',
+    'rank': '`%sawesomenaut %s` takes a player name as argument (use quotation marks if the name has spaces).',
     # INFO
     'info': '`%s%s` takes no arguments.',
     'help': '`%s%s` takes none or just one command name as argument.',
