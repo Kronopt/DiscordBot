@@ -68,6 +68,13 @@ A Discord Bot
 | `!xkcd latest` | Shows the latest xkcd comic |
 | `!xkcd id <number id>` | Shows the requested xkcd comic, if it exists |
 
+### Awesomenauts
+
+| command | descripion |
+| ------- | ---------- |
+| `!awesomenaut <str awesomenaut_name>` | Displays information of the specified awesomenaut. |
+| `!awesomenaut rank <str player_name>` | Displays rank information of an Awesomenaut's player. |
+
 ### Info
 
 | command | descripion |

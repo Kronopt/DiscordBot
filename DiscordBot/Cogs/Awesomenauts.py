@@ -78,7 +78,7 @@ class Awesomenauts(Cog):
     @commands.group(name='awesomenaut', ignore_extra=False, aliases=['awesomenauts'], invoke_without_command=True,
                     pass_context=True)
     async def command_awesomenaut(self, context, awesomenaut: existing_awesomenaut):
-        """Displays information on the specified awesomenaut.
+        """Displays information of the specified awesomenaut.
 
         Any text that matches at least part of an awesomenaut's name will work.
         Matches are performed in alphabetical order ('Coco' matches first than 'Commander Rocket' for text 'co').
