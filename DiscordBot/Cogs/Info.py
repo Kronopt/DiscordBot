@@ -94,59 +94,67 @@ class Info(Cog):
 
         else:  # show info on a command
             main_command_name = command[0].lower()
+            subcommands = command[1:] if len(command) > 1 else []
 
-            # check if argument is an existing command (plus aliases)
+            # check if argument is an existing command (plus aliases) (not subcommand)
             found_command = None
             for cog_commands in Cog.all_commands.values():
                 if found_command:
                     break
 
                 for command_object in cog_commands.values():
-                    if (main_command_name == command_object.name.lower() or
-                            main_command_name in [alias.lower() for alias in command_object.aliases]):
+                    if ((main_command_name == command_object.name.lower() or
+                            main_command_name in [alias.lower() for alias in command_object.aliases]) and
+                            command_object.parent is None):
                         found_command = command_object
                         break
 
             if not found_command:  # argument is not a command
-                raise commands.BadArgument
+                await self.bot.say('`%s` is not a command or is disabled.' % command[0])
+                return
+            elif not found_command.enabled:  # argument is a command but is disabled
+                await self.bot.say('`%s` is not a command or is disabled.' % command[0])
+                return
 
-            # argument is a command
-            else:
-                if found_command.enabled:
-                    # TODO be able to do '!help random between' instead of the current '!help between'...
-                    # TODO should be done in this else statement
-                    if found_command.parent is not None:  # is subcommand
-                        bot_prefix = '%s%s ' % (bot_prefix, found_command.parent)
+            else:  # argument is a command and is enabled
+                current_command = found_command
+                for subcommand in subcommands:  # verify if subcommands are valid
+                    if isinstance(current_command, commands.core.Group) and subcommand in current_command.commands:
+                        current_command = current_command.commands[subcommand]
+                    else:  # argument is not a subcommand
+                        await self.bot.say('`%s` is not a subcommand of %s.' % (subcommand, current_command.name))
+                        return
 
-                    # aliases
-                    if len(found_command.aliases) == 0:
-                        title = '%s%s' % (bot_prefix, found_command.name)
-                    else:
-                        title = '%s[%s | %s]' % (bot_prefix, found_command.name, ' | '.join(found_command.aliases))
+                # aliases
+                if len(current_command.aliases) == 0:
+                    title = '%s%s' % (bot_prefix, current_command.qualified_name)
+                else:
+                    title = '%s%s[%s | %s]' % (bot_prefix, current_command.full_parent_name, current_command.name,
+                                               ' | '.join(current_command.aliases))
 
-                    # arguments (logic retrieved from HelpFormatter.get_command_signature()
-                    arguments = found_command.clean_params
-                    if len(arguments) > 0:
-                        for argument_name, argument in arguments.items():
-                            title += ' '
-                            if argument.default is not argument.empty:
-                                should_print = argument.default if isinstance(argument.default,
-                                                                              str) else argument.default is not None
-                                if should_print:
-                                    title += '[%s=%s]' % (argument_name, argument.default)
-                                else:
-                                    title += '[%s]' % argument_name
-                            elif argument.kind == argument.VAR_POSITIONAL:
-                                title += '[%s...]' % argument_name
+                # arguments (logic retrieved from HelpFormatter.get_command_signature()
+                arguments = current_command.clean_params
+                if len(arguments) > 0:
+                    for argument_name, argument in arguments.items():
+                        title += ' '
+                        if argument.default is not argument.empty:
+                            should_print = argument.default if isinstance(argument.default,
+                                                                          str) else argument.default is not None
+                            if should_print:
+                                title += '[%s=%s]' % (argument_name, argument.default)
                             else:
-                                title += '<%s>' % argument_name
+                                title += '[%s]' % argument_name
+                        elif argument.kind == argument.VAR_POSITIONAL:
+                            title += '[%s...]' % argument_name
+                        else:
+                            title += '<%s>' % argument_name
 
-                    description = found_command.help
-                    description += self.add_subcommands(found_command, '\n\n**subcommands:**\n', '%s\t\t%s\n')
+                description = current_command.help
+                description += self.add_subcommands(current_command, '\n\n**subcommands:**\n', '%s\t\t%s\n')
 
-                    embed_help_command = discord.Embed(title=title, description=description, colour=self.embed_colour)
+                embed_help_command = discord.Embed(title=title, description=description, colour=self.embed_colour)
 
-                    await self.bot.say(embed=embed_help_command)
+                await self.bot.say(embed=embed_help_command)
 
     ################
     # ERROR HANDLING
