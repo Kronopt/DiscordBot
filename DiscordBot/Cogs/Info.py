@@ -54,11 +54,8 @@ class Info(Cog):
     @commands.command(name='info', ignore_extra=False)
     async def command_info(self):
         """Shows author, github page and framework."""
-        bot_info = await self.bot.application_info()
-        bot_owner = bot_info.owner.display_name + '#' + str(bot_info.owner.discriminator)
-
         embed_info = discord.Embed(colour=self.embed_colour)
-        embed_info.add_field(name='Author', value=bot_owner + '\n\u200b', inline=False)
+        embed_info.add_field(name='Author', value='[Kronopt](https://github.com/Kronopt)\n\u200b', inline=False)
         embed_info.add_field(name='Framework', value='[discord.py](https://github.com/Rapptz/discord.py)\n\u200b',
                              inline=False)
         embed_info.add_field(name='Github', value='https://github.com/Kronopt/DiscordBot\n\u200b', inline=False)
