@@ -86,7 +86,7 @@ class Math(Cog):
     @command_divide.error
     async def ping_hi_on_error(self, error, context):
         bot_message = '`%s%s` takes at least 1 number.' % (context.prefix, context.invoked_with)
-        bot_message_zero_division_error = '`%s%s` can\'t divide by zero.'
+        bot_message_zero_division_error = '`%s%s` can\'t divide by zero.' % (context.prefix, context.invoked_with)
         await self.generic_error_handler(error, context,
                                          (commands.TooManyArguments, commands.CommandOnCooldown,
                                           commands.NoPrivateMessage, commands.CheckFailure),

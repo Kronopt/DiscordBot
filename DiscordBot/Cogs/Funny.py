@@ -31,6 +31,13 @@ class Funny(Cog):
                                   "Don't count on it", "My reply is no", "My sources say no", "Outlook not so good",
                                   "Very doubtful"]
 
+    async def send_joke(self, api, joke):
+        if api is self.api_list[0]:  # ICanHazDadJokeClient
+            full_joke = joke.joke
+        else:
+            full_joke = '%s\n%s' % (joke.setup, joke.punchline)
+        await self.bot.say(full_joke)
+
     ##########
     # COMMANDS
     ##########
@@ -102,13 +109,6 @@ class Funny(Cog):
             await self.send_joke(api, joke)
         else:
             await self.send_joke(api, joke)
-
-    async def send_joke(self, api, joke):
-        if api is self.api_list[0]:  # ICanHazDadJokeClient
-            full_joke = joke.joke
-        else:
-            full_joke = '%s\n%s' % (joke.setup, joke.punchline)
-        await self.bot.say(full_joke)
 
     ################
     # ERROR HANDLING

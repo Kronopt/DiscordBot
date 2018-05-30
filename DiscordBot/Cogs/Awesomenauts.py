@@ -201,7 +201,7 @@ class Awesomenauts(Cog):
                                       'few minutes'
         bot_message_html_changed = 'Can\'t access Awesomenauts information right now. Command will sleep until issue ' \
                                    'is fixed'
-        if isinstance(context.command, self.command_awesomenaut):
+        if context.command.callback is self.command_awesomenaut.callback:
             bot_message = '`%s%s` takes a name of an awesomenaut (or part of it) as argument (use quotation marks to ' \
                           'enclose space separated names).' % (context.prefix, context.invoked_with)
             url_fetch_error_message = 'Awesomenauts Wiki (%s) is unreachable' % self.awesomenauts_url

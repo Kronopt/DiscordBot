@@ -95,10 +95,10 @@ class Xkcd(Cog):
     @command_xkcd_latest.error
     @command_xkcd_id.error
     async def xkcd_xkcd_latest_xkcd_id_on_error(self, error, context):
-        if isinstance(context.command, self.command_xkcd):
-            bot_message = '`%s%s` takes no arguments or one of the predefined ones (use `help xkcd` for more ' \
-                          'information).' % (context.prefix, context.invoked_with)
-        elif isinstance(context.command, self.command_xkcd_latest):
+        if context.command.callback is self.command_xkcd.callback:
+            bot_message = '`{0}{1}` takes no arguments or one of the predefined ones (use `{0}help {1}` for more ' \
+                          'information).'.format(context.prefix, context.invoked_with)
+        elif context.command.callback is self.command_xkcd_latest.callback:
             bot_message = '`%s%s` takes no arguments.' % (context.prefix, context.command.qualified_name)
         else:
             bot_message = '`%s%s` takes exactly 1 positive number.' % (context.prefix, context.command.qualified_name)

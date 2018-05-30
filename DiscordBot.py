@@ -74,7 +74,7 @@ async def on_command_error(error, context):
     # Exception handled in Math.command_divide
     elif (isinstance(error, commands.CommandInvokeError) and
           isinstance(error.original, ZeroDivisionError) and
-          isinstance(context.command, Math.command_divide)):
+          context.command.callback is Math.command_divide.callback):
         pass
     elif (isinstance(error, commands.CommandInvokeError) and
           isinstance(error.original, beckett.exceptions.InvalidStatusCodeError)):
