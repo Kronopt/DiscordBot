@@ -20,6 +20,10 @@ class General(Cog):
         super().__init__(bot)
         self.greetings = ['Hi', 'Hello', 'Hey', 'Sup', 'What\'s up', 'Greetings', 'Howdy']
 
+    ##########
+    # COMMANDS
+    ##########
+
     # PING
     @commands.command(name='ping', ignore_extra=False)
     async def command_ping(self):
@@ -89,3 +93,55 @@ class General(Cog):
 
         result = random.choice(args)
         await self.bot.say('Result: **' + result + '**')
+
+    ################
+    # ERROR HANDLING
+    ################
+
+    @command_ping.error
+    @command_hi.error
+    async def ping_hi_on_error(self, error, context):
+        bot_message = '`%s%s` takes no arguments.' % (context.prefix, context.invoked_with)
+        await self.generic_error_handler(error, context,
+                                         (commands.MissingRequiredArgument, commands.CommandOnCooldown,
+                                          commands.NoPrivateMessage, commands.CheckFailure),
+                                         (commands.TooManyArguments, bot_message),
+                                         (commands.BadArgument, bot_message))
+
+    @command_dice.error
+    async def dice_on_error(self, error, context):
+        bot_message = '`%s%s` takes either no arguments or one of the following: %s.'\
+                      % (context.prefix, context.invoked_with, ', '.join(Converters.DICES))
+        await self.generic_error_handler(error, context,
+                                         (commands.MissingRequiredArgument, commands.CommandOnCooldown,
+                                          commands.NoPrivateMessage, commands.CheckFailure),
+                                         (commands.TooManyArguments, bot_message),
+                                         (commands.BadArgument, bot_message))
+
+    @command_random.error
+    async def random_on_error(self, error, context):
+        bot_message = '`{0}{1}` takes no arguments or one of the predefined ones (use `{0}help {1}` for more ' \
+                      'information).'.format(context.prefix, context.invoked_with)
+        await self.generic_error_handler(error, context,
+                                         (commands.MissingRequiredArgument, commands.CommandOnCooldown,
+                                          commands.NoPrivateMessage, commands.CheckFailure),
+                                         (commands.TooManyArguments, bot_message),
+                                         (commands.BadArgument, bot_message))
+
+    @command_random_between.error
+    async def random_between_on_error(self, error, context):
+        bot_message = '`%s%s` takes 2 integers as arguments.' % (context.prefix, context.command.qualified_name)
+        await self.generic_error_handler(error, context,
+                                         (commands.CommandOnCooldown, commands.NoPrivateMessage, commands.CheckFailure),
+                                         (commands.TooManyArguments, bot_message),
+                                         (commands.BadArgument, bot_message),
+                                         (commands.MissingRequiredArgument, bot_message))
+
+    @command_random_from.error
+    async def random_from_on_error(self, error, context):
+        bot_message = '`%s%s` takes at least 1 argument.' % (context.prefix, context.command.qualified_name)
+        await self.generic_error_handler(error, context,
+                                         (commands.TooManyArguments, commands.CommandOnCooldown,
+                                          commands.NoPrivateMessage, commands.CheckFailure),
+                                         (commands.BadArgument, bot_message),
+                                         (commands.MissingRequiredArgument, bot_message))

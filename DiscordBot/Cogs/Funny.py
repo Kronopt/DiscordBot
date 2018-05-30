@@ -9,9 +9,9 @@ Funny Commands.
 
 import random
 import sys
+import beckett.exceptions
 from discord.ext import commands
 from beckett.clients import BaseClient
-from beckett.exceptions import InvalidStatusCodeError
 from beckett.resources import BaseResource
 from .BaseCog import Cog
 from DiscordBot import Converters
@@ -30,6 +30,17 @@ class Funny(Cog):
                                   "Better not tell you now", "Cannot predict now", "Concentrate and ask again",
                                   "Don't count on it", "My reply is no", "My sources say no", "Outlook not so good",
                                   "Very doubtful"]
+
+    async def send_joke(self, api, joke):
+        if api is self.api_list[0]:  # ICanHazDadJokeClient
+            full_joke = joke.joke
+        else:
+            full_joke = '%s\n%s' % (joke.setup, joke.punchline)
+        await self.bot.say(full_joke)
+
+    ##########
+    # COMMANDS
+    ##########
 
     # 8BALL
     @commands.command(name='8ball', ignore_extra=False, aliases=['eightball', '8b'])
@@ -88,7 +99,7 @@ class Funny(Cog):
         try:
             joke = api.get_random_joke(uid=-1)[0]
 
-        except InvalidStatusCodeError as error:
+        except beckett.exceptions.InvalidStatusCodeError as error:
             self.logger.error('Invalid HTTP status code on command joke: %s' % error.status_code)
 
             # try the other api
@@ -99,12 +110,43 @@ class Funny(Cog):
         else:
             await self.send_joke(api, joke)
 
-    async def send_joke(self, api, joke):
-        if api is self.api_list[0]:  # ICanHazDadJokeClient
-            full_joke = joke.joke
-        else:
-            full_joke = '%s\n%s' % (joke.setup, joke.punchline)
-        await self.bot.say(full_joke)
+    ################
+    # ERROR HANDLING
+    ################
+
+    @command_eightball.error
+    async def eightball_on_error(self, error, context):
+        bot_message = '`%s%s` needs a phrase on which to apply its fortune-telling powers.'\
+                      % (context.prefix, context.invoked_with)
+        await self.generic_error_handler(error, context,
+                                         (commands.TooManyArguments, commands.CommandOnCooldown,
+                                          commands.NoPrivateMessage, commands.CheckFailure),
+                                         (commands.MissingRequiredArgument, bot_message),
+                                         (commands.BadArgument, bot_message))
+
+    @command_poop.error
+    async def poop_on_error(self, error, context):
+        bot_message = '`%s%s` takes no arguments or 1 positive number.' % (context.prefix, context.invoked_with)
+        await self.generic_error_handler(error, context,
+                                         (commands.CommandOnCooldown, commands.NoPrivateMessage,
+                                          commands.CheckFailure, commands.MissingRequiredArgument),
+                                         (commands.BadArgument, bot_message),
+                                         (commands.TooManyArguments, bot_message))
+
+    @command_joke.error
+    async def joke_on_error(self, error, context):
+        bot_message = '`%s%s` takes no arguments.' % (context.prefix, context.invoked_with)
+        bot_message_beckett_error = 'Can\'t retrieve a joke from the server at the moment.'
+        await self.generic_error_handler(error, context,
+                                         (commands.MissingRequiredArgument, commands.CommandOnCooldown,
+                                          commands.NoPrivateMessage, commands.CheckFailure),
+                                         (commands.TooManyArguments, bot_message),
+                                         (commands.BadArgument, bot_message))
+        if (isinstance(error, commands.CommandInvokeError) and
+                isinstance(error.original, beckett.exceptions.InvalidStatusCodeError)):
+            self.logger.info('%s exception in command %s: %s',
+                             error.original.__class__.__name__, context.command.qualified_name, context.message.content)
+            await self.bot.say(bot_message_beckett_error)
 
 
 ######################################

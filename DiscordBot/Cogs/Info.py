@@ -46,6 +46,10 @@ class Info(Cog):
             return commands_listing
         return ''
 
+    ##########
+    # COMMANDS
+    ##########
+
     # INFO
     @commands.command(name='info', ignore_extra=False)
     async def command_info(self):
@@ -54,9 +58,10 @@ class Info(Cog):
         bot_owner = bot_info.owner.display_name + '#' + str(bot_info.owner.discriminator)
 
         embed_info = discord.Embed(colour=self.embed_colour)
-        embed_info.add_field(name='Author', value=bot_owner, inline=False)
-        embed_info.add_field(name='Framework', value='[discord.py](https://github.com/Rapptz/discord.py)', inline=False)
-        embed_info.add_field(name='Github', value='https://github.com/Kronopt/DiscordBot', inline=False)
+        embed_info.add_field(name='Author', value=bot_owner + '\n\u200b', inline=False)
+        embed_info.add_field(name='Framework', value='[discord.py](https://github.com/Rapptz/discord.py)\n\u200b',
+                             inline=False)
+        embed_info.add_field(name='Github', value='https://github.com/Kronopt/DiscordBot\n\u200b', inline=False)
 
         await self.bot.say(embed=embed_info)
 
@@ -145,3 +150,21 @@ class Info(Cog):
                     embed_help_command = discord.Embed(title=title, description=description, colour=self.embed_colour)
 
                     await self.bot.say(embed=embed_help_command)
+
+    ################
+    # ERROR HANDLING
+    ################
+
+    @command_info.error
+    @command_help.error
+    async def info_help_on_error(self, error, context):
+        if context.command.callback is self.command_info.callback:
+            bot_message = '`%s%s` takes no arguments.' % (context.prefix, context.invoked_with)
+        else:
+            bot_message = '`%s%s` takes either no arguments or a command (and possible subcommands).'\
+                          % (context.prefix, context.invoked_with)
+        await self.generic_error_handler(error, context,
+                                         (commands.MissingRequiredArgument, commands.CommandOnCooldown,
+                                          commands.NoPrivateMessage, commands.CheckFailure),
+                                         (commands.TooManyArguments, bot_message),
+                                         (commands.BadArgument, bot_message))
