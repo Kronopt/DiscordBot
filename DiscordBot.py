@@ -15,7 +15,6 @@ import sys
 import beckett.exceptions
 import discord
 from discord.ext import commands
-from DiscordBot.ErrorMessages import ERROR_MESSAGES
 from DiscordBot.Cogs.General import General
 from DiscordBot.Cogs.Math import Math
 from DiscordBot.Cogs.Funny import Funny
@@ -44,7 +43,6 @@ BOT.add_cog(AsciiEmojis(BOT))
 BOT.add_cog(Xkcd(BOT))
 BOT.add_cog(Awesomenauts(BOT))
 BOT.add_cog(Info(BOT))
-# BOT.add_cog(Polls(BOT))  # TODO not implemented yet
 
 
 @BOT.event
@@ -62,42 +60,28 @@ async def on_ready():
 
 @BOT.event
 async def on_command_error(error, context):
+    """
+    This will always be called after an exception is raised on a command.
+    In order to avoid duplicate log entries, errors that should be treated individually per command are ignored here.
+    """
     # Ignore non-existent and disabled commands
-    if isinstance(error, (commands.CommandNotFound, commands.DisabledCommand)):
+    # Handle these 6 exceptions for each command individually
+    if isinstance(error, (commands.CommandNotFound, commands.DisabledCommand,
+                          commands.TooManyArguments, commands.MissingRequiredArgument,
+                          commands.BadArgument, commands.CommandOnCooldown,
+                          commands.NoPrivateMessage, commands.CheckFailure)):
         pass
-
-    elif isinstance(error, (commands.TooManyArguments,
-                            commands.MissingRequiredArgument,
-                            commands.BadArgument,
-                            commands.UserInputError)):
-        logging.info('bad arguments for command %s: %s', context.invoked_with, context.message.content)
-        await BOT.send_message(context.message.channel,
-                               ERROR_MESSAGES[context.command.name] % (command_prefix, context.invoked_with))
-
-    elif isinstance(error, commands.CommandInvokeError) and isinstance(error.original, ZeroDivisionError):
-        logging.info('zero division error on command %s', context.invoked_with)
-        await BOT.send_message(context.message.channel,
-                               ERROR_MESSAGES['zero_division_error'] % (command_prefix, context.invoked_with))
-
+    # Exception handled in Math.command_divide
+    elif (isinstance(error, commands.CommandInvokeError) and
+          isinstance(error.original, ZeroDivisionError) and
+          isinstance(context.command, Math.command_divide)):
+        pass
     elif (isinstance(error, commands.CommandInvokeError) and
           isinstance(error.original, beckett.exceptions.InvalidStatusCodeError)):
-        logging.info('Invalid HTTP status code on command %s: %s' % (context.invoked_with, error.original.status_code))
-
-        if context.command.name == 'id':  # xkcd id command
-            if error.original.status_code == 404:
-                await BOT.send_message(context.message.channel, 'xkcd comic with the given id was not found.')
-            else:
-                await BOT.send_message(context.message.channel, 'Can\'t reach xkcd.com at the moment.')
-
-        elif context.command.name == 'joke':  # joke command
-            await BOT.send_message(context.message.channel, 'Can\'t retrieve a joke from the server at the moment.')
-
+        pass
     else:
         print('Ignoring exception in command', context.invoked_with, file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
-
-    # TODO NoPrivateMessage, CheckFailure, DisabledCommand, CommandOnCooldown,
-    # TODO NotOwner, MissingPermissions, BotMissingPermissions
 
 
 if __name__ == '__main__':

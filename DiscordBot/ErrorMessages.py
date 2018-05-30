@@ -12,43 +12,7 @@ Usually for errors:
 """
 
 
-from . import Converters
-
-
 ERROR_MESSAGES = {
-    # GENERAL
-    'ping': '`%s%s` takes no arguments.',
-    'hi': '`%s%s` takes no arguments.',
-    'dice': '`%s%s` takes no arguments or one of the following: ' + ', '.join(Converters.DICES) + '.',
-    'random': '`%s%s` takes no arguments or one of the predefined ones (use `help random` for more information).',
-    'between': '`%srandom %s` takes 2 integers as arguments.',
-    'from': '`%srandom %s` takes at least 1 argument.',
-    # MATH
-    'sum': '`%s%s` takes at least 1 number.',
-    'subtract': '`%s%s` takes at least 1 number.',
-    'divide': '`%s%s` takes at least 1 number.',
-    'zero_division_error': '`%s%s` can\'t divide by zero.',
-    'multiply': '`%s%s` takes at least 1 number.',
-    # FUNNY
-    '8ball': '`%s%s` needs a phrase on which to apply its fortune-telling powers.',
-    'poop':  '`%s%s` takes no arguments or 1 positive number.',
-    'joke': '`%s%s` takes no arguments.',
-    # GIFS
-    'rickroll': '`%s%s` takes no arguments.',
-    'ohgodno': '`%s%s` takes no arguments.',
-    'rekt': '`%s%s` takes no arguments.',
-    # ASCIIEMOJIS
-    'tableflip': '`%s%s` takes no arguments.',
-    'tableunflip': '`%s%s` takes no arguments.',
-    'shrug': '`%s%s` takes no arguments.',
-    # XKCD
-    'xkcd': '`%s%s` takes no arguments or one of the predefined ones (use `help xkcd` for more information).',
-    'latest': '`%sxkcd %s` takes no arguments.',
-    'id': '`%sxkcd %s` takes exactly 1 positive number.',
-    #AWESOMENAUTS
-    'awesomenaut': '`%s%s` takes a name of an awesomenaut (or part of it) as argument (use quotation marks to enclose'
-                   'space separated names).',
-    'rank': '`%sawesomenaut %s` takes a player name as argument (use quotation marks if the name has spaces).',
     # INFO
     'info': '`%s%s` takes no arguments.',
     'help': '`%s%s` takes none or just one command name as argument.',

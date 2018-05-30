@@ -42,6 +42,10 @@ class Gifs(Cog):
         gif.set_footer(text=footer_message)
         return gif
 
+    ##########
+    # COMMANDS
+    ##########
+
     # RICKROLL
     @commands.command(name='rickroll', ignore_extra=False, aliases=['rr'])
     async def command_rickroll(self):
@@ -65,6 +69,21 @@ class Gifs(Cog):
         gif = self.embed_gif('https://media.giphy.com/media/11yKQ9fN3c06fC/giphy.gif',
                              footer_message='rekt')
         await self.bot.say(embed=gif)
+
+    ################
+    # ERROR HANDLING
+    ################
+
+    @command_rickroll.error
+    @command_ohgodno.error
+    @command_rekt.error
+    async def rickroll_ohgodno_rekt_on_error(self, error, context):
+        bot_message = '`%s%s` takes no arguments.' % (context.prefix, context.invoked_with)
+        await self.generic_error_handler(error, context,
+                                         (commands.MissingRequiredArgument, commands.CommandOnCooldown,
+                                          commands.NoPrivateMessage, commands.CheckFailure),
+                                         (commands.TooManyArguments, bot_message),
+                                         (commands.BadArgument, bot_message))
 
 
 # TODO maybe use Giphy API if this gets rate limited

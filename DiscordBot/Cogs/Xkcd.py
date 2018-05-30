@@ -8,6 +8,7 @@ XKCD comic Commands.
 
 
 import random
+import beckett.exceptions
 import discord
 from discord.ext import commands
 from beckett.clients import BaseClient
@@ -49,6 +50,10 @@ class Xkcd(Cog):
         comic.set_footer(text=xkcd_comic.alt)
         return comic
 
+    ##########
+    # COMMANDS
+    ##########
+
     # XKCD
     @commands.group(name='xkcd', ignore_extra=False, invoke_without_command=True)
     async def command_xkcd(self):
@@ -81,6 +86,37 @@ class Xkcd(Cog):
         comic = self.xkcd_api_client.get_comic(uid=comic_id)[0]
         embed_comic = self.embed_comic(comic)
         await self.bot.say(embed=embed_comic)
+
+    ################
+    # ERROR HANDLING
+    ################
+
+    @command_xkcd.error
+    @command_xkcd_latest.error
+    @command_xkcd_id.error
+    async def xkcd_xkcd_latest_xkcd_id_on_error(self, error, context):
+        if isinstance(context.command, self.command_xkcd):
+            bot_message = '`%s%s` takes no arguments or one of the predefined ones (use `help xkcd` for more ' \
+                          'information).' % (context.prefix, context.invoked_with)
+        elif isinstance(context.command, self.command_xkcd_latest):
+            bot_message = '`%s%s` takes no arguments.' % (context.prefix, context.command.qualified_name)
+        else:
+            bot_message = '`%s%s` takes exactly 1 positive number.' % (context.prefix, context.command.qualified_name)
+        bot_message_id_not_found = 'xkcd comic with the given id was not found.'
+        bot_message_xkcd_unavailable = 'Can\'t reach xkcd.com at the moment.'
+        await self.generic_error_handler(error, context,
+                                         (commands.CommandOnCooldown, commands.NoPrivateMessage, commands.CheckFailure),
+                                         (commands.TooManyArguments, bot_message),
+                                         (commands.BadArgument, bot_message),
+                                         (commands.MissingRequiredArgument, bot_message))
+        if (isinstance(error, commands.CommandInvokeError) and
+                isinstance(error.original, beckett.exceptions.InvalidStatusCodeError)):
+            self.logger.info('%s exception in command %s: %s',
+                             error.original.__class__.__name__, context.command.qualified_name, context.message.content)
+            if error.original.status_code == 404:
+                await self.bot.say(bot_message_id_not_found)
+            else:
+                await self.bot.say(bot_message_xkcd_unavailable)
 
 
 ########################
