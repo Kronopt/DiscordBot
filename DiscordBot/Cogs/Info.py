@@ -129,8 +129,8 @@ class Info(Cog):
                 if len(current_command.aliases) == 0:
                     title = '%s%s' % (bot_prefix, current_command.qualified_name)
                 else:
-                    title = '%s%s[%s | %s]' % (bot_prefix, current_command.full_parent_name, current_command.name,
-                                               ' | '.join(current_command.aliases))
+                    title = '%s%s[%s | %s] ' % (bot_prefix, current_command.full_parent_name, current_command.name,
+                                                ' | '.join(current_command.aliases))
 
                 # arguments (logic retrieved from HelpFormatter.get_command_signature()
                 arguments = current_command.clean_params
