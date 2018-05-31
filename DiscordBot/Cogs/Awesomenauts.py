@@ -68,8 +68,8 @@ class Awesomenauts(Cog):
         super().__init__(bot)
 
         if _awesomenauts_wiki_unreachable:
-            self.command_awesomenaut.enabled = False
-            self.command_awesomenaut_rank.enabled = False
+            self.command_awesomenauts.enabled = False
+            self.command_awesomenauts_rank.enabled = False
         else:
             self.awesomenauts_url = 'https://awesomenauts.gamepedia.com/%s#Stats'
             self.rankings_url = 'https://nautsrankings.com/index.php?search=%s'
@@ -79,9 +79,9 @@ class Awesomenauts(Cog):
     ##########
 
     # AWESOMENAUT
-    @commands.group(name='awesomenaut', ignore_extra=False, aliases=['awesomenauts'], invoke_without_command=True,
+    @commands.group(name='awesomenauts', ignore_extra=False, aliases=['awesomenaut'], invoke_without_command=True,
                     pass_context=True)
-    async def command_awesomenaut(self, context, awesomenaut: existing_awesomenaut):
+    async def command_awesomenauts(self, context, awesomenaut: existing_awesomenaut):
         """Displays information of the specified awesomenaut.
 
         Any text that matches at least part of an awesomenaut's name will work.
@@ -126,8 +126,8 @@ class Awesomenauts(Cog):
         await self.bot.say(embed=awesomenaut_embed)
 
     # AWESOMENAUT RANK
-    @command_awesomenaut.command(name='rank', ignore_extra=False, aliases=['r', '-r'], pass_context=True)
-    async def command_awesomenaut_rank(self, context, player: str):
+    @command_awesomenauts.command(name='rank', ignore_extra=False, aliases=['r', '-r'], pass_context=True)
+    async def command_awesomenauts_rank(self, context, player: str):
         """Displays rank information of an Awesomenaut's player.
 
         Matches highest ranked player, alphabetically.
@@ -194,14 +194,14 @@ class Awesomenauts(Cog):
     # ERROR HANDLING
     ################
 
-    @command_awesomenaut.error
-    @command_awesomenaut_rank.error
+    @command_awesomenauts.error
+    @command_awesomenauts_rank.error
     async def awesomenaut_awesomenaut_rank_on_error(self, error, context):
         bot_message_url_unreachable = 'Can\'t access Awesomenauts information right now. Command will sleep for a ' \
                                       'few minutes'
         bot_message_html_changed = 'Can\'t access Awesomenauts information right now. Command will sleep until issue ' \
                                    'is fixed'
-        if context.command.callback is self.command_awesomenaut.callback:
+        if context.command.callback is self.command_awesomenauts.callback:
             bot_message = '`%s%s` takes a name of an awesomenaut (or part of it) as argument (use quotation marks to ' \
                           'enclose space separated names).' % (context.prefix, context.invoked_with)
             url_fetch_error_message = 'Awesomenauts Wiki (%s) is unreachable' % self.awesomenauts_url
@@ -216,16 +216,15 @@ class Awesomenauts(Cog):
                                          (commands.MissingRequiredArgument, bot_message),
                                          (commands.TooManyArguments, bot_message),
                                          (commands.BadArgument, bot_message))
-        if (isinstance(error, commands.CommandInvokeError) and
-                isinstance(error.original, requests.exceptions.RequestException)):
-            self.logger.warning(url_fetch_error_message)
-            await self.bot.say(bot_message_url_unreachable)
-            context.command.enabled = False
-            asyncio.sleep(60 * 5)
-            context.command.enabled = True
-        elif (isinstance(error, commands.CommandInvokeError) and
-                isinstance(error.original, (AttributeError, KeyError, IndexError))):
-            # html was altered and, therefore, the code is now broken...
-            self.logger.warning(html_changed_error)
-            await self.bot.say(bot_message_html_changed)
-            context.command.enabled = False
+        if isinstance(error, commands.CommandInvokeError):
+            if isinstance(error.original, requests.exceptions.RequestException):
+                self.logger.warning(url_fetch_error_message)
+                await self.bot.say(bot_message_url_unreachable)
+                context.command.enabled = False
+                asyncio.sleep(60 * 5)  # disable command for 5 minutes
+                context.command.enabled = True
+            elif isinstance(error.original, (AttributeError, KeyError, IndexError)):
+                # html was altered and, therefore, the code is now broken...
+                self.logger.warning(html_changed_error)
+                await self.bot.say(bot_message_html_changed)
+                context.command.enabled = False

@@ -74,17 +74,9 @@ class Math(Cog):
 
     @command_sum.error
     @command_subtract.error
+    @command_divide.error
     @command_multiply.error
     async def sum_subtract_divide_multiply_on_error(self, error, context):
-        bot_message = '`%s%s` takes at least 1 number.' % (context.prefix, context.invoked_with)
-        await self.generic_error_handler(error, context,
-                                         (commands.TooManyArguments, commands.CommandOnCooldown,
-                                          commands.NoPrivateMessage, commands.CheckFailure),
-                                         (commands.MissingRequiredArgument, bot_message),
-                                         (commands.BadArgument, bot_message))
-
-    @command_divide.error
-    async def ping_hi_on_error(self, error, context):
         bot_message = '`%s%s` takes at least 1 number.' % (context.prefix, context.invoked_with)
         bot_message_zero_division_error = '`%s%s` can\'t divide by zero.' % (context.prefix, context.invoked_with)
         await self.generic_error_handler(error, context,

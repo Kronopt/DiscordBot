@@ -100,28 +100,17 @@ class General(Cog):
 
     @command_ping.error
     @command_hi.error
-    async def ping_hi_on_error(self, error, context):
-        bot_message = '`%s%s` takes no arguments.' % (context.prefix, context.invoked_with)
-        await self.generic_error_handler(error, context,
-                                         (commands.MissingRequiredArgument, commands.CommandOnCooldown,
-                                          commands.NoPrivateMessage, commands.CheckFailure),
-                                         (commands.TooManyArguments, bot_message),
-                                         (commands.BadArgument, bot_message))
-
     @command_dice.error
-    async def dice_on_error(self, error, context):
-        bot_message = '`%s%s` takes either no arguments or one of the following: %s.'\
-                      % (context.prefix, context.invoked_with, ', '.join(Converters.DICES))
-        await self.generic_error_handler(error, context,
-                                         (commands.MissingRequiredArgument, commands.CommandOnCooldown,
-                                          commands.NoPrivateMessage, commands.CheckFailure),
-                                         (commands.TooManyArguments, bot_message),
-                                         (commands.BadArgument, bot_message))
-
     @command_random.error
-    async def random_on_error(self, error, context):
-        bot_message = '`{0}{1}` takes no arguments or one of the predefined ones (use `{0}help {1}` for more ' \
-                      'information).'.format(context.prefix, context.invoked_with)
+    async def ping_hi_dice_random_on_error(self, error, context):
+        if context.command.callback in (self.command_ping.callback, self.command_hi.callback):
+            bot_message = '`%s%s` takes no arguments.' % (context.prefix, context.invoked_with)
+        elif context.command.callback is self.command_dice.callback:
+            bot_message = '`%s%s` takes either no arguments or one of the following: %s.'\
+                          % (context.prefix, context.invoked_with, ', '.join(Converters.DICES))
+        else:
+            bot_message = '`{0}{1}` takes no arguments or one of the predefined ones (use `{0}help {1}` for more ' \
+                          'information).'.format(context.prefix, context.invoked_with)
         await self.generic_error_handler(error, context,
                                          (commands.MissingRequiredArgument, commands.CommandOnCooldown,
                                           commands.NoPrivateMessage, commands.CheckFailure),
