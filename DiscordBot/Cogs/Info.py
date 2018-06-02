@@ -129,8 +129,9 @@ class Info(Cog):
                 if len(current_command.aliases) == 0:
                     title = '%s%s' % (bot_prefix, current_command.qualified_name)
                 else:
-                    title = '%s%s [%s | %s] ' % (bot_prefix, current_command.full_parent_name, current_command.name,
-                                                 ' | '.join(current_command.aliases))
+                    command_parent = current_command.full_parent_name + ' ' if current_command.full_parent_name else ''
+                    title = '%s%s[%s | %s] ' % (bot_prefix, command_parent, current_command.name,
+                                                ' | '.join(current_command.aliases))
 
                 # arguments (logic retrieved from HelpFormatter.get_command_signature()
                 arguments = current_command.clean_params
@@ -152,8 +153,7 @@ class Info(Cog):
                 description = current_command.help
                 description += self.add_subcommands(current_command, '\n\n**subcommands:**\n', '%s\t\t%s\n')
 
-                embed_help_command = discord.Embed(title='```' + title + '```',
-                                                   description=description, colour=self.embed_colour)
+                embed_help_command = discord.Embed(title=title, description=description, colour=self.embed_colour)
 
                 await self.bot.say(embed=embed_help_command)
 
