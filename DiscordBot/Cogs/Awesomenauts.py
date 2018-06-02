@@ -138,7 +138,8 @@ class Awesomenauts(Cog):
 
         # player doesn't exist
         if rankings_soup.find('div', {'class': 'entries'}).text.startswith('0'):
-            await self.bot.say('No player whose name starts with `%s` was found' % player)
+            await self.bot.say('No player whose name starts with `%s` was found.\nOnly players that played '
+                               'during the current awesomenauts season are available.' % player)
             return
 
         row = rankings_soup.find('div', {'id': 'rankings'}).find('img')
