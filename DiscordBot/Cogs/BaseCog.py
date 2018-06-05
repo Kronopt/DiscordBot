@@ -67,7 +67,7 @@ class Cog(metaclass=CogMeta):
         self.bot = bot
         self.name = self.__class__.__name__
         self.logger = logger
-        self.embed_colour = 0xe74c3c
+        self.embed_colour = 16777215
 
         # {command_function_name: command_object, ...}
         self.commands = OrderedDict(inspect.getmembers(self, lambda x: issubclass(x.__class__, commands.core.Command)))
