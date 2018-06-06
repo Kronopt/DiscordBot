@@ -47,11 +47,10 @@ BOT.add_cog(Info(BOT))
 
 @BOT.event
 async def on_ready():
-    logging.info('started on_ready')
-    logging.info('Logged in as: %s, %s' % (BOT.user.name, BOT.user.id))
+    logging.info('Logged in as: %s, (id: %s)' % (BOT.user.name, BOT.user.id))
     logging.info('Channels connected to:')
     for channel in BOT.get_all_channels():
-        logging.info(' -%s.%s, %s-channel %s' % (channel.server.name, channel.name, str(channel.type), channel.id))
+        logging.info('    %s.%s (%s) (id: %s)' % (channel.server.name, channel.name, str(channel.type), channel.id))
     print('Bot is ready')
     print('------------')
 
