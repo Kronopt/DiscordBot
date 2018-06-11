@@ -125,6 +125,16 @@ class Awesomenauts(Cog):
 
         await self.bot.say(embed=awesomenaut_embed)
 
+    # AWESOMENAUT LIST
+    @command_awesomenauts.command(name='list', ignore_extra=False, aliases=['l', '-l'], pass_context=True)
+    async def command_awesomenauts_list(self, context):
+        """Displays all currently existing Awesomenauts characters."""
+        list_embed = discord.Embed(colour=self.embed_colour)
+
+        for awesomenaut, _ in AWESOMENAUTS:
+            list_embed.add_field(name=awesomenaut, value='\n\u200b')
+        await self.bot.say(embed=list_embed)
+
     # AWESOMENAUT RANK
     @command_awesomenauts.command(name='rank', ignore_extra=False, aliases=['r', '-r'], pass_context=True)
     async def command_awesomenauts_rank(self, context, player: str):
@@ -196,6 +206,7 @@ class Awesomenauts(Cog):
     ################
 
     @command_awesomenauts.error
+    @command_awesomenauts_list.error
     @command_awesomenauts_rank.error
     async def awesomenaut_awesomenaut_rank_on_error(self, error, context):
         bot_message_url_unreachable = 'Can\'t access Awesomenauts information right now. Command will sleep for a ' \
@@ -207,11 +218,15 @@ class Awesomenauts(Cog):
                           'enclose space separated names).' % (context.prefix, context.invoked_with)
             url_fetch_error_message = 'Awesomenauts Wiki (%s) is unreachable' % self.awesomenauts_url
             html_changed_error = 'Awesomenauts Wiki\'s html (%s) has changed' % self.awesomenauts_url
-        else:
+        elif context.command.callback is self.command_awesomenauts_rank.callback:
             bot_message = '`%s%s` takes a player name as argument (use quotation marks to enclose space separated ' \
                           'names).' % (context.prefix, context.command.qualified_name)
             url_fetch_error_message = 'nautsrankings.com (%s) is unreachable' % self.rankings_url
             html_changed_error = 'nautsrankings.com html (%s) has changed' % self.rankings_url
+        else:  # awesomenauts list
+            bot_message = '`%s%s` takes no arguments.' % (context.prefix, context.command.qualified_name)
+            url_fetch_error_message = ''
+            html_changed_error = ''
         await self.generic_error_handler(error, context,
                                          (commands.CommandOnCooldown, commands.NoPrivateMessage, commands.CheckFailure),
                                          (commands.MissingRequiredArgument, bot_message),
