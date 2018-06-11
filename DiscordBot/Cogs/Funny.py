@@ -97,6 +97,7 @@ class Funny(Cog):
 
         # retrieve random joke from the selected api
         try:
+            self.logger.info('Trying to fetch joke from %s' % api.Meta.name)
             joke = api.get_random_joke(uid=-1)[0]
 
         except beckett.exceptions.InvalidStatusCodeError as error:
@@ -106,8 +107,10 @@ class Funny(Cog):
             api_alternate = self.api_list[0] if api is not self.api_list[0] else self.api_list[1]
 
             joke = api_alternate.get_random_joke(uid=-1)[0]
+            self.logger.info('Fetched joke from %s' % api_alternate.Meta.name)
             await self.send_joke(api, joke)
         else:
+            self.logger.info('Fetched joke from %s' % api.Meta.name)
             await self.send_joke(api, joke)
 
     ################
