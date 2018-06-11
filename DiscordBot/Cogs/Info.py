@@ -51,8 +51,8 @@ class Info(Cog):
     ##########
 
     # INFO
-    @commands.command(name='info', ignore_extra=False)
-    async def command_info(self):
+    @commands.command(name='info', ignore_extra=False, pass_context=True)
+    async def command_info(self, context):
         """Shows author, github page and framework."""
         embed_info = discord.Embed(colour=self.embed_colour)
         embed_info.add_field(name='Author', value='[Kronopt](https://github.com/Kronopt)\n\u200b', inline=False)
@@ -63,8 +63,8 @@ class Info(Cog):
         await self.bot.say(embed=embed_info)
 
     # HELP
-    @commands.command(name='help', ignore_extra=False)
-    async def command_help(self, *command):
+    @commands.command(name='help', ignore_extra=False, pass_context=True)
+    async def command_help(self, context, *command):
         """Shows all commands or info on a command.
 
         Call without arguments to show all commands.

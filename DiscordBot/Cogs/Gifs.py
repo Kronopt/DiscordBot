@@ -47,24 +47,24 @@ class Gifs(Cog):
     ##########
 
     # RICKROLL
-    @commands.command(name='rickroll', ignore_extra=False, aliases=['rr'])
-    async def command_rickroll(self):
+    @commands.command(name='rickroll', ignore_extra=False, aliases=['rr'], pass_context=True)
+    async def command_rickroll(self, context):
         """Never gonna give you up."""
         gif = self.embed_gif('https://media.giphy.com/media/LXONhtCmN32YU/giphy.gif',
                              footer_message='You\'ve been rick rolled')
         await self.bot.say(embed=gif)
 
     # OHGODNO
-    @commands.command(name='ohgodno', ignore_extra=False, aliases=['godno'])
-    async def command_ohgodno(self):
+    @commands.command(name='ohgodno', ignore_extra=False, aliases=['godno'], pass_context=True)
+    async def command_ohgodno(self, context):
         """Oh god no (The Office)."""
         gif = self.embed_gif('https://media.giphy.com/media/12XMGIWtrHBl5e/giphy.gif',
                              footer_message='Noooooooooooooooooooooooooo')
         await self.bot.say(embed=gif)
 
     # REKT
-    @commands.command(name='rekt', ignore_extra=False)
-    async def command_rekt(self):
+    @commands.command(name='rekt', ignore_extra=False, pass_context=True)
+    async def command_rekt(self, context):
         """Rekt."""
         gif = self.embed_gif('https://media.giphy.com/media/11yKQ9fN3c06fC/giphy.gif',
                              footer_message='rekt')

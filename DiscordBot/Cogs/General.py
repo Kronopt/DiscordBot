@@ -25,8 +25,8 @@ class General(Cog):
     ##########
 
     # PING
-    @commands.command(name='ping', ignore_extra=False)
-    async def command_ping(self):
+    @commands.command(name='ping', ignore_extra=False, pass_context=True)
+    async def command_ping(self, context):
         """'pong'.
 
         Simple command to test if bot is alive."""
@@ -43,8 +43,8 @@ class General(Cog):
         await self.bot.say(random.choice(self.greetings) + ', ' + author_name)
 
     # DICE
-    @commands.command(name='dice', ignore_extra=False)
-    async def command_dice(self, *dice: Converters.dice):
+    @commands.command(name='dice', ignore_extra=False, pass_context=True)
+    async def command_dice(self, context, *dice: Converters.dice):
         """Rolls a die.
 
         Possible dices: d4, d6, d8, d10, d12 and d20.
@@ -62,8 +62,8 @@ class General(Cog):
         await self.bot.say('Rolled a **' + str(dice_roll) + '** with a ' + dice)
 
     # RANDOM
-    @commands.group(name='random', ignore_extra=False, aliases=['rand'], invoke_without_command=True)
-    async def command_random(self):
+    @commands.group(name='random', ignore_extra=False, aliases=['rand'], invoke_without_command=True, pass_context=True)
+    async def command_random(self, context):
         """Generates a number between 0 and 1.
 
         (inclusive)"""
@@ -71,8 +71,8 @@ class General(Cog):
         await self.bot.say('Result: **' + str(random_number) + '**')
 
     # RANDOM BETWEEN
-    @command_random.command(name='between', ignore_extra=False, aliases=['b', '-b', 'betw'])
-    async def command_random_between(self, a: int, b: int):
+    @command_random.command(name='between', ignore_extra=False, aliases=['b', '-b', 'betw'], pass_context=True)
+    async def command_random_between(self, context, a: int, b: int):
         """Generates a number between a and b.
 
         (inclusive)"""
@@ -83,8 +83,8 @@ class General(Cog):
         await self.bot.say('Result: **' + str(random_number) + '**')
 
     # RANDOM FROM
-    @command_random.command(name='from', ignore_extra=False, aliases=['f', '-f', 'fr'])
-    async def command_random_from(self, *args: str):
+    @command_random.command(name='from', ignore_extra=False, aliases=['f', '-f', 'fr'], pass_context=True)
+    async def command_random_from(self, context, *args: str):
         """Randomly selects one of the given arguments.
 
         Arguments cen be either space-separated or enclosed in quotes"""

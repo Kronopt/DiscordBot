@@ -34,9 +34,18 @@ def logging_wrapper(command):
     """
     command_callback = command.callback
 
+    # assumes all commands receive a context argument
     @functools.wraps(command_callback)
     async def wrapper(*args, **kwargs):
-        logger.info('command called: ' + command.qualified_name)
+        context = args[1]  # self, context, ...
+        command_called = command.qualified_name
+        message = context.message.content
+        channel = '%s.%s(%s)' % (context.message.server.name,
+                                 context.message.channel.name,
+                                 str(context.message.channel.type)) if context.message.server else 'Private Message'
+        user = '%s#%s' % (context.message.author.name, context.message.author.discriminator)
+
+        logger.info('command called: %s; message: %s; channel: %s; user: %s' % (command_called, message, channel, user))
         await command_callback(*args, **kwargs)
     return wrapper
 
@@ -46,10 +55,16 @@ class CogMeta(type):
     def __new__(mcs, name, bases, body):
         for attribute in body.values():
             if isinstance(attribute, commands.core.Command):  # Wrap every command inside a Cog in a logging function
-                attribute.callback = logging_wrapper(attribute)
+
                 if not hasattr(attribute, 'on_error'):  # Force implementation of command error handler
                     raise NotImplementedError('Command: %s (%s) in Cog: %s has no error handler'
                                               % (attribute.name, attribute.callback.__name__, name))
+
+                if not attribute.pass_context:  # Force pass_context to True
+                    raise NotImplementedError('Command: %s (%s) in Cog: %s has no passed context'
+                                              % (attribute.name, attribute.callback.__name__, name))
+
+                attribute.callback = logging_wrapper(attribute)
         return super().__new__(mcs, name, bases, body)
 
 

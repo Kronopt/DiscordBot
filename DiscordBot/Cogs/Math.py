@@ -25,8 +25,8 @@ class Math(Cog):
     ##########
 
     # SUM
-    @commands.command(name='sum', ignore_extra=False, aliases=['add', '+'])
-    async def command_sum(self, *numbers: Converters.number):
+    @commands.command(name='sum', ignore_extra=False, aliases=['add', '+'], pass_context=True)
+    async def command_sum(self, context, *numbers: Converters.number):
         """Sums all numbers."""
         if len(numbers) == 0:  # at least one argument
             raise commands.MissingRequiredArgument
@@ -36,8 +36,8 @@ class Math(Cog):
         await self.bot.say(' + '.join(numbers) + ' = ' + '**' + str(result) + '**')
 
     # SUBTRACT
-    @commands.command(name='subtract', ignore_extra=False, aliases=['-'])
-    async def command_subtract(self, *numbers: Converters.number):
+    @commands.command(name='subtract', ignore_extra=False, aliases=['-'], pass_context=True)
+    async def command_subtract(self, context, *numbers: Converters.number):
         """Subtracts all numbers."""
         if len(numbers) == 0:  # at least one argument
             raise commands.MissingRequiredArgument
@@ -47,8 +47,8 @@ class Math(Cog):
         await self.bot.say(' - '.join(numbers) + ' = ' + '**' + str(result) + '**')
 
     # DIVIDE
-    @commands.command(name='divide', ignore_extra=False, aliases=['/'])
-    async def command_divide(self, *numbers: Converters.number):
+    @commands.command(name='divide', ignore_extra=False, aliases=['/'], pass_context=True)
+    async def command_divide(self, context, *numbers: Converters.number):
         """Divides all numbers."""
         if len(numbers) == 0:  # at least one argument
             raise commands.MissingRequiredArgument
@@ -58,8 +58,8 @@ class Math(Cog):
         await self.bot.say(' / '.join(numbers) + ' = ' + '**' + str(result) + '**')
 
     # MULTIPLY
-    @commands.command(name='multiply', ignore_extra=False, aliases=['mul', '*'])
-    async def command_multiply(self, *numbers: Converters.number):
+    @commands.command(name='multiply', ignore_extra=False, aliases=['mul', '*'], pass_context=True)
+    async def command_multiply(self, context, *numbers: Converters.number):
         """Multiplies all numbers."""
         if len(numbers) == 0:  # at least one argument
             raise commands.MissingRequiredArgument

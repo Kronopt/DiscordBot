@@ -55,8 +55,8 @@ class Xkcd(Cog):
     ##########
 
     # XKCD
-    @commands.group(name='xkcd', ignore_extra=False, invoke_without_command=True)
-    async def command_xkcd(self):
+    @commands.group(name='xkcd', ignore_extra=False, invoke_without_command=True, pass_context=True)
+    async def command_xkcd(self, context):
         """Retrieves a random xkcd comic from xkcd.com."""
 
         # get the latest comic number and generate a number between 1 and that number
@@ -70,8 +70,8 @@ class Xkcd(Cog):
         await self.bot.say(embed=embed_comic)
 
     # XKCD LATEST
-    @command_xkcd.command(name='latest', ignore_extra=False, aliases=['l', '-l', 'last'])
-    async def command_xkcd_latest(self):
+    @command_xkcd.command(name='latest', ignore_extra=False, aliases=['l', '-l', 'last'], pass_context=True)
+    async def command_xkcd_latest(self, context):
         """Retrieves the latest xkcd comic from xkcd.com."""
 
         comic = self.xkcd_api_client.get_comic(uid=-1)[0]
@@ -79,8 +79,8 @@ class Xkcd(Cog):
         await self.bot.say(embed=embed_comic)
 
     # XKCD ID
-    @command_xkcd.command(name='id', ignore_extra=False, aliases=['n', '-n', 'number'])
-    async def command_xkcd_id(self, comic_id: Converters.positive_int):
+    @command_xkcd.command(name='id', ignore_extra=False, aliases=['n', '-n', 'number'], pass_context=True)
+    async def command_xkcd_id(self, context, comic_id: Converters.positive_int):
         """Retrieves the selected xkcd comic from xkcd.com."""
 
         comic = self.xkcd_api_client.get_comic(uid=comic_id)[0]

@@ -22,24 +22,24 @@ class AsciiEmojis(Cog):
     ##########
 
     # TABLEFLIP
-    @commands.command(name='tableflip', ignore_extra=False, aliases=['tf', 'flip'])
-    async def command_tableflip(self):
+    @commands.command(name='tableflip', ignore_extra=False, aliases=['tf', 'flip'], pass_context=True)
+    async def command_tableflip(self, context):
         """(╯°□°）╯︵ ┻━┻
 
         tableflip emoji."""
         await self.bot.say('(╯°□°）╯︵ ┻━┻')  # Discord already has this emoji implemented
 
     # TABLEUNFLIP
-    @commands.command(name='tableunflip', ignore_extra=False, aliases=['tuf', 'unflip'])
-    async def command_tableunflip(self):
+    @commands.command(name='tableunflip', ignore_extra=False, aliases=['tuf', 'unflip'], pass_context=True)
+    async def command_tableunflip(self, context):
         """┬─┬ ノ(゜-゜ノ)
 
         tableunflip emoji."""
         await self.bot.say('┬─┬ ノ( ゜-゜ノ)')  # Discord already has this emoji implemented
 
     # SHRUG
-    @commands.command(name='shrug', ignore_extra=False)
-    async def command_shrug(self):
+    @commands.command(name='shrug', ignore_extra=False, pass_context=True)
+    async def command_shrug(self, context):
         """¯\_(ツ)_/¯
 
         shrug emoji."""

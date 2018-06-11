@@ -43,8 +43,8 @@ class Funny(Cog):
     ##########
 
     # 8BALL
-    @commands.command(name='8ball', ignore_extra=False, aliases=['eightball', '8b'])
-    async def command_eightball(self, *args: str):
+    @commands.command(name='8ball', ignore_extra=False, aliases=['eightball', '8b'], pass_context=True)
+    async def command_eightball(self, context, *args: str):
         """Bot uses its fortune-telling powers to answer your question.
 
         Ask a question and get one of the classic magic 8 ball answers."""
@@ -61,8 +61,8 @@ class Funny(Cog):
         await self.bot.say('`' + ' '.join(args) + '`: ' + self.eightball_answers[answer] + ' ' + emoji)
 
     # POOP
-    @commands.command(name='poop', ignore_extra=False)
-    async def command_poop(self, *n: Converters.positive_int):
+    @commands.command(name='poop', ignore_extra=False, pass_context=True)
+    async def command_poop(self, context, *n: Converters.positive_int):
         """Sends n poops.
 
         Sends as much poop as discord allows."""
@@ -78,8 +78,8 @@ class Funny(Cog):
         await self.bot.say(':poop:' * n)
 
     # JOKE
-    @commands.command(name='joke', ignore_extra=False, invoke_without_command=True)
-    async def command_joke(self):
+    @commands.command(name='joke', ignore_extra=False, invoke_without_command=True, pass_context=True)
+    async def command_joke(self, context):
         """Tells a random (bad) joke.
 
         Jokes are randomly sourced from one of these APIs:
