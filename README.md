@@ -73,7 +73,7 @@ A Discord Bot
 | command | descripion |
 | ------- | ---------- |
 | `!awesomenaut <str awesomenaut_name>` | Displays information of the specified awesomenaut. |
-| `!awesomenaut list` | Displays all currently existing Awesomenauts characters. |
+| `!awesomenaut list` | Displays all currently existing Awesomenauts characters alphabetically. |
 | `!awesomenaut rank <str player_name>` | Displays rank information of an Awesomenaut's player. |
 
 ### Info

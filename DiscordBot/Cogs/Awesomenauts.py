@@ -128,11 +128,28 @@ class Awesomenauts(Cog):
     # AWESOMENAUT LIST
     @command_awesomenauts.command(name='list', ignore_extra=False, aliases=['l', '-l'], pass_context=True)
     async def command_awesomenauts_list(self, context):
-        """Displays all currently existing Awesomenauts characters."""
+        """Displays all currently existing Awesomenauts characters alphabetically."""
         list_embed = discord.Embed(colour=self.embed_colour)
 
-        for awesomenaut, _ in AWESOMENAUTS:
-            list_embed.add_field(name=awesomenaut, value='\n\u200b')
+        current_letter = ''
+        name = ''
+        value = ''
+        first = True
+        for awesomenaut, _ in AWESOMENAUTS:  # assumes awesomenauts are alphabetically ordered
+            if awesomenaut[0] != current_letter:
+                if not first:
+                    value += '\n\u200b'
+                    list_embed.add_field(name=name, value=value)
+                else:
+                    first = False
+
+                current_letter = awesomenaut[0]
+                name = '- %s -' % current_letter.upper()
+                value = awesomenaut
+            else:
+                value += '\n' + awesomenaut
+        list_embed.add_field(name=name, value=value)
+        list_embed.set_footer(text='There currently are %s Awesomenauts' % len(AWESOMENAUTS))
         await self.bot.say(embed=list_embed)
 
     # AWESOMENAUT RANK
