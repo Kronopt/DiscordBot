@@ -62,7 +62,7 @@ class AsciiEmojis(Cog):
         await self.bot.say('ಠ‿ಠ')
 
     # CUTEFACE
-    @commands.command(name='cute', ignore_extra=False, aliases=['cuteface'], pass_context=True)
+    @commands.command(name='cuteface', ignore_extra=False, aliases=['cute'], pass_context=True)
     async def command_cuteface(self, context):
         """(｡◕‿◕｡)
 
@@ -70,7 +70,7 @@ class AsciiEmojis(Cog):
         await self.bot.say('(｡◕‿◕｡)')
 
     # ANGRYFACE
-    @commands.command(name='angry', ignore_extra=False, aliases=['angryface'], pass_context=True)
+    @commands.command(name='angryface', ignore_extra=False, aliases=['angry'], pass_context=True)
     async def command_angryface(self, context):
         """(╬ ಠ益ಠ)
 
