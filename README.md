@@ -59,6 +59,15 @@ A Discord Bot
 | `!tableflip` | (╯°□°）╯︵ ┻━┻ |
 | `!tableunflip` | ┬─┬ ノ(゜-゜ノ) |
 | `!shrug` | ¯\\\_(ツ)_/¯ |
+| `!disapprovalface` | ಠ_ಠ |
+| `!deviousface` | ಠ‿ಠ |
+| `!cuteface` | (｡◕‿◕｡) |
+| `!angryface` | (╬ ಠ益ಠ) |
+| `!cryingface` | ಥ_ಥ |
+| `!inlove` | (っ´ω`c)♡ |
+| `!lol` | L(° O °L) |
+| `!finn` | &#124; (• ◡•)&#124; |
+| `!jake` | (❍ᴥ❍ʋ) |
 
 ### XKCD Comics
 
