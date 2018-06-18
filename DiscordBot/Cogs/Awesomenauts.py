@@ -9,6 +9,7 @@ Awesomenauts related Commands.
 import asyncio
 import logging
 import discord
+import regex
 import requests
 from bs4 import BeautifulSoup
 from discord.ext import commands
@@ -42,7 +43,7 @@ else:
 
 def existing_awesomenaut(name):
     """
-    Converter that finds whether the given name is a known awesomenaut.
+    Converter that finds whether the given name matches a known awesomenaut.
     Returns the url ready name of the matched awesomenaut, raises ValueError otherwise.
 
     Parameters
@@ -54,10 +55,27 @@ def existing_awesomenaut(name):
     -------
     url ready awesomenaut name, raises ValueError if no matching awesomenaut is found
     """
-    _name = name.lower()
+    _name = name.lower().strip()
+
+    if len(_name) <= 2:  # for smaller words will look at the start of the awesomenaut's name instead of it's whole
+        regex_operation = 'match'
+        re = regex.escape(_name)
+    else:
+        regex_operation = 'search'
+        re = '(%s){e<=1}' % regex.escape(_name)  # search for the given name with at most 1 mistake
+
+    regex_result = {}
+    best_match = (None, 2)  # (regex_result key, fuzzy_counts)
     for awesomenaut_name, awesomenaut_url_name in AWESOMENAUTS:
-        if _name in awesomenaut_name.lower():
-            return awesomenaut_url_name
+        result = getattr(regex, regex_operation)(re, awesomenaut_name.lower(), regex.BESTMATCH)
+        if result:
+            regex_result[result] = awesomenaut_url_name
+            fuzzy_counts = sum(result.fuzzy_counts)
+            if fuzzy_counts < best_match[1]:  # first match will always overwrite the best_match variable
+                best_match = (result, fuzzy_counts)
+
+    if regex_result:
+            return regex_result[best_match[0]]
     raise ValueError(name + ' does not match an existing awesomenaut')
 
 
