@@ -44,7 +44,7 @@ class Funny(Cog):
 
     # 8BALL
     @commands.command(name='8ball', ignore_extra=False, aliases=['eightball', '8b'], pass_context=True)
-    async def command_eightball(self, context, *args: str):
+    async def command_eightball(self, context, *args):
         """Bot uses its fortune-telling powers to answer your question.
 
         Ask a question and get one of the classic magic 8 ball answers."""
@@ -58,7 +58,7 @@ class Funny(Cog):
             emoji = self.eightball_emojis[1]
         else:  # Negative answer
             emoji = self.eightball_emojis[2]
-        await self.bot.say('`' + ' '.join(args) + '`: ' + self.eightball_answers[answer] + ' ' + emoji)
+        await self.bot.say('`' + context.message.clean_content + '`: ' + self.eightball_answers[answer] + ' ' + emoji)
 
     # POOP
     @commands.command(name='poop', ignore_extra=False, pass_context=True)

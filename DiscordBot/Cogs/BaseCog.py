@@ -39,7 +39,7 @@ def logging_wrapper(command):
     async def wrapper(*args, **kwargs):
         context = args[1]  # self, context, ...
         command_called = command.qualified_name
-        message = context.message.content
+        message = context.message.clean_content
         channel = '%s.%s(%s)' % (context.message.server.name,
                                  context.message.channel.name,
                                  str(context.message.channel.type)) if context.message.server else 'Private Message'
