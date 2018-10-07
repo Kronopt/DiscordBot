@@ -9,7 +9,7 @@ Info Commands.
 
 import discord
 from discord.ext import commands
-from .BaseCog import Cog
+from DiscordBot.BaseCog import Cog
 
 
 class Info(Cog):

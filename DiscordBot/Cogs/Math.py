@@ -10,7 +10,7 @@ Math Commands.
 import functools
 import operator
 from discord.ext import commands
-from .BaseCog import Cog
+from DiscordBot.BaseCog import Cog
 from DiscordBot import Converters
 
 

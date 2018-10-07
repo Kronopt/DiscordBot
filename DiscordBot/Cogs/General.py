@@ -9,7 +9,7 @@ General Commands.
 
 import random
 from discord.ext import commands
-from .BaseCog import Cog
+from DiscordBot.BaseCog import Cog
 from DiscordBot import Converters
 
 

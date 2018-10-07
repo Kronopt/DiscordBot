@@ -13,7 +13,7 @@ import beckett.exceptions
 from discord.ext import commands
 from beckett.clients import BaseClient
 from beckett.resources import BaseResource
-from .BaseCog import Cog
+from DiscordBot.BaseCog import Cog
 from DiscordBot import Converters
 
 

@@ -14,15 +14,9 @@ import traceback
 import sys
 import beckett.exceptions
 import discord
+import DiscordBot.Cogs
 from discord.ext import commands
-from DiscordBot.Cogs.General import General
 from DiscordBot.Cogs.Math import Math
-from DiscordBot.Cogs.Funny import Funny
-from DiscordBot.Cogs.Gifs import Gifs
-from DiscordBot.Cogs.AsciiEmojis import AsciiEmojis
-from DiscordBot.Cogs.Xkcd import Xkcd
-from DiscordBot.Cogs.Awesomenauts import Awesomenauts
-from DiscordBot.Cogs.Info import Info
 
 
 logging.basicConfig(level=logging.INFO)
@@ -34,15 +28,12 @@ BOT.command_prefix_simple = command_prefix
 # remove default help command
 BOT.remove_command('help')
 
-# Add cogs
-BOT.add_cog(General(BOT))
-BOT.add_cog(Math(BOT))
-BOT.add_cog(Funny(BOT))
-BOT.add_cog(Gifs(BOT))
-BOT.add_cog(AsciiEmojis(BOT))
-BOT.add_cog(Xkcd(BOT))
-BOT.add_cog(Awesomenauts(BOT))
-BOT.add_cog(Info(BOT))
+# Add cogs dynamically
+for cog_name in DiscordBot.Cogs.__all__:
+    cog_module = __import__('DiscordBot.Cogs.%s' % cog_name, fromlist=[cog_name])
+    if hasattr(cog_module, cog_name):  # ignores "in progress" cogs
+        cog = getattr(cog_module, cog_name)(BOT)
+        BOT.add_cog(cog)
 
 
 @BOT.event

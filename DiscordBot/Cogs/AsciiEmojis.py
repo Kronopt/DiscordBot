@@ -8,7 +8,7 @@ Ascii emojis Commands.
 
 
 from discord.ext import commands
-from .BaseCog import Cog
+from DiscordBot.BaseCog import Cog
 
 
 class AsciiEmojis(Cog):

@@ -13,7 +13,7 @@ import regex
 import requests
 from bs4 import BeautifulSoup
 from discord.ext import commands
-from .BaseCog import Cog
+from DiscordBot.BaseCog import Cog
 
 
 logger = logging.getLogger('discord')

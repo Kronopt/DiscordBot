@@ -6,12 +6,6 @@
 Poll related commands.
 """
 
-
-import asyncio
-from discord.ext import commands
-from .BaseCog import Cog
-
-
 # TODO use postgres data base
 
 # TODO handle errors
