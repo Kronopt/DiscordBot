@@ -34,7 +34,8 @@ class General(Cog):
         await self.bot.say('pong')
 
     # HI
-    @commands.command(name='hi', ignore_extra=False, aliases=['hello'], pass_context=True)
+    @commands.command(name='hi', ignore_extra=False, aliases=['hello', 'hey', 'sup', 'greetings', 'howdy'],
+                      pass_context=True)
     async def command_hi(self, context):
         """Greets user."""
         if hasattr(context.message.author, 'nick') and context.message.author.nick is not None:
