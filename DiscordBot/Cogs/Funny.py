@@ -22,6 +22,7 @@ class Funny(Cog):
 
     def __init__(self, bot):
         super().__init__(bot)
+        self.help_order = 1
         self.api_list = [ICanHazDadJokeClient(), OfficialJokeApiClient()]
         self.eightball_emojis = [":white_check_mark:", ":low_brightness:", ":x:"]
         self.eightball_answers = ["It is certain", "It is decidedly so", "Without a doubt", "Yes, definitely",

@@ -19,6 +19,7 @@ class Math(Cog):
 
     def __init__(self, bot):
         super().__init__(bot)
+        self.help_order = 4
 
     ##########
     # COMMANDS

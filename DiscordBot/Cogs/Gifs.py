@@ -17,6 +17,7 @@ class Gifs(Cog):
 
     def __init__(self, bot):
         super().__init__(bot)
+        self.help_order = 3
 
     def embed_gif(self, gif_url, footer_message=discord.Embed.Empty, colour=None):
         """

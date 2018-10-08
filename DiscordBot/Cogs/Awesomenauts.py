@@ -84,6 +84,7 @@ class Awesomenauts(Cog):
 
     def __init__(self, bot):
         super().__init__(bot)
+        self.help_order = 6
 
         if _awesomenauts_wiki_unreachable:
             self.command_awesomenauts.enabled = False
