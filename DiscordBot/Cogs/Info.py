@@ -74,8 +74,11 @@ class Info(Cog):
 
         if len(command) == 0:  # show all commands
             title = 'Commands can be called as follows:'
-            description = '\n```{0}{1}``````@Bot {1}```\n**COMMANDS**:'.format(
-                bot_prefix, '<command> [subcommand] [arguments]')
+            description = '\n```{0}{1}``````@Bot {1}```\n'.format(bot_prefix, '<command> [subcommands] [arguments]')
+            description += 'Subcommands are indented following their respective parent command.\n\n'
+            description += 'Some commands have aliases (ex: !8ball can also be called as !eightball or !8b).\n '
+            description += 'Type `!help <command> <subcommand>` to know more.\n\n\n\u200b'
+            description += '**COMMANDS**:'
 
             embed_help = discord.Embed(title=title, description=description, colour=self.embed_colour)
 
@@ -86,8 +89,10 @@ class Info(Cog):
                 # Command Groups
                 for command_object in cog_commands.values():
                     if command_object.parent is None and command_object.enabled:  # not a subcommand and enabled
-                        commands_listing += '%s%s\t\t%s\n' % (bot_prefix, command_object.name, command_object.short_doc)
-                        commands_listing += self.add_subcommands(command_object, '', '\t\t%s\t\t%s\n')
+                        commands_listing += '%s%s \u200b : \u200b %s\n' % (bot_prefix, command_object.name,
+                                                                           command_object.short_doc)
+                        commands_listing += self.add_subcommands(
+                            command_object, '', '\u200b . \u200b \u200b \u200b %s \u200b : \u200b %s\n')
 
                 commands_listing += '\n\u200b'  # separates fields a bit
                 embed_help.add_field(name=cog_object.name + ':', value=commands_listing)
@@ -153,7 +158,8 @@ class Info(Cog):
                             title += '<%s>' % argument_name
 
                 description = current_command.help
-                description += self.add_subcommands(current_command, '\n\n**subcommands:**\n', '%s\t\t%s\n')
+                description += self.add_subcommands(current_command, '\n\n**subcommands:**\n',
+                                                    '%s \u200b : \u200b %s\n')
 
                 embed_help_command = discord.Embed(title=title, description=description, colour=self.embed_colour)
 
