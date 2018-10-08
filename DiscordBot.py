@@ -28,10 +28,10 @@ BOT.command_prefix_simple = command_prefix
 # remove default help command
 BOT.remove_command('help')
 
-# Add cogs dynamically
+# add cogs dynamically
 for cog_name in DiscordBot.Cogs.__all__:
     cog_module = __import__('DiscordBot.Cogs.%s' % cog_name, fromlist=[cog_name])
-    if hasattr(cog_module, cog_name):  # ignores "in progress" cogs
+    if hasattr(cog_module, cog_name):  # ignores "work in progress" cogs
         cog = getattr(cog_module, cog_name)(BOT)
         BOT.add_cog(cog)
 

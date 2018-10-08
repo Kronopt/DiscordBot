@@ -18,6 +18,7 @@ class General(Cog):
 
     def __init__(self, bot):
         super().__init__(bot)
+        self.help_order = -float('inf')  # first cog in !help command output
         self.greetings = ['Hi', 'Hello', 'Hey', 'Sup', 'What\'s up', 'Greetings', 'Howdy']
 
     ##########

@@ -82,7 +82,8 @@ class Cog(metaclass=CogMeta):
         self.bot = bot
         self.name = self.__class__.__name__
         self.logger = logger
-        self.embed_colour = 16777215
+        self.embed_colour = 16777215  # colour of discord embed used in some messages
+        self.help_order = 10  # order number of cogs in !help command output
 
         # {command_function_name: command_object, ...}
         self.commands = OrderedDict(inspect.getmembers(self, lambda x: issubclass(x.__class__, commands.core.Command)))
@@ -161,3 +162,21 @@ class Cog(metaclass=CogMeta):
     def __check(self, context):
         """Cog global check goes here"""
         return True
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __lt__(self, other):
+        return self.help_order < other.help_order
+
+    def __le__(self, other):
+        return self.help_order <= other.help_order
+
+    def __eq__(self, other):
+        return self.help_order == other.help_order
+
+    def __gt__(self, other):
+        return self.help_order > other.help_order
+
+    def __ge__(self, other):
+        return self.help_order >= other.help_order

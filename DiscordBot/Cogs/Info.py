@@ -17,6 +17,7 @@ class Info(Cog):
 
     def __init__(self, bot):
         super().__init__(bot)
+        self.help_order = float('inf')  # last cog in !help command output
 
     @staticmethod
     def add_subcommands(command_object, string_before, base_string):
@@ -78,7 +79,8 @@ class Info(Cog):
 
             embed_help = discord.Embed(title=title, description=description, colour=self.embed_colour)
 
-            for cog_object, cog_commands in Cog.all_commands.items():
+            sorted_cogs = sorted(Cog.all_commands.items(), key=lambda x: x[0])
+            for cog_object, cog_commands in sorted_cogs:
                 commands_listing = ''
 
                 # Command Groups
