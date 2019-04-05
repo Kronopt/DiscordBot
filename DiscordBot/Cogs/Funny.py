@@ -225,7 +225,7 @@ class OfficialJokeApiResource(BaseResource):
 class OfficialJokeApiClient(BaseClient):
     class Meta(BaseClient.Meta):
         name = 'github.com/15Dkatz/official_joke_api API'
-        base_url = 'https://08ad1pao69.execute-api.us-east-1.amazonaws.com/dev'
+        base_url = 'https://official-joke-api.appspot.com/random_joke'
         resources = (
             OfficialJokeApiResource,
         )
