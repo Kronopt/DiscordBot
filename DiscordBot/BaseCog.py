@@ -3,9 +3,9 @@
 
 
 """
-Base Cog class.
-Each Cog should inherit from this.
-Each bot command should be decorated with a @command decorator.
+Base Cog class
+Each Cog should inherit from this
+Each bot command should be decorated with a @command decorator
 """
 
 
@@ -16,7 +16,7 @@ from collections import OrderedDict
 from discord.ext import commands
 
 
-logger = logging.getLogger('discord')
+logger = logging.getLogger('DiscordBot.Cog')
 
 
 def logging_wrapper(command):
@@ -38,39 +38,44 @@ def logging_wrapper(command):
     @functools.wraps(command_callback)
     async def wrapper(*args, **kwargs):
         context = args[1]  # self, context, ...
-        command_called = command.qualified_name
-        message = context.message.clean_content
-        channel = '%s.%s(%s)' % (context.message.server.name,
-                                 context.message.channel.name,
-                                 str(context.message.channel.type)) if context.message.server else 'Private Message'
-        user = '%s#%s' % (context.message.author.name, context.message.author.discriminator)
+        guild = context.message.guild
+        channel = context.message.channel
+        channel = f'{guild.name}.{channel.name} ' \
+                  f'({str(channel.type)})' if guild else 'Private Message'
+        user = f'{context.message.author.name}#{context.message.author.discriminator}'
 
-        logger.info('command called: %s; message: %s; channel: %s; user: %s' % (command_called, message, channel, user))
+        logger.info(f'command called: {command.qualified_name}; '
+                    f'message: {context.message.clean_content}; '
+                    f'channel: {channel}; '
+                    f'user: {user}')
         await command_callback(*args, **kwargs)
     return wrapper
 
 
-class CogMeta(type):
-
+class CogMeta(commands.CogMeta):
+    """
+    Cog meta class
+    Wraps every command inside a Cog in a logging function and
+    forces implementation of command error handler
+    """
     def __new__(mcs, name, bases, body):
         for attribute in body.values():
-            if isinstance(attribute, commands.core.Command):  # Wrap every command inside a Cog in a logging function
+            if isinstance(attribute, commands.core.Command):
 
-                if not hasattr(attribute, 'on_error'):  # Force implementation of command error handler
-                    raise NotImplementedError('Command: %s (%s) in Cog: %s has no error handler'
-                                              % (attribute.name, attribute.callback.__name__, name))
-
-                if not attribute.pass_context:  # Force pass_context to True
-                    raise NotImplementedError('Command: %s (%s) in Cog: %s has no passed context'
-                                              % (attribute.name, attribute.callback.__name__, name))
+                # Force implementation of command error handler
+                if not hasattr(attribute, 'on_error'):
+                    raise NotImplementedError(
+                        f'Command: {attribute.name} ({attribute.callback.__name__}) in Cog: '
+                        f'{name} has no error handler')
 
                 attribute.callback = logging_wrapper(attribute)
         return super().__new__(mcs, name, bases, body)
 
 
-class Cog(metaclass=CogMeta):
+class Cog(commands.Cog, metaclass=CogMeta):
 
-    # {Cog_object: {command_function_name: command_object, ...}, ...} of all commands from all instantiated Cogs
+    # all commands from all instantiated Cogs:
+    # {Cog_object: {command_function_name: command_object, ...}, ...}
     all_commands = OrderedDict()
 
     def __init__(self, bot):
@@ -78,7 +83,9 @@ class Cog(metaclass=CogMeta):
         Parameters
         ----------
         bot: discord.ext.commands.Bot
+            Bot
         """
+        super().__init__()
         self.bot = bot
         self.name = self.__class__.__name__
         self.logger = logger
@@ -86,11 +93,13 @@ class Cog(metaclass=CogMeta):
         self.help_order = 10  # order number of cogs in !help command output
 
         # {command_function_name: command_object, ...}
-        self.commands = OrderedDict(inspect.getmembers(self, lambda x: issubclass(x.__class__, commands.core.Command)))
+        self.commands = OrderedDict(
+            inspect.getmembers(self, lambda x: issubclass(x.__class__, commands.core.Command)))
         Cog.all_commands[self] = self.commands
 
-        self.logger.info('loaded commands from Cog %s: %s' % (self.name,
-                                                              ', '.join(command for command in self.commands)))
+        self.logger.info(f'loaded commands from Cog {self.name}:')
+        for command in self.commands:
+            self.logger.info(f'    {command}')
 
     @staticmethod
     def format_cooldown_time(seconds):
@@ -131,11 +140,14 @@ class Cog(metaclass=CogMeta):
         unhandled_exceptions: iter(commands.errors.CommandError)
         """
         if isinstance(error, (*unhandled_exceptions,)):
-            self.logger.warning('Unhandled Exception \'%s\': %s exceptions are not handled for %s%s'
-                                % (error.__class__.__name__, ', '.join([e.__name__ for e in unhandled_exceptions]),
-                                   context.prefix, context.invoked_with))
+            exceptions = ', '.join([e.__name__ for e in unhandled_exceptions])
+            self.logger.warning(
+                f'Unhandled Exception \'{error.__class__.__name__}\': '
+                f'{exceptions} exceptions are not handled for '
+                f'{context.prefix}{context.invoked_with}')
 
-    async def generic_error_handler(self, error, context, unhandled_exceptions, *handled_exceptions):
+    async def generic_error_handler(
+            self, error, context, unhandled_exceptions, *handled_exceptions):
         """
         Base error handler function.
         Warning will be logged if an unhandled exception is thrown.
@@ -149,19 +161,12 @@ class Cog(metaclass=CogMeta):
         """
         for handled_exception, bot_message in handled_exceptions:
             if isinstance(error, handled_exception):
-                self.logger.info('%s exception in command %s: %s',
-                                 error.__class__.__name__, context.command.qualified_name, context.message.content)
-                await self.bot.say(bot_message)
+                self.logger.info(
+                    f'{error.__class__.__name__} exception in command '
+                    f'{context.command.qualified_name}: {context.message.content}')
+                await context.send(bot_message)
                 return
         self.unhandled_exceptions(error, context, unhandled_exceptions)
-
-    def __unload(self):
-        """Cleanup goes here"""
-        pass
-
-    def __check(self, context):
-        """Cog global check goes here"""
-        return True
 
     def __hash__(self):
         return hash(self.name)
