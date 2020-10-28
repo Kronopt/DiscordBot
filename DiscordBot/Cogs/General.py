@@ -25,14 +25,6 @@ class General(Cog):
     # COMMANDS
     ##########
 
-    # PING
-    @commands.command(name='ping', ignore_extra=False, pass_context=True)
-    async def command_ping(self, context):
-        """'pong'.
-
-        Simple command to test if bot is alive."""
-        await self.bot.say('pong')
-
     # HI
     @commands.command(name='hi', ignore_extra=False, aliases=['hello', 'hey', 'sup', 'greetings', 'howdy'],
                       pass_context=True)
@@ -100,12 +92,11 @@ class General(Cog):
     # ERROR HANDLING
     ################
 
-    @command_ping.error
     @command_hi.error
     @command_dice.error
     @command_random.error
     async def ping_hi_dice_random_on_error(self, error, context):
-        if context.command.callback in (self.command_ping.callback, self.command_hi.callback):
+        if context.command.callback is self.command_hi.callback:
             bot_message = '`%s%s` takes no arguments.' % (context.prefix, context.invoked_with)
         elif context.command.callback is self.command_dice.callback:
             bot_message = '`%s%s` takes either no arguments or one of the following: %s.'\
