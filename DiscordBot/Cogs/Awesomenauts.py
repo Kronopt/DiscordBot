@@ -34,7 +34,8 @@ else:
     try:
         # list of pairs (awesomenaut_name, awesomenaut_url_ready_name)
         AWESOMENAUTS = [(awesomenaut.text, awesomenaut.a['href'][1:])
-                        for awesomenaut in _awesomenaut_list_soup.find(id='p-.27Nauts').find_all('li')]
+                        for awesomenaut in
+                        _awesomenaut_list_soup.find(id='p-.27Nauts').find_all('li')]
     except (AttributeError, KeyError):
         # html was altered and, therefore, the code is now broken...
         _awesomenauts_wiki_unreachable = True
@@ -57,7 +58,8 @@ def existing_awesomenaut(name):
     """
     _name = name.lower().strip()
 
-    if len(_name) <= 2:  # for smaller words will look at the start of the awesomenaut's name instead of it's whole
+    # for smaller words will look at the start of the awesomenaut's name instead of it's whole
+    if len(_name) <= 2:
         regex_operation = 'match'
         re = regex.escape(_name)
     else:
@@ -71,11 +73,12 @@ def existing_awesomenaut(name):
         if result:
             regex_result[result] = awesomenaut_url_name
             fuzzy_counts = sum(result.fuzzy_counts)
-            if fuzzy_counts < best_match[1]:  # first match will always overwrite the best_match variable
+            # first match will always overwrite the best_match variable
+            if fuzzy_counts < best_match[1]:
                 best_match = (result, fuzzy_counts)
 
     if regex_result:
-            return regex_result[best_match[0]]
+        return regex_result[best_match[0]]
     raise ValueError(name + ' does not match an existing awesomenaut')
 
 
@@ -98,15 +101,17 @@ class Awesomenauts(Cog):
     ##########
 
     # AWESOMENAUT
-    @commands.group(name='awesomenauts', ignore_extra=False, aliases=['awesomenaut'], invoke_without_command=True,
-                    pass_context=True)
+    @commands.group(name='awesomenauts', ignore_extra=False, aliases=['awesomenaut'],
+                    invoke_without_command=True,)
     async def command_awesomenauts(self, context, awesomenaut: existing_awesomenaut):
         """Displays information of the specified awesomenaut.
 
         Any text that matches at least part of an awesomenaut's name will work.
-        Matches are performed in alphabetical order ('Coco' matches first than 'Commander Rocket' for text 'co').
+        Matches are performed in alphabetical order ('Coco' matches first than
+        'Commander Rocket' for text 'co').
         Info retrieved from https://awesomenauts.gamepedia.com"""
-        # parameter is the URL READY NAME (raises ValueError if it does not match an existing awesomenaut)
+        # parameter is the URL READY NAME
+        # (raises ValueError if it does not match an existing awesomenaut)
         current_awesomenaut_url = self.awesomenauts_url % awesomenaut
 
         awesomenaut_url = requests.get(current_awesomenaut_url)
@@ -130,22 +135,24 @@ class Awesomenauts(Cog):
         awesomenaut_embed.set_thumbnail(url=awesomenaut_info['image'])
         awesomenaut_embed.set_author(name=awesomenaut_info['name'],
                                      url=current_awesomenaut_url,
-                                     icon_url='https://d1u5p3l4wpay3k.cloudfront.net/awesomenauts_gamepedia/0/'
-                                              '04/Overdrivesign.png')
+                                     icon_url='https://d1u5p3l4wpay3k.cloudfront.net/'
+                                              'awesomenauts_gamepedia/0/04/Overdrivesign.png')
         awesomenaut_embed.add_field(name=':chart_with_upwards_trend: DIFFICULTY',
                                     value=awesomenaut_info['difficulty'] + '\n\u200b')
         awesomenaut_embed.add_field(name=':spy: ROLE', value=awesomenaut_info['role'] + '\n\u200b')
-        awesomenaut_embed.add_field(name=':heart: HEALTH', value=awesomenaut_info['health'] + '\n\u200b')
+        awesomenaut_embed.add_field(name=':heart: HEALTH', value=awesomenaut_info['health'] +
+                                                                 '\n\u200b')
         awesomenaut_embed.add_field(name=':boot: MOVEMENT SPEED',
                                     value=awesomenaut_info['movement_speed'] + '\n\u200b')
         awesomenaut_embed.add_field(name=':crossed_swords: ATTACK TYPE',
                                     value=awesomenaut_info['attack_type'] + '\n\u200b')
-        awesomenaut_embed.add_field(name=':runner: MOBILITY', value=awesomenaut_info['mobility'] + '\n\u200b')
+        awesomenaut_embed.add_field(name=':runner: MOBILITY', value=awesomenaut_info['mobility'] +
+                                                                    '\n\u200b')
 
-        await self.bot.say(embed=awesomenaut_embed)
+        await context.send(embed=awesomenaut_embed)
 
     # AWESOMENAUT LIST
-    @command_awesomenauts.command(name='list', ignore_extra=False, aliases=['l', '-l'], pass_context=True)
+    @command_awesomenauts.command(name='list', ignore_extra=False, aliases=['l', '-l'])
     async def command_awesomenauts_list(self, context):
         """Displays all currently existing Awesomenauts characters alphabetically."""
         list_embed = discord.Embed(colour=self.embed_colour)
@@ -169,10 +176,10 @@ class Awesomenauts(Cog):
                 value += '\n' + awesomenaut
         list_embed.add_field(name=name, value=value)
         list_embed.set_footer(text='There currently are %s Awesomenauts' % len(AWESOMENAUTS))
-        await self.bot.say(embed=list_embed)
+        await context.send(embed=list_embed)
 
     # AWESOMENAUT RANK
-    @command_awesomenauts.command(name='rank', ignore_extra=False, aliases=['r', '-r'], pass_context=True)
+    @command_awesomenauts.command(name='rank', ignore_extra=False, aliases=['r', '-r'])
     async def command_awesomenauts_rank(self, context, player: str):
         """Displays rank information of an Awesomenaut's player.
 
@@ -184,8 +191,9 @@ class Awesomenauts(Cog):
 
         # player doesn't exist
         if rankings_soup.find('div', {'class': 'entries'}).text.startswith('0'):
-            await self.bot.say('No player whose name starts with `%s` was found.\nOnly players that played '
-                               'during the current awesomenauts season are available.' % player)
+            await context.send('No player whose name starts with `%s` was found.\n'
+                               'Only players that played during the current awesomenauts season are'
+                               ' available.' % player)
             return
 
         row = rankings_soup.find('div', {'id': 'rankings'}).find('img')
@@ -220,22 +228,29 @@ class Awesomenauts(Cog):
         ranking_embed.add_field(name=':first_place: RANK', value=ranking_info['rank'] + '\n\u200b')
         ranking_embed.add_field(name=':star2: RATING', value=ranking_info['rating'] + '\n\u200b')
         ranking_embed.add_field(name=':chart_with_upwards_trend: THIS SEASON',
-                                value='Games Played:   ' + ranking_info['games_played_this_season'] + '\n'
-                                      'Games Won:      ' + ranking_info['games_played_this_season_wins'] + '\n'
-                                      'Games Lost:       ' + ranking_info['games_played_this_season_losses']
+                                value='Games Played:   ' +
+                                      ranking_info['games_played_this_season'] + '\n'
+                                      'Games Won:      ' +
+                                      ranking_info['games_played_this_season_wins'] + '\n'
+                                      'Games Lost:       ' +
+                                      ranking_info['games_played_this_season_losses']
                                       + '\n'
-                                      'Win%:                 ' + ranking_info['win_percent_this_season'] +
+                                      'Win%:                 ' +
+                                      ranking_info['win_percent_this_season'] +
                                       '\n\u200b')
         ranking_embed.add_field(name=':mortar_board: TOTAL',
-                                value='Games Played:   ' + ranking_info['games_played_total'] + '\n'
-                                      'Games Won:      ' + ranking_info['games_played_total_wins'] + '\n'
-                                      'Games Lost:       ' + ranking_info['games_played_total_losses'] + '\n'
+                                value='Games Played:   ' +
+                                      ranking_info['games_played_total'] + '\n'
+                                      'Games Won:      ' +
+                                      ranking_info['games_played_total_wins'] + '\n'
+                                      'Games Lost:       ' +
+                                      ranking_info['games_played_total_losses'] + '\n'
                                       'Win%:                 ' + ranking_info['win_percent_total'] +
                                       '\n\u200b')
         ranking_embed.set_footer(text=ranking_info['favourite_naut_name'] + ' (favourite naut)',
                                  icon_url=ranking_info['favourite_naut_img'])
 
-        await self.bot.say(embed=ranking_embed)
+        await context.send(embed=ranking_embed)
 
     ################
     # ERROR HANDLING
@@ -245,38 +260,44 @@ class Awesomenauts(Cog):
     @command_awesomenauts_list.error
     @command_awesomenauts_rank.error
     async def awesomenaut_awesomenaut_rank_on_error(self, error, context):
-        bot_message_url_unreachable = 'Can\'t access Awesomenauts information right now. Command will sleep for a ' \
-                                      'few minutes'
-        bot_message_html_changed = 'Can\'t access Awesomenauts information right now. Command will sleep until issue ' \
-                                   'is fixed'
+        bot_message_url_unreachable = 'Can\'t access Awesomenauts information right now. ' \
+                                      'Command will sleep for a few minutes'
+        bot_message_html_changed = 'Can\'t access Awesomenauts information right now. Command will ' \
+                                   'sleep until issue is fixed'
         if context.command.callback is self.command_awesomenauts.callback:
-            bot_message = '`%s%s` takes a name of an awesomenaut (or part of it) as argument (use quotation marks to ' \
-                          'enclose space separated names).' % (context.prefix, context.invoked_with)
-            url_fetch_error_message = 'Awesomenauts Wiki (%s) is unreachable' % self.awesomenauts_url
-            html_changed_error = 'Awesomenauts Wiki\'s html (%s) has changed' % self.awesomenauts_url
+            bot_message = '`%s%s` takes a name of an awesomenaut (or part of it) as ' \
+                          'argument (use quotation marks to enclose space ' \
+                          'separated names).' % (context.prefix, context.invoked_with)
+            url_fetch_error_message = 'Awesomenauts Wiki (%s) is ' \
+                                      'unreachable' % self.awesomenauts_url
+            html_changed_error = 'Awesomenauts Wiki\'s html (%s) ' \
+                                 'has changed' % self.awesomenauts_url
         elif context.command.callback is self.command_awesomenauts_rank.callback:
-            bot_message = '`%s%s` takes a player name as argument (use quotation marks to enclose space separated ' \
+            bot_message = '`%s%s` takes a player name as argument (use quotation marks ' \
+                          'to enclose space separated ' \
                           'names).' % (context.prefix, context.command.qualified_name)
             url_fetch_error_message = 'nautsrankings.com (%s) is unreachable' % self.rankings_url
             html_changed_error = 'nautsrankings.com html (%s) has changed' % self.rankings_url
         else:  # awesomenauts list
-            bot_message = '`%s%s` takes no arguments.' % (context.prefix, context.command.qualified_name)
+            bot_message = '`%s%s` takes no arguments.' % (context.prefix,
+                                                          context.command.qualified_name)
             url_fetch_error_message = ''
             html_changed_error = ''
         await self.generic_error_handler(error, context,
-                                         (commands.CommandOnCooldown, commands.NoPrivateMessage, commands.CheckFailure),
+                                         (commands.CommandOnCooldown, commands.NoPrivateMessage,
+                                          commands.CheckFailure),
                                          (commands.MissingRequiredArgument, bot_message),
                                          (commands.TooManyArguments, bot_message),
                                          (commands.BadArgument, bot_message))
         if isinstance(error, commands.CommandInvokeError):
             if isinstance(error.original, requests.exceptions.RequestException):
                 self.logger.warning(url_fetch_error_message)
-                await self.bot.say(bot_message_url_unreachable)
+                await context.send(bot_message_url_unreachable)
                 context.command.enabled = False
-                asyncio.sleep(60 * 5)  # disable command for 5 minutes
+                await asyncio.sleep(60 * 5)  # disable command for 5 minutes
                 context.command.enabled = True
             elif isinstance(error.original, (AttributeError, KeyError, IndexError)):
                 # html was altered and, therefore, the code is now broken...
                 self.logger.warning(html_changed_error)
-                await self.bot.say(bot_message_html_changed)
+                await context.send(bot_message_html_changed)
                 context.command.enabled = False

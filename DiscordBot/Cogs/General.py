@@ -26,18 +26,18 @@ class General(Cog):
     ##########
 
     # HI
-    @commands.command(name='hi', ignore_extra=False, aliases=['hello', 'hey', 'sup', 'greetings', 'howdy'],
-                      pass_context=True)
+    @commands.command(name='hi', ignore_extra=False,
+                      aliases=['hello', 'hey', 'sup', 'greetings', 'howdy'])
     async def command_hi(self, context):
         """Greets user."""
         if hasattr(context.message.author, 'nick') and context.message.author.nick is not None:
             author_name = context.message.author.nick
         else:
             author_name = context.message.author.name
-        await self.bot.say(random.choice(self.greetings) + ', ' + author_name)
+        await context.send(random.choice(self.greetings) + ', ' + author_name)
 
     # DICE
-    @commands.command(name='dice', ignore_extra=False, pass_context=True)
+    @commands.command(name='dice', ignore_extra=False)
     async def command_dice(self, context, *dice: Converters.dice):
         """Rolls a die.
 
@@ -53,19 +53,19 @@ class General(Cog):
 
         dice_number = int(dice[1:])
         dice_roll = random.randint(1, dice_number)
-        await self.bot.say('Rolled a **' + str(dice_roll) + '** with a ' + dice)
+        await context.send('Rolled a **' + str(dice_roll) + '** with a ' + dice)
 
     # RANDOM
-    @commands.group(name='random', ignore_extra=False, aliases=['rand'], invoke_without_command=True, pass_context=True)
+    @commands.group(name='random', ignore_extra=False, aliases=['rand'], invoke_without_command=True)
     async def command_random(self, context):
         """Generates a number between 0 and 1.
 
         (inclusive)"""
         random_number = random.random()
-        await self.bot.say('Result: **' + str(random_number) + '**')
+        await context.send('Result: **' + str(random_number) + '**')
 
     # RANDOM BETWEEN
-    @command_random.command(name='between', ignore_extra=False, aliases=['b', '-b', 'betw'], pass_context=True)
+    @command_random.command(name='between', ignore_extra=False, aliases=['b', '-b', 'betw'])
     async def command_random_between(self, context, a: int, b: int):
         """Generates a number between a and b.
 
@@ -74,10 +74,10 @@ class General(Cog):
         values.sort()  # Either value can be the smallest one
         a, b = values
         random_number = random.randint(a, b)
-        await self.bot.say('Result: **' + str(random_number) + '**')
+        await context.send('Result: **' + str(random_number) + '**')
 
     # RANDOM FROM
-    @command_random.command(name='from', ignore_extra=False, aliases=['f', '-f', 'fr'], pass_context=True)
+    @command_random.command(name='from', ignore_extra=False, aliases=['f', '-f', 'fr'])
     async def command_random_from(self, context, *args: str):
         """Randomly selects one of the given arguments.
 
@@ -86,7 +86,7 @@ class General(Cog):
             raise commands.MissingRequiredArgument
 
         result = random.choice(args)
-        await self.bot.say('Result: **' + result + '**')
+        await context.send('Result: **' + result + '**')
 
     ################
     # ERROR HANDLING

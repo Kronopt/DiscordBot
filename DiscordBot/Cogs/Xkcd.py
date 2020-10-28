@@ -56,7 +56,7 @@ class Xkcd(Cog):
     ##########
 
     # XKCD
-    @commands.group(name='xkcd', ignore_extra=False, invoke_without_command=True, pass_context=True)
+    @commands.group(name='xkcd', ignore_extra=False, invoke_without_command=True)
     async def command_xkcd(self, context):
         """Retrieves a random xkcd comic from xkcd.com."""
 
@@ -68,25 +68,25 @@ class Xkcd(Cog):
         random_comic = self.xkcd_api_client.get_comic(uid=random_comic_number)[0]
 
         embed_comic = self.embed_comic(random_comic)
-        await self.bot.say(embed=embed_comic)
+        await context.send(embed=embed_comic)
 
     # XKCD LATEST
-    @command_xkcd.command(name='latest', ignore_extra=False, aliases=['l', '-l', 'last'], pass_context=True)
+    @command_xkcd.command(name='latest', ignore_extra=False, aliases=['l', '-l', 'last'])
     async def command_xkcd_latest(self, context):
         """Retrieves the latest xkcd comic from xkcd.com."""
 
         comic = self.xkcd_api_client.get_comic(uid=-1)[0]
         embed_comic = self.embed_comic(comic)
-        await self.bot.say(embed=embed_comic)
+        await context.send(embed=embed_comic)
 
     # XKCD ID
-    @command_xkcd.command(name='id', ignore_extra=False, aliases=['n', '-n', 'number'], pass_context=True)
+    @command_xkcd.command(name='id', ignore_extra=False, aliases=['n', '-n', 'number'])
     async def command_xkcd_id(self, context, comic_id: Converters.positive_int):
         """Retrieves the selected xkcd comic from xkcd.com."""
 
         comic = self.xkcd_api_client.get_comic(uid=comic_id)[0]
         embed_comic = self.embed_comic(comic)
-        await self.bot.say(embed=embed_comic)
+        await context.send(embed=embed_comic)
 
     ################
     # ERROR HANDLING
@@ -97,27 +97,33 @@ class Xkcd(Cog):
     @command_xkcd_id.error
     async def xkcd_xkcd_latest_xkcd_id_on_error(self, error, context):
         if context.command.callback is self.command_xkcd.callback:
-            bot_message = '`{0}{1}` takes no arguments or one of the predefined ones (use `{0}help {1}` for more ' \
+            bot_message = '`{0}{1}` takes no arguments or one of the predefined ones ' \
+                          '(use `{0}help {1}` for more ' \
                           'information).'.format(context.prefix, context.invoked_with)
         elif context.command.callback is self.command_xkcd_latest.callback:
-            bot_message = '`%s%s` takes no arguments.' % (context.prefix, context.command.qualified_name)
+            bot_message = '`%s%s` takes no arguments.' % (context.prefix,
+                                                          context.command.qualified_name)
         else:
-            bot_message = '`%s%s` takes exactly 1 positive number.' % (context.prefix, context.command.qualified_name)
+            bot_message = '`%s%s` takes exactly 1 positive ' \
+                          'number.' % (context.prefix, context.command.qualified_name)
         bot_message_id_not_found = 'xkcd comic with the given id was not found.'
         bot_message_xkcd_unavailable = 'Can\'t reach xkcd.com at the moment.'
         await self.generic_error_handler(error, context,
-                                         (commands.CommandOnCooldown, commands.NoPrivateMessage, commands.CheckFailure),
+                                         (commands.CommandOnCooldown, commands.NoPrivateMessage,
+                                          commands.CheckFailure),
                                          (commands.TooManyArguments, bot_message),
                                          (commands.BadArgument, bot_message),
                                          (commands.MissingRequiredArgument, bot_message))
         if (isinstance(error, commands.CommandInvokeError) and
                 isinstance(error.original, beckett.exceptions.InvalidStatusCodeError)):
             self.logger.info('%s exception in command %s: %s',
-                             error.original.__class__.__name__, context.command.qualified_name, context.message.content)
+                             error.original.__class__.__name__,
+                             context.command.qualified_name,
+                             context.message.content)
             if error.original.status_code == 404:
-                await self.bot.say(bot_message_id_not_found)
+                await context.send(bot_message_id_not_found)
             else:
-                await self.bot.say(bot_message_xkcd_unavailable)
+                await context.send(bot_message_xkcd_unavailable)
 
 
 ########################
