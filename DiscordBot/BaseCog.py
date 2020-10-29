@@ -74,6 +74,9 @@ class CogMeta(commands.CogMeta):
 
 
 class Cog(commands.Cog, metaclass=CogMeta):
+    """
+    Base Cog class
+    """
 
     # all commands from all instantiated Cogs:
     # {Cog_object: {command_function_name: command_object, ...}, ...}
@@ -128,7 +131,7 @@ class Cog(commands.Cog, metaclass=CogMeta):
                                     str(seconds % (60*60) % 60))
         return time
 
-    def unhandled_exceptions(self, error, context, *unhandled_exceptions):
+    def unhandled_exceptions(self, context, error, *unhandled_exceptions):
         """
         Warn about unhandled exceptions.
         To be used on each command's error handler.
@@ -136,8 +139,8 @@ class Cog(commands.Cog, metaclass=CogMeta):
 
         Parameters
         ----------
-        error: Exception
         context: commands.context.Context
+        error: Exception
         unhandled_exceptions: iter(commands.errors.CommandError)
         """
         if isinstance(error, (*unhandled_exceptions,)):
@@ -148,15 +151,15 @@ class Cog(commands.Cog, metaclass=CogMeta):
                 f'{context.prefix}{context.invoked_with}')
 
     async def generic_error_handler(
-            self, error, context, unhandled_exceptions, *handled_exceptions):
+            self, context, error, unhandled_exceptions, *handled_exceptions):
         """
         Base error handler function.
         Warning will be logged if an unhandled exception is thrown.
 
         Parameters
         ----------
-        error: Exception
         context: commands.context.Context
+        error: Exception
         unhandled_exceptions: tuple of commands.errors.CommandError
         handled_exceptions: (type of Exception, str)
         """
@@ -167,7 +170,7 @@ class Cog(commands.Cog, metaclass=CogMeta):
                     f'{context.command.qualified_name}: {context.message.content}')
                 await context.send(bot_message)
                 return
-        self.unhandled_exceptions(error, context, unhandled_exceptions)
+        self.unhandled_exceptions(context, error, unhandled_exceptions)
 
     def __hash__(self):
         return hash(self.name)

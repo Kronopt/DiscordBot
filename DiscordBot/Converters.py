@@ -16,12 +16,6 @@ def dice(argument):
 
 
 def positive_int(argument):
-    try:
-        value = int(argument)
-    except ValueError:
-        raise ValueError(str(argument) + ' is not a valid positive integer')
-    else:
-        if value < 1:
-            raise ValueError(str(argument) + ' is not a valid positive integer')
-        else:
-            return value
+    if argument.isdecimal():
+        return int(argument)
+    raise ValueError(f'{argument} is not a valid positive integer')
