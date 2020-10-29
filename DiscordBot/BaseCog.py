@@ -16,17 +16,16 @@ from collections import OrderedDict
 from discord.ext import commands
 
 
-logger = logging.getLogger('DiscordBot.Cog')
-
-
-def logging_wrapper(command):
+def logging_wrapper(command, logger):
     """
     Logging wrapper for command callback
+    Every command in a Cog is wrapped in a logging call
 
     Parameters
     ----------
     command: commands.core.Command
         Command whose callback is to be wrapped
+    logger: logging.Logger
 
     Returns
     -------
@@ -34,7 +33,6 @@ def logging_wrapper(command):
     """
     command_callback = command.callback
 
-    # assumes all commands receive a context argument
     @functools.wraps(command_callback)
     async def wrapper(*args, **kwargs):
         context = args[1]  # self, context, ...
@@ -59,6 +57,9 @@ class CogMeta(commands.CogMeta):
     forces implementation of command error handler
     """
     def __new__(mcs, name, bases, body):
+        logger = logging.getLogger(f'DiscordBot.Cog.{name}')
+        body['logger'] = logger
+
         for attribute in body.values():
             if isinstance(attribute, commands.core.Command):
 
@@ -68,7 +69,7 @@ class CogMeta(commands.CogMeta):
                         f'Command: {attribute.name} ({attribute.callback.__name__}) in Cog: '
                         f'{name} has no error handler')
 
-                attribute.callback = logging_wrapper(attribute)
+                attribute.callback = logging_wrapper(attribute, logger)
         return super().__new__(mcs, name, bases, body)
 
 
@@ -88,7 +89,7 @@ class Cog(commands.Cog, metaclass=CogMeta):
         super().__init__()
         self.bot = bot
         self.name = self.__class__.__name__
-        self.logger = logger
+        # self.logger  # defined in CogMeta.__new__
         self.embed_colour = 16777215  # colour of discord embed used in some messages
         self.help_order = 10  # order number of cogs in !help command output
 
@@ -97,9 +98,9 @@ class Cog(commands.Cog, metaclass=CogMeta):
             inspect.getmembers(self, lambda x: issubclass(x.__class__, commands.core.Command)))
         Cog.all_commands[self] = self.commands
 
-        self.logger.info(f'loaded commands from Cog {self.name}:')
-        for command in self.commands:
-            self.logger.info(f'    {command}')
+        self.logger.info(f'Loaded commands:')
+        for command in self.commands.values():
+            self.logger.info(f'    {command.qualified_name}')
 
     @staticmethod
     def format_cooldown_time(seconds):

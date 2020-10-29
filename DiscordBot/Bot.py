@@ -24,12 +24,10 @@ class Bot(commands.Bot):
         prefix = commands.when_mentioned_or(prefix) if prefix else commands.when_mentioned
         intents = intents if intents else discord.Intents.default()
 
-        super().__init__(command_prefix=prefix, intents=intents, *args, **kwargs)
-
-        self.command_prefix_simple = prefix
-
-        # remove default help command
-        self.remove_command('help')
+        super().__init__(command_prefix=prefix,
+                         intents=intents,
+                         help_command=None,  # remove default help command
+                         *args, **kwargs)
 
         # add cogs dynamically
         for cog_name in DiscordBot.Cogs.__all__:
@@ -48,6 +46,7 @@ class Bot(commands.Bot):
             self.logger.info(f'    {channel.guild.name}.{channel.name} '
                              f'({str(channel.type)}) (id: {channel.id})')
 
+        # set presence message ("Watching for @bot help")
         await self.change_presence(
             activity=discord.Activity(
                 type=discord.ActivityType.watching,
@@ -71,7 +70,7 @@ class Bot(commands.Bot):
         if isinstance(exception, commands.CommandNotFound):
             return
 
-        # original logic but with logging
+        # original on_command_error logic but with logging
         if self.extra_events.get('on_command_error', None):
             return
         if hasattr(ctx.command, 'on_error'):
