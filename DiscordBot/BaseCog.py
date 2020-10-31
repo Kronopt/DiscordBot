@@ -94,7 +94,6 @@ class Cog(commands.Cog, metaclass=CogMeta):
         self.name = self.__class__.__name__
         # self.logger  # defined in CogMeta.__new__
         self.embed_colour = 16777215  # colour of discord embed used in some messages
-        self.help_order = 10  # order number of cogs in !help command output
 
         # {command_function_name: command_object, ...}
         self.commands = OrderedDict(

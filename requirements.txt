@@ -1,5 +1,6 @@
 discord.py==1.5.*
 xkcd-wrapper[async]==1.0.*
+psutil==5.7.*
 # beckett==0.8.0
 # requests==2.20.0
 # beautifulsoup4==4.6.0

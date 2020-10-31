@@ -22,7 +22,6 @@ class Xkcd(Cog):
 
     def __init__(self, bot):
         super().__init__(bot)
-        self.help_order = 5
         self.xkcd_api_client = xkcd_wrapper.AsyncClient()
 
     def embed_comic(self, xkcd_comic, colour=None):
