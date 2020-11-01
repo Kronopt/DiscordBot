@@ -11,7 +11,7 @@ import aiohttp
 import discord
 import xkcd_wrapper
 from discord.ext import commands
-from DiscordBot import Converters
+from DiscordBot.Services import Converters
 from DiscordBot.BaseCog import Cog
 
 

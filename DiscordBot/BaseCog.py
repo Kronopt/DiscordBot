@@ -139,9 +139,12 @@ class Cog(commands.Cog, metaclass=CogMeta):
         Parameters
         ----------
         context: commands.context.Context
-        error: Exception
+        error: Exception or commands.CommandInvokeError
         unhandled_exceptions: iter(commands.errors.CommandError)
         """
+        if isinstance(error, commands.CommandInvokeError):
+            error = error.original
+
         if isinstance(error, (*unhandled_exceptions,)):
             exceptions = ', '.join([e.__name__ for e in unhandled_exceptions])
             self.logger.warning(
@@ -158,33 +161,21 @@ class Cog(commands.Cog, metaclass=CogMeta):
         Parameters
         ----------
         context: commands.context.Context
-        error: Exception
+        error: Exception or commands.CommandInvokeError
         unhandled_exceptions: tuple of commands.errors.CommandError
         handled_exceptions: (type of Exception, str)
         """
+        if isinstance(error, commands.CommandInvokeError):
+            error = error.original
+
         for handled_exception, bot_message in handled_exceptions:
             if isinstance(error, handled_exception):
                 self.logger.info(
                     f'{error.__class__.__name__} exception in command '
-                    f'{context.command.qualified_name}: {context.message.content}')
+                    f'{context.command.qualified_name}: {error}')
                 await context.send(bot_message)
                 return
         self.unhandled_exceptions(context, error, unhandled_exceptions)
 
     def __hash__(self):
         return hash(self.name)
-
-    def __lt__(self, other):
-        return self.help_order < other.help_order
-
-    def __le__(self, other):
-        return self.help_order <= other.help_order
-
-    def __eq__(self, other):
-        return self.help_order == other.help_order
-
-    def __gt__(self, other):
-        return self.help_order > other.help_order
-
-    def __ge__(self, other):
-        return self.help_order >= other.help_order

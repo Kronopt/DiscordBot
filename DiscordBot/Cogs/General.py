@@ -10,7 +10,7 @@ General Commands.
 import random
 from discord.ext import commands
 from DiscordBot.BaseCog import Cog
-from DiscordBot import Converters
+from DiscordBot.Services import Converters
 
 
 class General(Cog):
