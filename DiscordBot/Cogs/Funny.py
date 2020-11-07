@@ -45,6 +45,7 @@ class Funny(Cog):
             'Better not tell you now', 'Cannot predict now', 'Concentrate and ask again',
             'Don\'t count on it', 'My reply is no', 'My sources say no', 'Outlook not so good',
             'Very doubtful']
+        self.dick = r'(\_\_)_)##{}D'
 
         headers = {'Accept': 'application/json',
                    'User-Agent': 'DiscordBot (https://github.com/Kronopt/DiscordBot)'}
@@ -88,8 +89,20 @@ class Funny(Cog):
             emoji = self.eightball_emojis[1]
         else:  # Negative answer
             emoji = self.eightball_emojis[2]
+
+        message_without_command = context.message.clean_content.split(maxsplit=1)[1]
         await context.send(
-            f'`{context.message.clean_content}`: {self.eightball_answers[answer]} {emoji}')
+            f'`{message_without_command}`: {self.eightball_answers[answer]} {emoji}')
+
+    # DICK
+    @commands.command(name='dick', ignore_extra=False, aliases=['penis'])
+    async def command_dick(self, context):
+        """
+        Reveals user's dick size
+        """
+        random.seed(context.author.id)
+        dick = self.dick.format('#' * random.randrange(12))
+        await context.send(f'{context.author.display_name}\'s dick: {dick}')
 
     # POOP
     @commands.command(name='poop', ignore_extra=False)
@@ -153,6 +166,16 @@ class Funny(Cog):
             (commands.TooManyArguments, commands.CommandOnCooldown,
              commands.NoPrivateMessage, commands.CheckFailure),
             (commands.MissingRequiredArgument, bot_message),
+            (commands.BadArgument, bot_message))
+
+    @command_dick.error
+    async def joke_on_error(self, context, error):
+        bot_message = f'`{context.prefix}{context.invoked_with}` takes no arguments'
+        await self.generic_error_handler(
+            context, error,
+            (commands.MissingRequiredArgument, commands.CommandOnCooldown,
+             commands.NoPrivateMessage, commands.CheckFailure),
+            (commands.TooManyArguments, bot_message),
             (commands.BadArgument, bot_message))
 
     @command_poop.error
