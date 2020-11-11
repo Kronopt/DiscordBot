@@ -12,6 +12,7 @@ import sys
 import discord
 from discord.ext import commands
 import DiscordBot.Cogs
+from DiscordBot.Services import HelpCommand
 
 
 class Bot(commands.Bot):
@@ -28,7 +29,7 @@ class Bot(commands.Bot):
 
         super().__init__(command_prefix=prefix,
                          intents=intents,
-                         help_command=None,  # remove default help command
+                         help_command=HelpCommand.HelpCommand(self.embed_colour),
                          *args, **kwargs)
 
         # add cogs dynamically
