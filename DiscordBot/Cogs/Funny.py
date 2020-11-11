@@ -36,7 +36,7 @@ class Funny(Cog):
 
     def __init__(self, bot):
         super().__init__(bot)
-
+        self.emoji = '😂'
         self.eightball_emojis = ['✅', '🔅', '❌']
         self.eightball_answers = [
             'It is certain', 'It is decidedly so', 'Without a doubt', 'Yes, definitely',
@@ -110,7 +110,7 @@ class Funny(Cog):
         """
         Sends n poops
 
-        Sends as much poop as discord allows
+        Sends the defined number of poops (up to the maximum that discord allows)
         """
         if len(n) > 1:    # At most one argument
             raise commands.TooManyArguments
@@ -128,7 +128,8 @@ class Funny(Cog):
 
         Jokes are randomly sourced from one of these APIs:
         - icanhazdadjoke.com
-        - official_joke_api @ github
+        - official_joke_api @ github.com/15Dkatz/official_joke_api
+        - JokeAPI @ sv443.net/jokeapi/v2
         """
 
         # shuffle APIs and then try to get a joke from a single API sequentially

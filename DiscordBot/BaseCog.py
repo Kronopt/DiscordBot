@@ -70,6 +70,7 @@ class CogMeta(commands.CogMeta):
                         f'{name} has no error handler')
 
                 attribute.callback = logging_wrapper(attribute, logger)
+
         return super().__new__(mcs, name, bases, body)
 
 
@@ -93,7 +94,8 @@ class Cog(commands.Cog, metaclass=CogMeta):
         self.bot = bot
         self.name = self.__class__.__name__
         # self.logger  # defined in CogMeta.__new__
-        self.embed_colour = 16777215  # colour of discord embed used in some messages
+        self.embed_colour = bot.embed_colour
+        self.emoji = ''
 
         # {command_function_name: command_object, ...}
         self.commands = OrderedDict(

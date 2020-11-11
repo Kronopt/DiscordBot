@@ -22,6 +22,7 @@ class Info(Cog):
 
     def __init__(self, bot):
         super().__init__(bot)
+        self.emoji = 'ℹ️'
         self.info_embed = self.create_info_embed()
 
     @staticmethod

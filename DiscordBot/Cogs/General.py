@@ -20,6 +20,7 @@ class General(Cog):
 
     def __init__(self, bot):
         super().__init__(bot)
+        self.emoji = '🎛️'
         self.greetings = ['Hi', 'Hello', 'Hey', 'Sup', 'What\'s up', 'Greetings', 'Howdy']
         self.greeting_emojis = ['👋', '🤙', '🖖', '🤟', '👊', '🙌']
 

@@ -20,6 +20,7 @@ class Bot(commands.Bot):
     """
     def __init__(self, prefix, intents, *args, **kwargs):
         self.logger = logging.getLogger('DiscordBot.Bot')
+        self.embed_colour = 16777215  # colour of discord embed used in some messages
 
         prefix = commands.when_mentioned_or(prefix) if prefix else commands.when_mentioned
         intents = intents if intents else discord.Intents.default()
