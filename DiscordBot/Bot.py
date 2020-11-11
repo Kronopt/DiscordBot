@@ -20,6 +20,7 @@ class Bot(commands.Bot):
     """
     def __init__(self, prefix, intents, *args, **kwargs):
         self.logger = logging.getLogger('DiscordBot.Bot')
+        self.prefix_simple = prefix
         self.embed_colour = 16777215  # colour of discord embed used in some messages
 
         prefix = commands.when_mentioned_or(prefix) if prefix else commands.when_mentioned
@@ -47,11 +48,11 @@ class Bot(commands.Bot):
             self.logger.info(f'    {channel.guild.name}.{channel.name} '
                              f'({str(channel.type)}) (id: {channel.id})')
 
-        # set presence message ("Watching for @bot help")
+        # set presence message ("Watching for !help")
         await self.change_presence(
             activity=discord.Activity(
                 type=discord.ActivityType.watching,
-                name=f'for @{self.user.display_name} help'))
+                name=f'for {self.prefix_simple}help'))
 
         self.logger.info('Bot is ready')
 
