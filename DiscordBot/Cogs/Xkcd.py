@@ -17,7 +17,7 @@ from DiscordBot.BaseCog import Cog
 
 class Xkcd(Cog):
     """
-    XKCD webcomic Commands
+    Commands that deal with XKCD webcomics
     """
 
     def __init__(self, bot):

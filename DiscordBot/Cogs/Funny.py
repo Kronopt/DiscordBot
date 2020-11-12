@@ -31,7 +31,7 @@ class NoJokeError(Exception):
 
 class Funny(Cog):
     """
-    Funny commands
+    Funny commands (debatable)
     """
 
     def __init__(self, bot):

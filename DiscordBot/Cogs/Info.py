@@ -17,7 +17,7 @@ from DiscordBot.BaseCog import Cog
 
 class Info(Cog):
     """
-    Info Commands
+    Commands that show information about the bot
     """
 
     def __init__(self, bot):

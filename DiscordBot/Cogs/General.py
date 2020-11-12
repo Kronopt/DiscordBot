@@ -15,7 +15,7 @@ from DiscordBot.Services import Converters
 
 class General(Cog):
     """
-    General Commands
+    General commands that don't fit in other, more specific, categories
     """
 
     def __init__(self, bot):
