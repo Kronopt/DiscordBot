@@ -125,6 +125,7 @@ class HelpCommand(commands.HelpCommand):
         super().__init__(**options)
         self.paginator = Paginator(embed_colour=embed_colour)
         self.no_category = collections.namedtuple('NoCategory', ['qualified_name', 'emoji'])
+        self.command_indent = '  '
 
     async def send_bot_help(self, mapping):
         """
@@ -137,9 +138,7 @@ class HelpCommand(commands.HelpCommand):
             commands not associated with a cog (if any) will be in mapping[None]
             Both cogs and commands are ordered by name (None 'cog' is at the end)
         """
-        if opening_note := self.opening_note():
-            self.paginator.add_line(opening_note, empty=True)
-
+        self.format_opening_note()
         self.paginator.add_line('__**Commands**__:', empty=True)
 
         if None in mapping:
@@ -148,19 +147,39 @@ class HelpCommand(commands.HelpCommand):
 
         for cog, _commands in mapping.items():
             if len(_commands) > 0:
-                self.add_bot_commands_formatting(cog, _commands)
+                self.format_cog_commands(cog, _commands)
 
         await self.send_pages()
+
+
+    async def prepare_help_command(self, ctx, command=None):
+        """
+        Prepares the help command before it does anything
+
+        Parameters
+        ----------
+        ctx: commands.Context
+        command: str
+            argument passed to the help command
+        """
+        self.paginator.clear()
+        await super().prepare_help_command(ctx, command)
+
+    async def send_pages(self):
+        """
+        Sends the page output from the paginator to the destination
+        """
+        for page in self.paginator.pages:
+            await self.get_destination().send(embed=page)
 
     def command_not_found(self, command_name):
         """
         Called when help is called for a non-existent command
-        (overridden)
 
         Parameters
         ----------
         command_name : str
-            invalid command
+            invalid command name
 
         Returns
         -------
@@ -178,7 +197,7 @@ class HelpCommand(commands.HelpCommand):
         command : commands.Command
             The command that did not have the requested subcommand
         command_name : str
-            invalid subcommand
+            invalid subcommand name
 
         Returns
         -------
@@ -189,17 +208,13 @@ class HelpCommand(commands.HelpCommand):
             return f'Command `{command.qualified_name}` has no subcommand `{command_name}`'
         return f'Command `{command.qualified_name}` has no subcommands'
 
-    async def prepare_help_command(self, ctx, command=None):
-        """
-        Prepares the help command before it does anything
-        Parameters
-        """
-        self.paginator.clear()
-        await super().prepare_help_command(ctx, command)
-
     def get_bot_mapping(self):
         """
         Retrieves bot mapping, which is passed to send_bot_help
+
+        Returns
+        -------
+        OrderedDict{commands.Cog/None: List[commands.Command]}
         """
         bot = self.context.bot
 
@@ -211,63 +226,96 @@ class HelpCommand(commands.HelpCommand):
         mapping[None] = [c for c in bot.all_commands.values() if c.cog is None]
         return mapping
 
-    async def send_pages(self):
+    def format_opening_note(self):
         """
-        Sends the page output from the paginator to the destination
-        """
-        for page in self.paginator.pages:
-            await self.get_destination().send(embed=page)
-
-    def opening_note(self):
-        """
-        Opening note
-
-        Returns
-        -------
-        str
-            The help command opening note
+        Formats help message opening note
         """
         help_command_name = self.invoked_with
         prefix_simple = self.context.bot.prefix_simple
         prefix_mention = self.context.bot.user.display_name
-        return f'Commands can be called with the prefix `{prefix_simple}` ' \
-               f'or by mentioning the bot. Ex:\n' \
-               f'`{prefix_simple}`info\n' \
-               f'`@{prefix_mention}` info\n\n' \
-               f'For more info on a command use `{prefix_simple}{help_command_name} ' \
-               '[command] [subcommand]`\n' \
-               f'You can also use `{prefix_simple}{help_command_name} [category]`' \
-               ' for more info on a category'
+        opening_note = f'Commands can be called with the prefix `{prefix_simple}` ' \
+                       'or by mentioning the bot. Ex:\n' \
+                       f'`{prefix_simple}`info\n' \
+                       f'`@{prefix_mention}` info\n\n' \
+                       f'For more info on a command use `{prefix_simple}{help_command_name} ' \
+                       '[command] [subcommand]`\n' \
+                       f'You can also use `{prefix_simple}{help_command_name} [category]` ' \
+                       'for more info on a category'
+        self.paginator.add_line(opening_note, empty=True)
 
-    def add_bot_commands_formatting(self, cog, _commands):
+    def format_cog_commands(self, cog, cog_commands):
         """
-        Formats categories, commands and subcommands
+        Formats a category, its commands and subcommands
+
+        Parameters
+        ----------
+        cog : DiscordBot.BaseCog.Cog or self.no_category
+        cog_commands: List[commands.Command]
         """
-        if _commands:
-            max_size = self.get_max_size(_commands)
-            space = '   '
-            self.paginator.add_line(f'{cog.emoji} __**{cog.qualified_name}**__')
+        if cog_commands:
+            self.format_cog_header(cog)
+            self.paginator.add_line('```')
+
+            max_size = self.get_max_size(cog_commands)
+            for command in cog_commands:
+                self.format_command_and_subcommands(command, max_size)
 
             self.paginator.add_line('```')
-            for command in _commands:
-                indent = ' ' * (max_size - len(command.name)) + space
-                line = self.handle_line_size(f'{command.name}{indent}{command.short_doc}',
-                                             ' ' * max_size + space)
-                self.paginator.add_line(line)
 
-                if isinstance(command, commands.Group):
-                    max_size_sub = self.get_max_size(command.commands)
-                    for subcommand in command.commands:
-                        indent = ' ' * (max_size_sub - len(subcommand.name)) + space
-                        line = self.handle_line_size(
-                            f'{space}{subcommand.name}{indent}{subcommand.short_doc}',
-                            ' ' * max_size_sub + space * 2)
-                        self.paginator.add_line(line)
+    def format_cog_header(self, cog):
+        """
+        Formats the cog name header for a category section of the help output
 
-            self.paginator.add_line('```')
+        Parameters
+        ----------
+        cog : DiscordBot.BaseCog.Cog
+        """
+        self.paginator.add_line(f'{cog.emoji} __**{cog.qualified_name}**__')
+
+    def format_command_and_subcommands(self, command, max_size, prefix_spacer_size=0):
+        """
+        Formats a command and all its subcommands, recursively
+
+        Parameters
+        ----------
+        command: commands.Command or commands.Group
+        max_size: int
+            size of biggest command in the group (for indenting purposes)
+        prefix_spacer_size: int
+            size of spacer before command/subcommand name
+        """
+        prefix = self.command_indent * prefix_spacer_size
+        self.format_single_command(command, max_size, prefix)
+
+        if isinstance(command, commands.Group):
+            for subcommand in command.commands:
+                max_size = self.get_max_size(command.commands)
+                self.format_command_and_subcommands(subcommand, max_size, prefix_spacer_size + 1)
+
+    def format_single_command(self, command, max_size=None, starting_spacer='', spacer=None):
+        """
+        Formats a single command.
+        Name and description
+
+        Parameters
+        ----------
+        command: commands.Command
+        max_size: int
+            size of biggest command in the group
+        starting_spacer: str
+            spacer command name
+        spacer: str
+            space between command name and description
+        """
+        max_size = max_size if max_size is not None else len(command.name)
+        spacer = spacer if spacer is not None else self.command_indent
+        indent = ' ' * (max_size - len(command.name)) + spacer
+        line = self.handle_line_size(f'{starting_spacer}{command.name}{indent}{command.short_doc}',
+                                     ' ' * max_size + spacer)
+        self.paginator.add_line(line)
 
     @staticmethod
-    def handle_line_size(line, prefix_char, char_number=61):
+    def handle_line_size(line, spacer, char_number=61):
         """
         Divides a line in multiple lines given the number of characters per line
 
@@ -275,8 +323,8 @@ class HelpCommand(commands.HelpCommand):
         ----------
         line: str
             line to be divided
-        prefix_char: str
-            prefix added to the beginning of each new line
+        spacer: str
+            space prefix added to the beginning of each additional line
         char_number: int
             number of characters per line
 
@@ -294,10 +342,11 @@ class HelpCommand(commands.HelpCommand):
         still_line = True
         while still_line:
             if len(line) > char_number:
-                new_line += prefix_char + line[:char_number - len(prefix_char)] + '\n'
-                line = line[char_number - len(prefix_char):]
+                new_line += spacer + line[:char_number - len(spacer)] + '\n'
+                line = line[char_number - len(spacer):]
             else:
-                new_line += prefix_char + line[:char_number - len(prefix_char)]
+                new_line += spacer + line[:char_number - len(spacer)]
                 still_line = False
 
         return new_line
+
