@@ -44,9 +44,7 @@ class General(Cog):
     async def command_dice(self, context, *dice: Converters.dice):
         """
         Rolls a die
-
-        Possible dices: d4, d6, d8, d10, d12 and d20
-        A dice can either be written as 'D#' or 'd#' (case insensitive)
+        Possible dices: `d4`, `d6`, `d8`, `d10`, `d12` and `d20`
         """
         if len(dice) > 1:    # At most one argument
             raise commands.TooManyArguments

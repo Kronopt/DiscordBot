@@ -161,12 +161,43 @@ class HelpCommand(commands.HelpCommand):
         ----------
         cog: commands.Cog
         """
-        self.paginator.add_line(cog.description, empty=True)
+        self.paginator.add_line(f'**{cog.description}**', empty=True)
         self.format_cog_commands(cog, cog.get_commands())
-        self.format_ending_note()
 
         await self.send_pages()
 
+    async def send_group_help(self, group):
+        """
+        Sends help message when the help command is called with a command group as argument
+        (a command that has subcommands)
+
+        Parameters
+        ----------
+        group: commands.Group
+        """
+        await self.send_command_help(group, True)
+
+    async def send_command_help(self, command, subcommands=False):
+        """
+        Sends help message when the help command is called with a command as argument
+
+        Parameters
+        ----------
+        command: commands.Command
+        subcommands: bool
+            if command has subcommands
+        """
+        command_signature = self.get_command_signature(command)
+        self.paginator.add_line(f'**{command_signature}**', empty=True)
+        self.paginator.add_line(command.help, empty=True)
+
+        if subcommands:
+            self.paginator.add_line('__**Subcommands**__:')
+            self.paginator.add_line('```')
+            self.format_command_and_subcommands(command, len(command.qualified_name), False)
+            self.paginator.add_line('```')
+
+        await self.send_pages()
 
     async def prepare_help_command(self, ctx, command=None):
         """
@@ -296,7 +327,8 @@ class HelpCommand(commands.HelpCommand):
         """
         self.paginator.add_line(f'{cog.emoji} __**{cog.qualified_name}**__')
 
-    def format_command_and_subcommands(self, command, max_size, prefix_spacer_size=0):
+    def format_command_and_subcommands(
+            self, command, max_size, show_main=True, prefix_spacer_size=0):
         """
         Formats a command and all its subcommands, recursively
 
@@ -305,16 +337,22 @@ class HelpCommand(commands.HelpCommand):
         command: commands.Command or commands.Group
         max_size: int
             size of biggest command in the group (for indenting purposes)
+        show_main: bool
+            if main command name and description should be shown or not
         prefix_spacer_size: int
             size of spacer before command/subcommand name
         """
-        prefix = self.command_indent * prefix_spacer_size
-        self.format_single_command(command, max_size, prefix)
+        if show_main:
+            prefix = self.command_indent * prefix_spacer_size
+            self.format_single_command(command, max_size, prefix)
+        else:
+            prefix_spacer_size -= 1
 
         if isinstance(command, commands.Group):
             for subcommand in command.commands:
                 max_size = self.get_max_size(command.commands)
-                self.format_command_and_subcommands(subcommand, max_size, prefix_spacer_size + 1)
+                self.format_command_and_subcommands(
+                    subcommand, max_size, True, prefix_spacer_size + 1)
 
     def format_single_command(self, command, max_size=None, starting_spacer='', spacer=None):
         """

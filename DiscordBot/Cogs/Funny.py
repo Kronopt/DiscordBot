@@ -75,7 +75,6 @@ class Funny(Cog):
     async def command_eightball(self, context, *phrase):
         """
         Bot uses its fortune-telling powers to answer your question
-
         Ask a question and get one of the classic magic 8 ball answers
         """
         if len(phrase) == 0:  # at least one argument
@@ -109,7 +108,6 @@ class Funny(Cog):
     async def command_poop(self, context, *n: Converters.positive_int):
         """
         Sends n poops
-
         Sends the defined number of poops (up to the maximum that discord allows)
         """
         if len(n) > 1:    # At most one argument
@@ -125,7 +123,6 @@ class Funny(Cog):
     async def command_joke(self, context):
         """
         Tells a random (bad) joke
-
         Jokes are randomly sourced from one of these APIs:
         - icanhazdadjoke.com
         - official_joke_api @ github.com/15Dkatz/official_joke_api

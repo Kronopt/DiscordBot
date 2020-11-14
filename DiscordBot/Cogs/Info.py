@@ -77,7 +77,8 @@ class Info(Cog):
     @commands.command(name='system', ignore_extra=False)
     async def command_system(self, context):
         """
-        Shows bot host system information (OS, CPU, RAM, etc)
+        Shows bot host system information
+        OS, CPU, RAM, Up time and Python version
         """
         embed = discord.Embed(colour=self.embed_colour, title='\u200b')
         embed.set_author(name='🖥️ Host System Information')
