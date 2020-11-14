@@ -12,7 +12,7 @@ import sys
 import discord
 from discord.ext import commands
 import DiscordBot.Cogs
-from DiscordBot.Services import HelpCommand
+from DiscordBot.Services import HelpCommand, CommandLogging
 
 
 class Bot(commands.Bot):
@@ -81,6 +81,4 @@ class Bot(commands.Bot):
         if ctx.cog and commands.Cog._get_overridden_method(ctx.cog.cog_command_error) is not None:
             return
 
-        self.logger.exception(
-            f'When calling command : {ctx.command}\n'
-            f'{sys.exc_info()[2]}')
+        CommandLogging.log_command_exception(self.logger, ctx.command.qualified_name)

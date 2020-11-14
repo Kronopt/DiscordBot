@@ -109,6 +109,11 @@ class Cog(commands.Cog, metaclass=CogMeta):
         context: commands.context.Context
         error: Exception or commands.CommandInvokeError
         unhandled_exceptions: iter(commands.errors.CommandError)
+
+        Returns
+        -------
+        bool or None
+            True if error wasn't defined as an unhandled exception
         """
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
@@ -119,6 +124,8 @@ class Cog(commands.Cog, metaclass=CogMeta):
                 f'Unhandled Exception \'{error.__class__.__name__}\': '
                 f'{exceptions} exceptions are not handled for '
                 f'{context.prefix}{context.invoked_with}')
+        else:
+            return True
 
     async def generic_error_handler(
             self, context, error, unhandled_exceptions, *handled_exceptions):
@@ -143,7 +150,8 @@ class Cog(commands.Cog, metaclass=CogMeta):
                     f'{context.command.qualified_name}: {error}')
                 await context.send(bot_message)
                 return
-        self.unhandled_exceptions(context, error, unhandled_exceptions)
+        if self.unhandled_exceptions(context, error, unhandled_exceptions):
+            CommandLogging.log_command_exception(self.logger, context.command.qualified_name)
 
     def __hash__(self):
         return hash(self.name)

@@ -229,6 +229,9 @@ class HelpCommand(commands.HelpCommand):
         for page in self.paginator.pages:
             await self.get_destination().send(embed=page)
 
+    async def on_help_command_error(self, ctx, error):
+        CommandLogging.log_command_exception(self.logger, 'help')
+
     def command_not_found(self, command_name):
         """
         Called when help is called for a non-existent command

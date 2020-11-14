@@ -9,6 +9,7 @@ Wraps commands in a logging call
 
 
 import functools
+import sys
 
 
 def logging_wrapper(command, logger):
@@ -55,3 +56,17 @@ def log_command_call(context, logger, command_name):
                 f'message: {context.message.clean_content}; '
                 f'channel: {channel}; '
                 f'user: {user}')
+
+
+def log_command_exception(logger, command_name):
+    """
+    Logs command error
+
+    Parameters
+    ----------
+    logger: logging.logger
+    command_name: str
+        name of the command whose error is being logged
+    """
+    _, error, traceback = sys.exc_info()
+    logger.exception(f'When calling command: {command_name}\n{error}\n{traceback}')
