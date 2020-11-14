@@ -9,45 +9,11 @@ Each bot command should be decorated with a @command decorator
 """
 
 
-import functools
 import inspect
 import logging
 from collections import OrderedDict
 from discord.ext import commands
-
-
-def logging_wrapper(command, logger):
-    """
-    Logging wrapper for command callback
-    Every command in a Cog is wrapped in a logging call
-
-    Parameters
-    ----------
-    command: commands.core.Command
-        Command whose callback is to be wrapped
-    logger: logging.Logger
-
-    Returns
-    -------
-    Wrapper function of command callback
-    """
-    command_callback = command.callback
-
-    @functools.wraps(command_callback)
-    async def wrapper(*args, **kwargs):
-        context = args[1]  # self, context, ...
-        guild = context.message.guild
-        channel = context.message.channel
-        channel = f'{guild.name}.{channel.name} ' \
-                  f'({str(channel.type)})' if guild else 'Private Message'
-        user = f'{context.message.author.name}#{context.message.author.discriminator}'
-
-        logger.info(f'command called: {command.qualified_name}; '
-                    f'message: {context.message.clean_content}; '
-                    f'channel: {channel}; '
-                    f'user: {user}')
-        await command_callback(*args, **kwargs)
-    return wrapper
+from DiscordBot.Services import CommandLogging
 
 
 class CogMeta(commands.CogMeta):
@@ -69,7 +35,7 @@ class CogMeta(commands.CogMeta):
                         f'Command: {attribute.name} ({attribute.callback.__name__}) in Cog: '
                         f'{name} has no error handler')
 
-                attribute.callback = logging_wrapper(attribute, logger)
+                attribute.callback = CommandLogging.logging_wrapper(attribute, logger)
 
         return super().__new__(mcs, name, bases, body)
 
@@ -87,7 +53,7 @@ class Cog(commands.Cog, metaclass=CogMeta):
         """
         Parameters
         ----------
-        bot: discord.ext.commands.Bot
+        bot: DiscordBot.Bot
             Bot
         """
         super().__init__()

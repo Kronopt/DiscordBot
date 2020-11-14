@@ -8,8 +8,10 @@ Help Command
 
 
 import collections
+import logging
 import discord
 from discord.ext import commands
+from DiscordBot.Services import CommandLogging
 
 
 class Paginator:
@@ -123,6 +125,7 @@ class HelpCommand(commands.HelpCommand):
     """
     def __init__(self, embed_colour, **options):
         super().__init__(**options)
+        self.logger = logging.getLogger('DiscordBot.Help')
         self.paginator = Paginator(embed_colour=embed_colour)
         self.no_category = collections.namedtuple('NoCategory', ['qualified_name', 'emoji'])
         self.command_indent = '  '
@@ -198,6 +201,13 @@ class HelpCommand(commands.HelpCommand):
             self.paginator.add_line('```')
 
         await self.send_pages()
+
+    async def command_callback(self, ctx, command=None):
+        """
+        Log help command calls
+        """
+        CommandLogging.log_command_call(ctx, self.logger, 'help')
+        await super().command_callback(ctx, command=command)
 
     async def prepare_help_command(self, ctx, command=None):
         """
