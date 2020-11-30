@@ -72,11 +72,18 @@ class Cog(commands.Cog, metaclass=CogMeta):
         for command in self.commands.values():
             self.logger.info(f'    {command.qualified_name}')
 
+    async def setup_cog(self):
+        """
+        Basically an async __init__
+        Bot handles this method when it is initializing
+        """
+        pass
+
     @staticmethod
     def format_cooldown_time(seconds):
         """
-        Format cooldown time.
-        To be used in the handling of commands.CommandOnCooldown exception.
+        Format cooldown time
+        To be used in the handling of commands.CommandOnCooldown exception
 
         Parameters
         ----------
@@ -100,8 +107,8 @@ class Cog(commands.Cog, metaclass=CogMeta):
 
     def unhandled_exceptions(self, context, error, *unhandled_exceptions):
         """
-        Warn about unhandled exceptions.
-        To be used on each command's error handler.
+        Warn about unhandled exceptions
+        To be used on each command's error handler
         (in case I implement these features and forget to handle the related errors...)
 
         Parameters
@@ -130,8 +137,8 @@ class Cog(commands.Cog, metaclass=CogMeta):
     async def generic_error_handler(
             self, context, error, unhandled_exceptions, *handled_exceptions):
         """
-        Base error handler function.
-        Warning will be logged if an unhandled exception is thrown.
+        Base error handler function
+        Warning will be logged if an unhandled exception is thrown
 
         Parameters
         ----------

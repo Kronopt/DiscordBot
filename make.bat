@@ -14,9 +14,9 @@ python -m pip install -r requirements.txt
 goto:eof
 
 :testbot
-python DiscordBot.py %TEST_TOKEN%
+python DiscordBot.py %TEST_TOKEN% --setup-extra
 goto:eof
 
 :testbot
-python DiscordBot.py %BOT_TOKEN%
+python DiscordBot.py %BOT_TOKEN% --setup-extra
 goto:eof

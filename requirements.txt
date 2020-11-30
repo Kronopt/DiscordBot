@@ -2,5 +2,8 @@ discord.py==1.5.*               # main bot functionality
 xkcd-wrapper[async]==1.0.*      # xkcd commands
 psutil==5.7.*                   # info commands
 aiohttp==3.6.*                  # external APIs communication
+pyppeteer==0.2.*                # browser automation, scraping
+pycountry==20.7.*               # AwesomenautsRank
+emoji-country-flag==1.2.*       # AwesomenautsRank
 # beautifulsoup4==4.6.0
 # regex==2018.6.9

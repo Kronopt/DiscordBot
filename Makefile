@@ -9,7 +9,7 @@ install-dependencies:
 	python -m pip install -r requirements.txt
 
 testbot:
-	python DiscordBot.py $TEST_TOKEN
+	python DiscordBot.py $TEST_TOKEN --setup-extra
 
 bot:
-	python DiscordBot.py $BOT_TOKEN
+	python DiscordBot.py $BOT_TOKEN --setup-extra

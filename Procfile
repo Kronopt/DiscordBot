@@ -1,1 +1,1 @@
-worker: python DiscordBot.py $BOT_TOKEN
+worker: python DiscordBot.py $BOT_TOKEN --setup-extra

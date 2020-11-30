@@ -39,6 +39,18 @@ class Bot(commands.Bot):
                 cog = getattr(cog_module, cog_name)(self)
                 self.add_cog(cog)
 
+    async def on_connect(self):
+        """
+        Called when the client has successfully connected to Discord
+        This is not the same as the client being fully prepared
+        Setups Cogs
+        """
+        self.logger.info('Setting up Cogs...')
+        for cog in self.cogs.values():
+            await cog.setup_cog()
+
+        self.logger.info('Cogs are ready')
+
     async def on_ready(self):
         """
         Called when bot finishes preparing data received from Discord
