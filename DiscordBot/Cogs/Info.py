@@ -48,6 +48,8 @@ class Info(Cog):
     @staticmethod
     async def python_version():
         return platform.python_version()
+    def discord_version():
+        return discord.__version__
 
     def create_info_embed(self):
         embed = discord.Embed(colour=self.embed_colour, title='\u200b')
@@ -55,7 +57,8 @@ class Info(Cog):
         embed.add_field(name='👨‍💻 Author',
                         value='[Kronopt](https://github.com/Kronopt) \n\u200b')
         embed.add_field(name='🏗️ Framework',
-                        value='[discord.py](https://github.com/Rapptz/discord.py) \n\u200b')
+                        value=f'[discord.py v{self.discord_version()}]'
+                              '(https://github.com/Rapptz/discord.py) \n\u200b')
         embed.add_field(name='📁 Github',
                         value='[DiscordBot repository](https://github.com/Kronopt/DiscordBot)'
                               '\n\u200b')
