@@ -24,20 +24,7 @@ class Info(Cog):
         super().__init__(bot)
         self.emoji = 'ℹ️'
         self.info_embed = self.create_info_embed()
-
-    @staticmethod
-    async def os_name():
-        return platform.platform()
-
-    @staticmethod
-    async def cpu_info():
-        cores = psutil.cpu_count()
-        cores = f'{cores} cores' if cores > 1 else f'{cores} core'
-        return cores + ' ({:.2f}GHz)'.format(psutil.cpu_freq().current/1000)
-
-    @staticmethod
-    async def ram():
-        return psutil._common.bytes2human(psutil.virtual_memory().total)
+        self.system_embed = self.create_system_embed()
 
     @staticmethod
     async def uptime():
@@ -46,8 +33,24 @@ class Info(Cog):
         return str(today - boot_time)
 
     @staticmethod
-    async def python_version():
+    def os_name():
+        return platform.platform()
+
+    @staticmethod
+    def cpu_info():
+        cores = psutil.cpu_count()
+        cores = f'{cores} cores' if cores > 1 else f'{cores} core'
+        return cores + ' ({:.2f}GHz)'.format(psutil.cpu_freq().current/1000)
+
+    @staticmethod
+    def ram():
+        return psutil._common.bytes2human(psutil.virtual_memory().total)
+
+    @staticmethod
+    def python_version():
         return platform.python_version()
+
+    @staticmethod
     def discord_version():
         return discord.__version__
 
@@ -62,6 +65,16 @@ class Info(Cog):
         embed.add_field(name='📁 Github',
                         value='[DiscordBot repository](https://github.com/Kronopt/DiscordBot)'
                               '\n\u200b')
+        return embed
+
+    def create_system_embed(self):
+        embed = discord.Embed(colour=self.embed_colour, title='\u200b')
+        embed.set_author(name='🖥️ Host System Information')
+        embed.add_field(name='📟  OS', value=(self.os_name()) + '\n\u200b')
+        embed.add_field(name='🎛️ CPU', value=(self.cpu_info()) + '\n\u200b')
+        embed.add_field(name='🧠 RAM', value=(self.ram()) + '\n\u200b')
+        embed.add_field(name='🐍 Python version', value=(self.python_version()) + '\n\u200b')
+
         return embed
 
     ##########
@@ -81,22 +94,14 @@ class Info(Cog):
     async def command_system(self, context):
         """
         Shows bot host system information
-        OS, CPU, RAM, Up time and Python version
+        OS, CPU, RAM, Python version and Up time
         """
-        embed = discord.Embed(colour=self.embed_colour, title='\u200b')
-        embed.set_author(name='🖥️ Host System Information')
-        embed.add_field(name='📟  OS',
-                        value=(await self.os_name()) + '\n\u200b')
-        embed.add_field(name='🎛️ CPU',
-                        value=(await self.cpu_info()) + '\n\u200b')
-        embed.add_field(name='🧠 RAM',
-                        value=(await self.ram()) + '\n\u200b')
-        embed.add_field(name='🕒 Up time',
-                        value=(await self.uptime()) + '\n\u200b')
-        embed.add_field(name='🐍 Python version',
-                        value=(await self.python_version()) + '\n\u200b')
+        embed = self.system_embed
+        embed.add_field(name='🕒 Up time', value=(await self.uptime()) + '\n\u200b')
 
         await context.send(embed=embed)
+
+        embed.remove_field(-1)
 
     ################
     # ERROR HANDLING
