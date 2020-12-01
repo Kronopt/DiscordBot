@@ -3,10 +3,12 @@
 
 
 """
-Videogames related Commands
+Gaming related Commands
 """
 
+
 import asyncio
+import collections
 import urllib
 from discord.ext import commands
 import pyppeteer
@@ -15,9 +17,9 @@ from DiscordBot.BaseCog import Cog
 from DiscordBot.Services import AwesomenautsRank
 
 
-class Games(Cog):
+class Gaming(Cog):
     """
-    Commands that deal with games (player rank, high scores, characters, etc)
+    Commands that deal with games/gaming (player rank, high scores, characters, etc)
     """
 
     def __init__(self, bot):
@@ -52,6 +54,10 @@ class Games(Cog):
         `<prefix>awesomenauts rank` niki
         `<prefix>awesomenauts r` game is broken
         """
+        if len(player_name) == 0:  # at least one argument
+            param = collections.namedtuple('param', 'name')
+            raise commands.MissingRequiredArgument(param('player_name'))
+
         player_name = ' '.join(player_name)
         player_name_quoted = urllib.parse.quote(player_name)
 
@@ -90,22 +96,22 @@ class Games(Cog):
             awesomenaut_rank = AwesomenautsRank.AwesomenautsRank(
                 self.embed_colour,
                 {'player_name': text_fields[1].rstrip(),
-                'rank': text_fields[0].rstrip(),
-                'games_played_current_season': text_fields[3].rstrip(),
-                'games_played_all_time': text_fields[4].rstrip(),
-                'win_percentage': text_fields[2].rstrip()[:-1],
-                'rating': text_fields[6].rstrip(),
-                'league': img_titles[0],
-                'league_img_url': img_urls[0],
-                'favourite_naut': img_titles[1],
-                'favourite_naut_img_url': img_urls[1],
-                'country': img_titles[2] if len(img_titles) == 3 else '',
-                'steam_profile_url': steam_profile})
+                 'rank': text_fields[0].rstrip(),
+                 'games_played_current_season': text_fields[3].rstrip(),
+                 'games_played_all_time': text_fields[4].rstrip(),
+                 'win_percentage': text_fields[2].rstrip()[:-1],
+                 'rating': text_fields[6].rstrip(),
+                 'league': img_titles[0],
+                 'league_img_url': img_urls[0],
+                 'favourite_naut': img_titles[1],
+                 'favourite_naut_img_url': img_urls[1],
+                 'country': img_titles[2] if len(img_titles) == 3 else '',
+                 'steam_profile_url': steam_profile})
 
             await context.send(embed=awesomenaut_rank.embed)
 
         else:
-            await context.send(f'Can\'t retrieve player `{player_name}`.\n')
+            await context.send(f'Can\'t retrieve player `{player_name}`')
 
         await page.close()
 
