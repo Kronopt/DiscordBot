@@ -74,8 +74,14 @@ class Funny(Cog):
     @commands.command(name='8ball', ignore_extra=False, aliases=['eightball', '8b'])
     async def command_eightball(self, context, *phrase):
         """
-        Bot uses its fortune-telling powers to answer your question
-        Ask a question and get one of the classic magic 8 ball answers
+        Predicts the outcome of a question
+
+        Bot uses its fortune-telling powers to answer your question.
+        Ask a question and get one of the classic magic 8 ball answers.
+
+        ex:
+        `<prefix>8ball` is it going to be sunny today?
+        `<prefix>8b` are you going to answer correctly?
         """
         if len(phrase) == 0:  # at least one argument
             param = collections.namedtuple('param', 'name')
@@ -98,6 +104,13 @@ class Funny(Cog):
     async def command_dick(self, context):
         """
         Reveals user's dick size
+
+        Bot peaks into your pants and reveals your dick size to everyone on the channel.
+        You can't change your dick size (talking code here, not real life).
+
+        ex:
+        `<prefix>dick`
+        `<prefix>penis`
         """
         random.seed(context.author.id)
         dick = self.dick.format('#' * random.randrange(12))
@@ -107,8 +120,13 @@ class Funny(Cog):
     @commands.command(name='poop', ignore_extra=False)
     async def command_poop(self, context, *n: Converters.positive_int):
         """
-        Sends n poops
-        Sends the defined number of poops (up to the maximum that discord allows)
+        Sends poops
+
+        Sends n number of poops (up to the maximum number of characters allowed by discord).
+
+        ex:
+        `<prefix>poop`
+        `<prefix>poop` 10
         """
         if len(n) > 1:    # At most one argument
             raise commands.TooManyArguments
@@ -119,14 +137,19 @@ class Funny(Cog):
         await context.send('💩' * n)
 
     # JOKE
-    @commands.command(name='joke', ignore_extra=False, invoke_without_command=True)
+    @commands.command(name='joke', ignore_extra=False, aliases=['jk'])
     async def command_joke(self, context):
         """
         Tells a random (bad) joke
+
         Jokes are randomly sourced from one of these APIs:
-        - icanhazdadjoke.com
-        - official_joke_api @ github.com/15Dkatz/official_joke_api
-        - JokeAPI @ sv443.net/jokeapi/v2
+        - http://icanhazdadjoke.com
+        - official_joke_api @ http://github.com/15Dkatz/official_joke_api
+        - JokeAPI @ http://sv443.net/jokeapi/v2
+
+        ex:
+        `<prefix>joke`
+        `<prefix>jk`
         """
 
         # shuffle APIs and then try to get a joke from a single API sequentially

@@ -34,6 +34,10 @@ class General(Cog):
     async def command_hi(self, context):
         """
         Greets user
+
+        ex:
+        `<prefix>hi`
+        `<prefix>hey`
         """
         greeting = random.choice(self.greetings)
         emoji = random.choice(self.greeting_emojis)
@@ -44,7 +48,12 @@ class General(Cog):
     async def command_dice(self, context, *dice: Converters.dice):
         """
         Rolls a die
+
         Possible dices: `d4`, `d6`, `d8`, `d10`, `d12` and `d20`
+
+        ex:
+        `<prefix>dice`
+        `<prefix>dice` d20
         """
         if len(dice) > 1:    # At most one argument
             raise commands.TooManyArguments

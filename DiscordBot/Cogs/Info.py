@@ -82,19 +82,28 @@ class Info(Cog):
     ##########
 
     # INFO
-    @commands.command(name='info', ignore_extra=False)
+    @commands.command(name='info', ignore_extra=False, aliases=['information'])
     async def command_info(self, context):
         """
         Shows author, github page and framework
+
+        ex:
+        `<prefix>info`
+        `<prefix>information`
         """
         await context.send(embed=self.info_embed)
 
     # SYSTEM
-    @commands.command(name='system', ignore_extra=False)
+    @commands.command(name='system', ignore_extra=False, aliases=['sys'])
     async def command_system(self, context):
         """
         Shows bot host system information
+
         OS, CPU, RAM, Python version and Up time
+
+        ex:
+        `<prefix>system`
+        `<prefix>sys`
         """
         embed = self.system_embed
         embed.add_field(name='🕒 Up time', value=(await self.uptime()) + '\n\u200b')

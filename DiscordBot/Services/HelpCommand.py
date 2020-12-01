@@ -76,14 +76,14 @@ class Paginator:
         self.current_page = ''
         self._pages = []
 
-    def add_line(self, line='', *, empty=False):
+    def add_line(self, line=None, *, empty=False):
         """
         Adds a line to the current page (appends a \n at the end)
         If the line exceeds the max_size limit, an exception is raised
 
         Parameters
         -----------
-        line: str
+        line: str or None
             The line to add
         empty: bool
             Indicates if another empty line should be added
@@ -93,16 +93,17 @@ class Paginator:
         RuntimeError
             The line was too big for the current max_size
         """
-        if len(line) + 1 > self.max_size:
-            raise RuntimeError(f'Line exceeds maximum page size of {self.max_size}')
+        if line is not None:
+            if len(line) + 1 > self.max_size:
+                raise RuntimeError(f'Line exceeds maximum page size of {self.max_size}')
 
-        if len(line) + 1 + len(self.current_page) > self.max_size:
-            self.close_page()
+            if len(line) + 1 + len(self.current_page) > self.max_size:
+                self.close_page()
 
-        self.current_page += line + '\n'
+            self.current_page += line + '\n'
 
-        if empty and len(self.current_page) + 1 <= self.max_size:
-            self.current_page += '\n'
+            if empty and len(self.current_page) + 1 <= self.max_size:
+                self.current_page += '\n'
 
     def close_page(self):
         """
@@ -125,6 +126,7 @@ class HelpCommand(commands.HelpCommand):
     """
     def __init__(self, embed_colour, **options):
         super().__init__(**options)
+        self.command_attrs['help'] = 'Shows command help message'
         self.logger = logging.getLogger('DiscordBot.Help')
         self.paginator = Paginator(embed_colour=embed_colour)
         self.no_category = collections.namedtuple('NoCategory', ['qualified_name', 'emoji'])
@@ -192,7 +194,7 @@ class HelpCommand(commands.HelpCommand):
         """
         command_signature = self.get_command_signature(command)
         self.paginator.add_line(f'**{command_signature}**', empty=True)
-        self.paginator.add_line(command.help, empty=True)
+        self.format_command_help_message(command.help)
 
         if subcommands:
             self.paginator.add_line('__**Subcommands**__:')
@@ -286,6 +288,28 @@ class HelpCommand(commands.HelpCommand):
         mapping[None] = [c for c in bot.all_commands.values() if c.cog is None]
         return mapping
 
+    def get_command_signature(self, command):
+        """
+        Retrieves the signature portion of the help page
+
+        Parameters
+        ----------
+        command : commands.Command
+            The command to get the signature of
+
+        Returns
+        -------
+        str
+            Formatted command signature
+        """
+        parent = command.full_parent_name + ' ' if command.full_parent_name else ''
+        alias = f'{parent}{command.name}'
+        if len(command.aliases) > 0:
+            aliases = ' | '.join(command.aliases)
+            alias = f'[{alias} | {aliases}]'
+
+        return f'{self.clean_prefix}{alias} {command.signature}'
+
     def format_opening_note(self):
         """
         Formats help message opening note
@@ -295,7 +319,7 @@ class HelpCommand(commands.HelpCommand):
         opening_note = f'Commands can be called with the prefix `{prefix_simple}` ' \
                        'or by mentioning the bot. Ex:\n' \
                        f'> `{prefix_simple}`info\n' \
-                       f'> `@{prefix_mention}` info\n'
+                       f'> `@{prefix_mention}` info'
 
         self.paginator.add_line(opening_note, empty=True)
 
@@ -305,11 +329,24 @@ class HelpCommand(commands.HelpCommand):
         """
         help_command_name = self.invoked_with
         prefix_simple = self.context.bot.prefix_simple
-        ending_note = f'\nFor more info on a command use `{prefix_simple}{help_command_name} ' \
+        ending_note = f'For more info on a command use `{prefix_simple}{help_command_name} ' \
                       '[command] [subcommand]`\n' \
                       f'You can also use `{prefix_simple}{help_command_name} [category]` ' \
                       'for more info on a category'
         self.paginator.add_line(ending_note, empty=True)
+
+    def format_command_help_message(self, command_help):
+        """
+        Formats command help message
+
+        Parameters
+        ----------
+        command_help : str or None
+            original command help message (command docstring)
+        """
+        if command_help is not None:
+            command_help = command_help.replace('<prefix>', self.clean_prefix)
+            self.paginator.add_line(command_help, empty=True)
 
     def format_cog_commands(self, cog, cog_commands):
         """
@@ -362,7 +399,8 @@ class HelpCommand(commands.HelpCommand):
             prefix_spacer_size -= 1
 
         if isinstance(command, commands.Group):
-            for subcommand in command.commands:
+            ordered_subcommands = sorted(command.commands, key=lambda c: c.qualified_name)
+            for subcommand in ordered_subcommands:
                 max_size = self.get_max_size(command.commands)
                 self.format_command_and_subcommands(
                     subcommand, max_size, True, prefix_spacer_size + 1)

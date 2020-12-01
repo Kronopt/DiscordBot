@@ -35,11 +35,7 @@ class Games(Cog):
 
     # AWESOMENAUTS
     @commands.group(name='awesomenauts', ignore_extra=False, invoke_without_command=True)
-    async def command_awesomenauts(self, context, *subcommands):
-        """
-        Awesomenauts command group
-        Groups awesomenauts-related commands
-        """
+    async def command_awesomenauts(self, context, *subcommand):
         await context.send('Please specify a known subcommand\n'
                            f'Type `{context.prefix}help {context.invoked_with}` to know more')
 
@@ -48,8 +44,13 @@ class Games(Cog):
     async def command_awesomenauts_rank(self, context, *player_name):
         """
         Displays rank of an Awesomenaut's player
+
         Matches highest ranked player out of a list of closely named players found
         (ie, retrieves first result obtained from https://orikaru.net/nautsrankings)
+
+        ex:
+        `<prefix>awesomenauts rank` niki
+        `<prefix>awesomenauts r` game is broken
         """
         player_name = ' '.join(player_name)
         player_name_quoted = urllib.parse.quote(player_name)

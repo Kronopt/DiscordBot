@@ -57,7 +57,12 @@ class Xkcd(Cog):
     @commands.group(name='xkcd', ignore_extra=False, invoke_without_command=True)
     async def command_xkcd(self, context):
         """
-        Retrieves a random xkcd comic from xkcd.com
+        Shows a random xkcd comic
+
+        Retrieves a random xkcd webcomic from xkcd.com
+
+        ex:
+        `<prefix>xkcd`
         """
         random_comic = await self.xkcd_api_client.random(raw_comic_image=False)
         embed_comic = self.embed_comic(random_comic)
@@ -67,7 +72,13 @@ class Xkcd(Cog):
     @command_xkcd.command(name='latest', ignore_extra=False, aliases=['l', '-l', 'last'])
     async def command_xkcd_latest(self, context):
         """
-        Retrieves the latest xkcd comic from xkcd.com
+        Shows the latest xkcd comic
+
+        Retrieves the latest xkcd webcomic from xkcd.com
+
+        ex:
+        `<prefix>xkcd latest`
+        `<prefix>xkcd l`
         """
         comic = await self.xkcd_api_client.latest(raw_comic_image=False)
         embed_comic = self.embed_comic(comic)
@@ -77,7 +88,13 @@ class Xkcd(Cog):
     @command_xkcd.command(name='id', ignore_extra=False, aliases=['n', '-n', 'number'])
     async def command_xkcd_id(self, context, comic_id: Converters.positive_int):
         """
-        Retrieves the selected xkcd comic from xkcd.com
+        Shows the selected xkcd comic
+
+        Retrieves the xkcd webcomic with the specified ID from xkcd.com
+
+        ex:
+        `<prefix>xkcd id` 100
+        `<prefix>xkcd n` 1234
         """
         comic = await self.xkcd_api_client.get(comic_id, raw_comic_image=False)
         embed_comic = self.embed_comic(comic)
