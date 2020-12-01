@@ -202,7 +202,7 @@ class HelpCommand(commands.HelpCommand):
 
         await self.send_pages()
 
-    async def command_callback(self, ctx, command=None):
+    async def command_callback(self, ctx, *, command=None):
         """
         Log help command calls
         """
@@ -424,4 +424,3 @@ class HelpCommand(commands.HelpCommand):
                 still_line = False
 
         return new_line
-
