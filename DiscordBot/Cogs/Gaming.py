@@ -29,7 +29,7 @@ class Gaming(Cog):
         self.awesomenauts_rank_url = 'https://orikaru.net/nautsrankings#//rank/asc/{}//'
 
     async def setup_cog(self):
-        self.browser = await launch({"args": ['--no-sandbox']})
+        self.browser = await launch(options={"args": ['--no-sandbox']})
 
     ##########
     # COMMANDS
