@@ -306,7 +306,7 @@ class HelpCommand(commands.HelpCommand):
         alias = f'{parent}{command.name}'
         if len(command.aliases) > 0:
             aliases = ' | '.join(command.aliases)
-            alias = f'[{alias} | {aliases}]'
+            alias = f'{parent}[{command.name} | {aliases}]'
 
         return f'{self.clean_prefix}{alias} {command.signature}'
 
