@@ -16,7 +16,7 @@ import pyppeteer
 
 def get_ws_endpoint(url):
     url = url + '/json/version'
-    timeout = time.time() + 30
+    timeout = time.time() + 120
     while True:
         if time.time() > timeout:
             raise pyppeteer.errors.BrowserError('Browser closed unexpectedly:\n')
