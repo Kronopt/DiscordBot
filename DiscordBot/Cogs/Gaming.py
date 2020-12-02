@@ -12,9 +12,8 @@ import collections
 import urllib
 from discord.ext import commands
 import pyppeteer
-from pyppeteer import launch
 from DiscordBot.BaseCog import Cog
-from DiscordBot.Services import AwesomenautsRank
+from DiscordBot.Services import AwesomenautsRank, PyppeteerFixes
 
 
 class Gaming(Cog):
@@ -29,7 +28,8 @@ class Gaming(Cog):
         self.awesomenauts_rank_url = 'https://orikaru.net/nautsrankings#//rank/asc/{}//'
 
     async def setup_cog(self):
-        self.browser = await launch(options={"args": ['--no-sandbox']})
+        pyppeteer.launcher.get_ws_endpoint = PyppeteerFixes.get_ws_endpoint
+        self.browser = await pyppeteer.launch()
 
     ##########
     # COMMANDS
