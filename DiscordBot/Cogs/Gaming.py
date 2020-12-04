@@ -42,12 +42,12 @@ class Gaming(Cog):
         # self.rankings_url = 'https://nautsrankings.com/index.php?search=%s'
 
     async def setup_cog(self):
-        launcher = pyppeteer.launcher.Launcher({'args': ['--no-sandbox']})
+        chromium_args = self.bot.cog_args['gaming_cog']
+        launcher = pyppeteer.launcher.Launcher({'args': chromium_args})
 
-        # for testing
-        # chromium_cmd = ' '.join(launcher.cmd)
+        # for testing:
         # import os
-        # os.system(chromium_cmd)
+        # os.system(' '.join(launcher.cmd))
 
         self.browser = await launcher.launch()
 

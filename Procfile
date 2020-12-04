@@ -1,1 +1,1 @@
-worker: python DiscordBot.py $BOT_TOKEN --setup-extra
+worker: make install-extra-dependencies && make bot

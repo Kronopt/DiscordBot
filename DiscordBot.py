@@ -10,7 +10,6 @@ A small command line utility is available so that the bot's token is not hardcod
 
 import argparse
 import logging
-import os
 from DiscordBot.Bot import Bot
 
 
@@ -18,8 +17,8 @@ if __name__ == '__main__':
     # command line handling
     cli = argparse.ArgumentParser(description='Run Discord Bot')
     cli.add_argument('token', help='Bot token')
-    cli.add_argument('--setup-extra', action='store_true',
-                     help='Whether to setup/download external bot dependencies or not')
+    cli.add_argument('-gaming_cog', action="extend", nargs='*', default=[],
+                     help='Gaming cog extra arguments')
     cli = cli.parse_args()
 
     # logging handling
@@ -28,12 +27,7 @@ if __name__ == '__main__':
         format='%(asctime)s:%(levelname)s:%(name)s: %(message)s')
     logger = logging.getLogger('DiscordBot.main')
 
-    # extra dependencies
-    if cli.setup_extra:
-        logger.info('Downloading and setting up external dependencies...')
-        os.system('pyppeteer-install')
-
     # run bot
     logger.info('Starting bot')
-    Bot(prefix='!', intents=None).run(cli.token)
+    Bot(prefix='!', intents=None, gaming_cog=cli.gaming_cog).run(cli.token)
     logger.info('Shutting down bot complete')
