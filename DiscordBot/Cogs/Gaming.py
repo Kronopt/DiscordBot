@@ -43,7 +43,7 @@ class Gaming(Cog):
 
     async def setup_cog(self):
         # pyppeteer.launcher.get_ws_endpoint = PyppeteerFixes.get_ws_endpoint
-        launcher = pyppeteer.launcher.Launcher()
+        launcher = pyppeteer.launcher.Launcher({'args': ['--no-sandbox']})
 
         # TODO TEST
         chromium_cmd = ' '.join(launcher.cmd)
