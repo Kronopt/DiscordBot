@@ -23,5 +23,5 @@ python DiscordBot.py %TEST_TOKEN%
 goto:eof
 
 :testbot
-python DiscordBot.py $BOT_TOKEN -gaming_cog=--no-sandbox
+python DiscordBot.py %BOT_TOKEN% -gaming_cog=--no-sandbox
 goto:eof

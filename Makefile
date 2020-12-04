@@ -13,7 +13,7 @@ install-extra-dependencies:
 	pyppeteer-install
 
 testbot:
-	python DiscordBot.py $TEST_TOKEN
+	python DiscordBot.py ${TEST_TOKEN}
 
 bot:
-	python DiscordBot.py $BOT_TOKEN -gaming_cog=--no-sandbox
+	python DiscordBot.py ${BOT_TOKEN} -gaming_cog=--no-sandbox
