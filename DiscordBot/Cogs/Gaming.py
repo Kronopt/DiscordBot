@@ -44,9 +44,13 @@ class Gaming(Cog):
     async def setup_cog(self):
         # pyppeteer.launcher.get_ws_endpoint = PyppeteerFixes.get_ws_endpoint
         launcher = pyppeteer.launcher.Launcher()
+
+        # TODO TEST
         chromium_cmd = ' '.join(launcher.cmd)
-        self.logger.info(f'Launching Chromium with command: {chromium_cmd}')
-        self.browser = await launcher.launch()
+        import os
+        os.system(chromium_cmd)
+        # self.logger.info(f'Launching Chromium with command: {chromium_cmd}')
+        # self.browser = await launcher.launch()
 
     ##########
     # COMMANDS
