@@ -13,7 +13,7 @@ import urllib
 from discord.ext import commands
 import pyppeteer
 from DiscordBot.BaseCog import Cog
-from DiscordBot.Services import AwesomenautsRank, PyppeteerFixes
+from DiscordBot.Services import AwesomenautsRank
 
 
 
@@ -42,15 +42,14 @@ class Gaming(Cog):
         # self.rankings_url = 'https://nautsrankings.com/index.php?search=%s'
 
     async def setup_cog(self):
-        # pyppeteer.launcher.get_ws_endpoint = PyppeteerFixes.get_ws_endpoint
         launcher = pyppeteer.launcher.Launcher({'args': ['--no-sandbox']})
 
-        # TODO TEST
-        chromium_cmd = ' '.join(launcher.cmd)
-        import os
-        os.system(chromium_cmd)
-        # self.logger.info(f'Launching Chromium with command: {chromium_cmd}')
-        # self.browser = await launcher.launch()
+        # for testing
+        # chromium_cmd = ' '.join(launcher.cmd)
+        # import os
+        # os.system(chromium_cmd)
+
+        self.browser = await launcher.launch()
 
     ##########
     # COMMANDS
