@@ -4,7 +4,7 @@ if "%1" == "" goto help
 goto %~1
 
 :help
-echo install-dependencies           installs dependencies
+echo install-dependencies           installs python dependencies
 echo testbot                        runs bot on test bot account
 echo bot                            runs bot on main bot account
 goto:eof

@@ -140,26 +140,8 @@ class Gaming(Cog):
     # ERROR HANDLING
     ################
 
-
     # @command_awesomenauts.error
-    # async def awesomenauts_on_error(self, context, error):
-    #     await self.generic_error_handler(
-    #         context, error,
-    #         (commands.CommandOnCooldown, commands.NoPrivateMessage, commands.CheckFailure))
-    #
     # @command_awesomenauts_rank.error
-    # async def awesomenauts_on_error(self, context, error):
-    #     bot_message = f'`{context.prefix}{context.command.qualified_name}` expects an ' \
-    #                   'Awesomenauts player name as argument'
-    #     timeout_message = 'can\'t retrieve Awesomenauts rankings at the moment'
-    #
-    #     await self.generic_error_handler(
-    #         context, error,
-    #         (commands.CommandOnCooldown, commands.NoPrivateMessage, commands.CheckFailure),
-    #         (commands.TooManyArguments, bot_message),
-    #         (commands.BadArgument, bot_message),
-    #         (commands.MissingRequiredArgument, bot_message),
-    #         (pyppeteer.errors.TimeoutError, timeout_message))
 
     @command_awesomenauts.error
     async def awesomenauts_on_error(self, context, error):
