@@ -9,6 +9,7 @@ Info Commands
 
 import datetime
 import platform
+import time
 import discord
 import psutil
 from discord.ext import commands
@@ -23,14 +24,9 @@ class Info(Cog):
     def __init__(self, bot):
         super().__init__(bot)
         self.emoji = 'ℹ️'
+        self.start_time = datetime.datetime.fromtimestamp(time.time())
         self.info_embed = self.create_info_embed()
         self.system_embed = self.create_system_embed()
-
-    @staticmethod
-    async def uptime():
-        today = datetime.datetime.today()
-        boot_time = datetime.datetime.fromtimestamp(psutil.boot_time())
-        return str(today - boot_time)
 
     @staticmethod
     def os_name():
@@ -53,6 +49,11 @@ class Info(Cog):
     @staticmethod
     def discord_version():
         return discord.__version__
+
+    async def uptime(self):
+        now = datetime.datetime.fromtimestamp(time.time())
+        up_time = now - self.start_time
+        return str(up_time).rsplit('.', maxsplit=1)[0]
 
     def create_info_embed(self):
         embed = discord.Embed(colour=self.embed_colour, title='\u200b')

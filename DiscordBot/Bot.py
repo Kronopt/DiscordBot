@@ -44,7 +44,7 @@ class Bot(commands.Bot):
         """
         Called when the client has successfully connected to Discord
         This is not the same as the client being fully prepared
-        Setups Cogs
+        Sets up Cogs
         """
         self.logger.info('Setting up Cogs...')
         for cog in self.cogs.values():
