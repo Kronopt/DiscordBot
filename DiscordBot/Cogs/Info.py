@@ -30,7 +30,11 @@ class Info(Cog):
 
     @staticmethod
     def os_name():
-        return platform.platform()
+        os = platform.system()
+        version = platform.version()
+        architecture = platform.architecture()
+        architecture = architecture[0] if architecture else ''
+        return f'{os} {version} {architecture}'
 
     @staticmethod
     def cpu_info():
