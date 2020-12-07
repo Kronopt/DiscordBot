@@ -16,13 +16,14 @@ from DiscordBot.BaseCog import Cog
 from DiscordBot.Services import AwesomenautsRank
 
 
+class NoBrowserError(Exception):
+    """
+    Browser is not available
+    """
+    def __str__(self):
+        return 'Browser is not available'
 
-#     """
-#
-#
-#
-#
-#
+
 class Gaming(Cog):
     """
     Commands that deal with games/gaming (player rank, high scores, characters, etc)
@@ -34,14 +35,8 @@ class Gaming(Cog):
         self.browser = None
         self.awesomenauts_rank_url = 'https://orikaru.net/nautsrankings#//rank/asc/{}//'
 
-        # if _awesomenauts_wiki_unreachable:
-        #     self.command_awesomenauts.enabled = False
-        #     self.command_awesomenauts_rank.enabled = False
-        # else:
-        #     self.awesomenauts_url = 'https://awesomenauts.gamepedia.com/%s#Stats'
-        # self.rankings_url = 'https://nautsrankings.com/index.php?search=%s'
-
     async def setup_cog(self):
+        # init browser
         chromium_args = self.bot.cog_args['gaming_cog']
         launcher = pyppeteer.launcher.Launcher({'args': chromium_args})
 
@@ -58,8 +53,8 @@ class Gaming(Cog):
     # AWESOMENAUTS
     @commands.group(name='awesomenauts', ignore_extra=False, invoke_without_command=True)
     async def command_awesomenauts(self, context, *subcommand):
-        await context.send('Please specify a known subcommand\n'
-                           f'Type `{context.prefix}help {context.invoked_with}` to know more')
+        await context.send('Please specify a known subcommand')
+        await context.send_help(self.command_awesomenauts)
 
     # AWESOMENAUTS RANK
     @command_awesomenauts.command(name='rank', ignore_extra=False, aliases=['r', '-r'])
@@ -80,6 +75,9 @@ class Gaming(Cog):
 
         player_name = ' '.join(player_name)
         player_name_quoted = urllib.parse.quote(player_name)
+
+        if self.browser is None:
+            raise NoBrowserError()
 
         page = await self.browser.newPage()
         await page.goto(self.awesomenauts_rank_url.format(player_name_quoted),
@@ -139,9 +137,6 @@ class Gaming(Cog):
     # ERROR HANDLING
     ################
 
-    # @command_awesomenauts.error
-    # @command_awesomenauts_rank.error
-
     @command_awesomenauts.error
     async def awesomenauts_on_error(self, context, error):
         await self.generic_error_handler(
@@ -152,7 +147,7 @@ class Gaming(Cog):
     async def awesomenauts_on_error(self, context, error):
         bot_message = f'`{context.prefix}{context.command.qualified_name}` expects an ' \
                       'Awesomenauts player name as argument'
-        timeout_message = 'can\'t retrieve Awesomenauts rankings at the moment'
+        timeout_message = 'Can\'t retrieve Awesomenauts rankings at the moment'
 
         await self.generic_error_handler(
             context, error,
@@ -160,4 +155,5 @@ class Gaming(Cog):
             (commands.TooManyArguments, bot_message),
             (commands.BadArgument, bot_message),
             (commands.MissingRequiredArgument, bot_message),
+            (NoBrowserError, timeout_message),
             (pyppeteer.errors.TimeoutError, timeout_message))
