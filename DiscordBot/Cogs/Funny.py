@@ -66,6 +66,28 @@ class Funny(Cog):
             joke_container=JokeApi.JokeApiJoke)
         self.apis = [icanhazdadjoke_api, officialjoke_api, joke_api]
 
+    async def get_joke(self):
+        # shuffle APIs and then try to get a joke from a single API sequentially
+        random.shuffle(self.apis)
+        for jokeapi in self.apis:
+            try:
+                self.logger.info(f'Trying to fetch joke from {jokeapi}')
+                joke = await jokeapi.random_joke()
+                joke_text = joke.text()
+
+            except ExternalAPIHandler.HttpError as error:
+                self.logger.error(f'Invalid HTTP status code on command joke: {error.status_code}')
+
+            except (aiohttp.ClientResponseError, aiohttp.ClientConnectionError) as error:
+                self.logger.error(f'Can\'t reach {jokeapi}: {error}')
+
+            else:
+                self.logger.info(f'Fetched joke from {jokeapi}')
+                return joke_text
+
+        # couldn't retrieve a joke from any joke API
+        raise NoJokeError(self.apis)
+
     ##########
     # COMMANDS
     ##########
@@ -137,7 +159,7 @@ class Funny(Cog):
         await context.send('💩' * n)
 
     # JOKE
-    @commands.command(name='joke', ignore_extra=False, aliases=['jk'])
+    @commands.group(name='joke', ignore_extra=False, aliases=['jk'], invoke_without_command=True)
     async def command_joke(self, context):
         """
         Tells a random (bad) joke
@@ -151,28 +173,21 @@ class Funny(Cog):
         `<prefix>joke`
         `<prefix>jk`
         """
+        joke = await self.get_joke()
+        await context.send(joke)
 
-        # shuffle APIs and then try to get a joke from a single API sequentially
-        random.shuffle(self.apis)
-        for jokeapi in self.apis:
-            try:
-                self.logger.info(f'Trying to fetch joke from {jokeapi}')
-                joke = await jokeapi.random_joke()
-                joke_text = joke.text()
+    # JOKE TTS
+    @command_joke.command(name='tts', ignore_extra=False, aliases=['-tts', '-t'])
+    async def command_joke_tts(self, context):
+        """
+        Reads joke using tts
 
-            except ExternalAPIHandler.HttpError as error:
-                self.logger.error(f'Invalid HTTP status code on command joke: {error.status_code}')
-
-            except (aiohttp.ClientResponseError, aiohttp.ClientConnectionError) as error:
-                self.logger.error(f'Can\'t reach {jokeapi}: {error}')
-
-            else:
-                self.logger.info(f'Fetched joke from {jokeapi}')
-                await context.send(joke_text)
-                return
-
-        # couldn't retrieve a joke from any joke API
-        raise NoJokeError(self.apis)
+        ex:
+        `<prefix>joke tts`
+        `<prefix>joke -t`
+        """
+        joke = await self.get_joke()
+        await context.send(joke, tts=True)
 
     ################
     # ERROR HANDLING
@@ -211,6 +226,7 @@ class Funny(Cog):
             (commands.TooManyArguments, bot_message))
 
     @command_joke.error
+    @command_joke_tts.error
     async def joke_on_error(self, context, error):
         bot_message = f'`{context.prefix}{context.invoked_with}` takes no arguments'
         bot_message_api_error = 'Can\'t retrieve a joke from the server at the moment'
