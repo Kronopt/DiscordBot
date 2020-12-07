@@ -1,9 +1,10 @@
-# DiscordBot  (Work in Progress)
+# DiscordBot
 A Discord Bot
 
 #### Install Dependencies
 * Python 3.9
 * `pip install -r requirements.txt`
+* `pyppeteer-install` (command becomes available after installing python dependencies)
 
 #### How to run
 * Download this repo
@@ -11,8 +12,10 @@ A Discord Bot
 * Create a `bot` [here](https://discordapp.com/developers/applications/me) and then create an `app bot user`
 (on the same page)
 * Use the `BOT_TOKEN` provided there
-* Run `python DiscordBot.py <BOT_TOKEN> --setup-extra` on the root of the repo
+* Run `python DiscordBot.py <BOT_TOKEN>` on the root of the repo
 * Add the bot to a server using discord
+
+note: on linux you might need to pass an extra parameter to DiscordBot.py: `-gaming_cog=--no-sandbox`
 
 ## Commands
 
@@ -23,6 +26,7 @@ A Discord Bot
 | `!8ball <str phrase>` | "Predicts" the outcome of a question |
 | `!dick` | Reveals user's dick size |
 | `!joke` | Tells a random (bad) joke |
+| `!joke tts` | Reads joke using tts |
 | `!poop [int n]` | Sends n poops |
 
 ### Gaming
@@ -57,4 +61,4 @@ A Discord Bot
 
 | command | descripion |
 | ------- | ---------- |
-| `!help` | Shows command help message |
+| `!help [command] [subcommand]` | Shows command help message |
