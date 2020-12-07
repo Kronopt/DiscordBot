@@ -123,12 +123,8 @@ class Info(Cog):
 
     @command_info.error
     @command_system.error
-    async def info_on_error(self, context, error):
-        if context.command.callback is self.command_info.callback:
-            bot_message = f'`{context.prefix}{context.invoked_with}` takes no arguments'
-        else:
-            bot_message = f'`{context.prefix}{context.invoked_with}` either takes either no ' \
-                          'arguments or a command (and possible subcommands)'
+    async def info_system_on_error(self, context, error):
+        bot_message = f'`{context.prefix}{context.invoked_with}` takes no arguments'
         await self.generic_error_handler(
             context, error,
             (commands.MissingRequiredArgument, commands.CommandOnCooldown,

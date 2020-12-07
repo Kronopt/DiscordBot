@@ -72,14 +72,19 @@ class General(Cog):
     ################
 
     @command_hi.error
-    @command_dice.error
-    async def ping_hi_dice_random_on_error(self, context, error):
-        if context.command.callback is self.command_hi.callback:
-            bot_message = f'`{context.prefix}{context.invoked_with}` takes no arguments'
-        else:
-            bot_message = f'`{context.prefix}{context.invoked_with}` either takes no arguments or' \
-                          ' one of the following: %s' % (', '.join(Converters.DICES))
+    async def hi_on_error(self, context, error):
+        bot_message = f'`{context.prefix}{context.invoked_with}` takes no arguments'
+        await self.generic_error_handler(
+            context, error,
+            (commands.MissingRequiredArgument, commands.CommandOnCooldown,
+             commands.NoPrivateMessage, commands.CheckFailure),
+            (commands.TooManyArguments, bot_message),
+            (commands.BadArgument, bot_message))
 
+    @command_dice.error
+    async def dice_on_error(self, context, error):
+        bot_message = f'`{context.prefix}{context.invoked_with}` either takes no arguments or' \
+                          ' one of the following: %s' % (', '.join(Converters.DICES))
         await self.generic_error_handler(
             context, error,
             (commands.MissingRequiredArgument, commands.CommandOnCooldown,

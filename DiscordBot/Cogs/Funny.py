@@ -67,6 +67,19 @@ class Funny(Cog):
         self.apis = [icanhazdadjoke_api, officialjoke_api, joke_api]
 
     async def get_joke(self):
+        """
+        joke command implementation
+
+        Returns
+        -------
+        str
+            joke text
+
+        Raises
+        ------
+        NoJokeError
+            if none of the joke APIs is reachable
+        """
         # shuffle APIs and then try to get a joke from a single API sequentially
         random.shuffle(self.apis)
         for jokeapi in self.apis:

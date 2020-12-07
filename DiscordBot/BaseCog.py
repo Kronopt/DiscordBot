@@ -156,6 +156,7 @@ class Cog(commands.Cog, metaclass=CogMeta):
                     f'{error.__class__.__name__} exception in command '
                     f'{context.command.qualified_name}: {error}')
                 await context.send(bot_message)
+                await context.send_help(context.command)
                 return
         if self.unhandled_exceptions(context, error, unhandled_exceptions):
             CommandLogging.log_command_exception(self.logger, context.command.qualified_name)
