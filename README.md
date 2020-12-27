@@ -1,4 +1,7 @@
 # DiscordBot
+[![License](https://img.shields.io/github/license/Kronopt/DiscordBot)](https://github.com/Kronopt/DiscordBot/blob/master/LICENSE)
+[![Known Vulnerabilities](https://snyk.io/test/github/Kronopt/DiscordBot/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/Kronopt/DiscordBot?targetFile=requirements.txt)
+
 A Discord Bot
 
 #### Install Dependencies
