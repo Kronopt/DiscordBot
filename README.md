@@ -44,6 +44,7 @@ note: on linux you might need to pass an extra parameter to DiscordBot.py: `-gam
 | ------- | ---------- |
 | `!dice [str dice]` | Rolls one of the following dices: d4, d6, d8, d10, d12 and d20 |
 | `!hi` | Greets user |
+| `!poll` | Starts a poll|
 
 ### Info
 
