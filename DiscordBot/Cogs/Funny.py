@@ -51,19 +51,19 @@ class Funny(Cog):
                    'User-Agent': 'DiscordBot (https://github.com/Kronopt/DiscordBot)'}
         icanhazdadjoke_api = ExternalAPIHandler.APICommunicationHandler(
             api_name='ICanHazDadJoke (icanhazdadjoke.com)',
-            base_url='https://icanhazdadjoke.com/',
+            url='https://icanhazdadjoke.com/',
             headers=headers,
-            joke_container=ICanHazDadJoke.DadJoke)
+            json_parser=ICanHazDadJoke.DadJoke)
         officialjoke_api = ExternalAPIHandler.APICommunicationHandler(
             api_name='OfficialJokeAPI (github.com/15Dkatz/official_joke_api)',
-            base_url='https://official-joke-api.appspot.com/random_joke',
+            url='https://official-joke-api.appspot.com/random_joke',
             headers=headers,
-            joke_container=OfficialJokeAPI.OfficialJoke)
+            json_parser=OfficialJokeAPI.OfficialJoke)
         joke_api = ExternalAPIHandler.APICommunicationHandler(
             api_name='JokeAPI (sv443.net/jokeapi/v2)',
-            base_url='https://sv443.net/jokeapi/v2/joke/Any',
+            url='https://sv443.net/jokeapi/v2/joke/Any',
             headers=headers,
-            joke_container=JokeApi.JokeApiJoke)
+            json_parser=JokeApi.JokeApiJoke)
         self.apis = [icanhazdadjoke_api, officialjoke_api, joke_api]
 
     async def get_joke(self):
@@ -85,7 +85,7 @@ class Funny(Cog):
         for jokeapi in self.apis:
             try:
                 self.logger.info(f'Trying to fetch joke from {jokeapi}')
-                joke = await jokeapi.random_joke()
+                joke = await jokeapi.call_api()
                 joke_text = joke.text()
 
             except ExternalAPIHandler.HttpError as error:

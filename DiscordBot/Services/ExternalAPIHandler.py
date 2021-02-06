@@ -34,26 +34,36 @@ class HttpError(Exception):
 class APICommunicationHandler:
     """
     External API communication handler
+
+    Attributes
+    ----------
+    name : str
+        API name
+    url : str
+        API endpoint url
+    headers : list
+        Headers to send with http request
+    json_parser : class/function
+        Class/Function which parses the json response dict
     """
 
-    def __init__(self, api_name, base_url, headers, joke_container):
+    def __init__(self, api_name, url, headers, json_parser):
         self.name = api_name
-        self.url = base_url
+        self.url = url
         self.headers = headers
-        self.joke_container = joke_container
+        self.json_parser = json_parser
 
-    async def random_joke(self):
+    async def call_api(self):
         """
-        Retrieves a random joke
+        Calls the API endpoint
 
         Returns
         -------
-        self.joke_container
-            joke container class
+        Output of json_parser
         """
         response = await self._request()
-        joke = await self._parse_response(response)
-        return joke
+        parsed_response = await self._parse_response(response)
+        return parsed_response
 
     async def _request(self):
         """
@@ -81,7 +91,7 @@ class APICommunicationHandler:
 
     async def _parse_response(self, response_json):
         """
-        Parses the external API response into a joke container object
+        Parses the external API response using the json_parser
 
         Parameters
         ----------
@@ -90,10 +100,9 @@ class APICommunicationHandler:
 
         Returns
         -------
-        self.joke_container
-            joke container class
+        Output of json_parser
         """
-        return json.loads(response_json, object_hook=self.joke_container)
+        return json.loads(response_json, object_hook=self.json_parser)
 
     def __repr__(self):
         return self.name
