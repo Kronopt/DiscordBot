@@ -94,10 +94,7 @@ class APICommunicationHandler:
         url = self.base_url
 
         if endpoint_url:
-            if endpoint_url.startswith("/"):
-                url += endpoint_url
-            else:
-                url += f"/{endpoint_url}"
+            url += endpoint_url
 
         async with aiohttp.ClientSession(headers=self.headers) as session:
             async with session.get(url) as response:
@@ -120,7 +117,7 @@ class APICommunicationHandler:
         -------
         Output of json_parser
         """
-        return json.loads(response_json, object_hook=self.json_parser)
+        return self.json_parser(json.loads(response_json))
 
     def __repr__(self):
         return self.name
