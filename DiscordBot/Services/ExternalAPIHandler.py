@@ -39,35 +39,45 @@ class APICommunicationHandler:
     ----------
     name : str
         API name
-    url : str
-        API endpoint url
+    base_url : str
+        API base url
     headers : list
         Headers to send with http request
     json_parser : class/function
         Class/Function which parses the json response dict
     """
 
-    def __init__(self, api_name, url, headers, json_parser):
+    def __init__(self, api_name, base_url, headers, json_parser):
         self.name = api_name
-        self.url = url
+        self.base_url = base_url if not base_url.endswith("/") else base_url[:-1]
         self.headers = headers
         self.json_parser = json_parser
 
-    async def call_api(self):
+    async def call_api(self, endpoint_url=None):
         """
         Calls the API endpoint
+
+        Attributes
+        ----------
+        endpoint_url : str
+            endpoint to add to base_url
 
         Returns
         -------
         Output of json_parser
         """
-        response = await self._request()
+        response = await self._request(endpoint_url)
         parsed_response = await self._parse_response(response)
         return parsed_response
 
-    async def _request(self):
+    async def _request(self, endpoint_url=None):
         """
         Handles asynchronous http requests with the external API
+
+        Attributes
+        ----------
+        endpoint_url : str
+            endpoint to add to base_url
 
         Returns
         -------
@@ -81,8 +91,16 @@ class APICommunicationHandler:
         HttpError
             If an http code different from 200 is returned
         """
+        url = self.base_url
+
+        if endpoint_url:
+            if endpoint_url.startswith("/"):
+                url += endpoint_url
+            else:
+                url += f"/{endpoint_url}"
+
         async with aiohttp.ClientSession(headers=self.headers) as session:
-            async with session.get(self.url) as response:
+            async with session.get(url) as response:
                 if response.status != 200:
                     raise HttpError(response.status, response.reason)
                 response_json = await response.text()

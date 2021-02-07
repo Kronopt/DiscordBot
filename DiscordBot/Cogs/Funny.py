@@ -51,17 +51,17 @@ class Funny(Cog):
                    'User-Agent': 'DiscordBot (https://github.com/Kronopt/DiscordBot)'}
         icanhazdadjoke_api = ExternalAPIHandler.APICommunicationHandler(
             api_name='ICanHazDadJoke (icanhazdadjoke.com)',
-            url='https://icanhazdadjoke.com/',
+            base_url='https://icanhazdadjoke.com',
             headers=headers,
             json_parser=ICanHazDadJoke.DadJoke)
         officialjoke_api = ExternalAPIHandler.APICommunicationHandler(
             api_name='OfficialJokeAPI (github.com/15Dkatz/official_joke_api)',
-            url='https://official-joke-api.appspot.com/random_joke',
+            base_url='https://official-joke-api.appspot.com/random_joke',
             headers=headers,
             json_parser=OfficialJokeAPI.OfficialJoke)
         joke_api = ExternalAPIHandler.APICommunicationHandler(
             api_name='JokeAPI (sv443.net/jokeapi/v2)',
-            url='https://sv443.net/jokeapi/v2/joke/Any',
+            base_url='https://sv443.net/jokeapi/v2/joke/Any',
             headers=headers,
             json_parser=JokeApi.JokeApiJoke)
         self.apis = [icanhazdadjoke_api, officialjoke_api, joke_api]
