@@ -17,8 +17,9 @@ if __name__ == '__main__':
     # command line handling
     cli = argparse.ArgumentParser(description='Run Discord Bot')
     cli.add_argument('token', help='Bot token')
-    cli.add_argument('-gaming_cog', action="extend", nargs='*', default=[],
-                     help='Gaming cog extra arguments')
+    cli.add_argument('-chromium_args', action='extend', nargs='*', default=[],
+                     help='Chromium extra arguments')
+    cli.add_argument('-isthereanydeal_token', help='IsThereAnyDeal API token')
     cli = cli.parse_args()
 
     # logging handling
@@ -29,5 +30,9 @@ if __name__ == '__main__':
 
     # run bot
     logger.info('Starting bot')
-    Bot(prefix='!', intents=None, gaming_cog=cli.gaming_cog).run(cli.token)
+    Bot(prefix='!',
+        intents=None,
+        chromium_args=cli.chromium_args,
+        isthereanydeal_token=cli.isthereanydeal_token
+        ).run(cli.token)
     logger.info('Shutting down bot complete')

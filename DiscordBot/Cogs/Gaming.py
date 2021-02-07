@@ -37,7 +37,7 @@ class Gaming(Cog):
 
     async def setup_cog(self):
         # init browser
-        chromium_args = self.bot.cog_args['gaming_cog']
+        chromium_args = self.bot.cog_args['chromium_args']
         launcher = pyppeteer.launcher.Launcher({'args': chromium_args})
 
         # for testing:
