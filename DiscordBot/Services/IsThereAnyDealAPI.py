@@ -296,6 +296,5 @@ class GetHistoricalLowEndpoint(IsThereAnyDealErrorResponse):
                 if 'shop' in shop_info:
                     shop = shop_info['shop']
                     self.id = shop.get('id')
-                    self.name = shop.get('name')
+                    self.store = shop.get('name')
                 self.price = shop_info.get('price')
-
