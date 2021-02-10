@@ -39,12 +39,12 @@ class Gaming(Cog):
 
         headers = {'Accept': 'application/json',
                    'User-Agent': 'DiscordBot (https://github.com/Kronopt/DiscordBot)'}
-        self.isthereanydeal_search_api = ExternalAPIHandler.APICommunicationHandler(
-            api_name='IsThereAnyDeal API, Search endpoint',
-            base_url=f'{self.isthereanydeal_base_url}/v02/search/search/?key='
-                     f'{self.bot.cog_args["isthereanydeal_token"]}&limit=1',
+        self.isthereanydeal_identifier_api = ExternalAPIHandler.APICommunicationHandler(
+            api_name='IsThereAnyDeal API, Identifier endpoint',
+            base_url=f'{self.isthereanydeal_base_url}/v02/game/plain/?key='
+                     f'{self.bot.cog_args["isthereanydeal_token"]}',
             headers=headers,
-            json_parser=IsThereAnyDealAPI.SearchEndpoint)
+            json_parser=IsThereAnyDealAPI.IdentifierEndpoint)
         self.isthereanydeal_game_info_api = ExternalAPIHandler.APICommunicationHandler(
             api_name='IsThereAnyDeal API, Get Info About Game endpoint',
             base_url=f'{self.isthereanydeal_base_url}/v01/game/info/?key='
@@ -57,7 +57,7 @@ class Gaming(Cog):
                      f'{self.bot.cog_args["isthereanydeal_token"]}&region=eu2&country=PT',
             headers=headers,
             json_parser=IsThereAnyDealAPI.GetCurrentPricesEndpoint)
-        self.isthereanydeal_game_historical_price_api = ExternalAPIHandler.APICommunicationHandler(
+        self.isthereanydeal_historical_price_api = ExternalAPIHandler.APICommunicationHandler(
             api_name='IsThereAnyDeal API, Get Historical Price endpoint',
             base_url=f'{self.isthereanydeal_base_url}/v01/game/lowest/?key='
                      f'{self.bot.cog_args["isthereanydeal_token"]}&region=eu2&country=PT',
