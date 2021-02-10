@@ -76,28 +76,16 @@ class Gaming(Cog):
         self.browser = await launcher.launch()
 
     async def create_gamedeal_embed(self, game_info, game_prices, game_historical_low_price):
-        # TODO games available in lots of stores makes description go above embed char limit...
+        embed = discord.Embed(colour=self.embed_colour)
 
+        # game title
         dlc = ' (DLC)' if game_info.is_dlc else ''
-
-        embed = discord.Embed(colour=self.embed_colour, description='')
         embed.set_author(name=game_info.title + dlc)
-        embed.set_image(url=game_info.image_url)
-        embed.set_footer(text='IsThereAnyDeal.com ❤',
-                         icon_url='https://d2uym1p5obf9p8.cloudfront.net/images/favicon.png')
-        embed.add_field(name='Historical Low',
-                        value=f'__{game_historical_low_price.price}{game_prices.currency}__ '
-                              f'on {game_historical_low_price.store}',
-                        inline=True)
-        embed.add_field(name='Steam Review',
-                        value=f'**{game_info.steam_review.text}**\n'
-                              f'({game_info.steam_review.positive_reviews_percent}% of '
-                              f'{game_info.steam_review.total_reviews} users)',
-                        inline=True)
 
+        # game prices per store
+        embed_value = ''
         for shop in game_prices.shops:
             price_current = f'{shop.price_full}{game_prices.currency}'
-
             if shop.price_percent_discount != 0:
                 price_current = f'~~{price_current}~~'
                 price_cut = f'{shop.price_discounted}{game_prices.currency} ' \
@@ -105,8 +93,37 @@ class Gaming(Cog):
             else:
                 price_cut = ''
 
-            embed.description += f'{price_current} {price_cut}[{shop.name}]({shop.game_url})\n'
-        embed.description += '\n'
+            shop_price_info = f'{price_current} {price_cut}[{shop.name}]({shop.game_url})\n'
+
+            if len(embed_value) + len(shop_price_info) < 1024:  # embed.field.value size limit
+                embed_value += shop_price_info
+            else:
+                embed.add_field(name='\u200b', value=embed_value, inline=False)
+                embed_value = shop_price_info
+
+        embed.add_field(name='\u200b', value=embed_value, inline=False)
+
+        # historical low price and store
+        embed.add_field(name='\u200b\nHistorical Low',
+                        value=f'__{game_historical_low_price.price}{game_prices.currency}__ '
+                              f'on {game_historical_low_price.store}',
+                        inline=True)
+
+        # steam review, if any
+        if game_info.steam_review:
+            embed.add_field(name='\u200b\nSteam Review',
+                            value=f'**{game_info.steam_review.text}**\n'
+                                  f'({game_info.steam_review.positive_reviews_percent}% of '
+                                  f'{game_info.steam_review.total_reviews} users)',
+                            inline=True)
+
+        # game image
+        if game_info.image_url:
+            embed.set_image(url=game_info.image_url)
+
+        # footer info
+        embed.set_footer(text='source: IsThereAnyDeal.com ❤',
+                         icon_url='https://d2uym1p5obf9p8.cloudfront.net/images/favicon.png')
 
         return embed
 
@@ -216,18 +233,22 @@ class Gaming(Cog):
         game_name = ' '.join(game_name)
         game_name_quoted = urllib.parse.quote(game_name)
 
-        game = await self.isthereanydeal_search_api.call_api(f'&q={game_name_quoted}')
-        # TODO check if game exists, is ok, etc
-        game_info = await self.isthereanydeal_game_info_api.call_api(f'&plains={game.plain}')
-        # TODO check if needed fields are ok
-        game_prices = await self.isthereanydeal_game_prices_api.call_api(f'&plains={game.plain}')
-        # TODO check if needed fields are ok
-        game_historical_low_price = await self.isthereanydeal_game_historical_price_api.call_api(
-            f'&plains={game.plain}')
-        # TODO check if needed fields are ok
+        game = await self.isthereanydeal_identifier_api.call_api(f'&title={game_name_quoted}')
 
-        embed = await self.create_gamedeal_embed(game_info, game_prices, game_historical_low_price)
-        await context.send(embed=embed)
+        if game.plain:
+            game_info = await self.isthereanydeal_game_info_api.call_api(
+                f'&plains={game.plain}')
+            game_prices = await self.isthereanydeal_game_prices_api.call_api(
+                f'&plains={game.plain}')
+            game_historical_low_price = await self.isthereanydeal_historical_price_api.call_api(
+                f'&plains={game.plain}')
+
+            embed = await self.create_gamedeal_embed(
+                game_info, game_prices, game_historical_low_price)
+            await context.send(embed=embed)
+
+        else:
+            await context.send(f'Could not find game `{game_name}`')
 
     ################
     # ERROR HANDLING

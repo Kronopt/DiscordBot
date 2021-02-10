@@ -51,43 +51,33 @@ class IsThereAnyDealErrorResponse:
             raise IsThereAnyDealError(self.error, self.error_description)
 
 
-class SearchEndpoint(IsThereAnyDealErrorResponse):
+class IdentifierEndpoint(IsThereAnyDealErrorResponse):
     """
-    IsThereAnyDeal API Search endpoint parser
+    IsThereAnyDeal API Identifier endpoint parser
 
     All properties can be None if the value can't be retrieved from the IsThereAnyDeal API
 
     Attributes
     ----------
-    id : int or None
-        IsThereAnyDeal API game id
     plain : str or None
         IsThereAnyDeal API game identifier
-    title : str or None
-        Game name
     """
 
     def __init__(self, response_dict):
         """
-        IsThereAnyDeal API Search endpoint init
+        IsThereAnyDeal API Identifier endpoint init
 
         Parameters
         ----------
         response_dict : dict
-            parsed json obtained from IsThereAnyDeal API Search endpoint
+            parsed json obtained from IsThereAnyDeal API Identifier endpoint
         """
         super().__init__(response_dict)
 
-        self.id = None
         self.plain = None
-        self.title = None
 
-        if 'data' in response_dict:
-            if 'results' in response_dict['data']:
-                result = response_dict['data']['results'][0]  # only the first result is relevant
-                self.id = result.get('id')
-                self.plain = result.get('plain')
-                self.title = result.get('title')
+        if 'data' in response_dict and response_dict['data']:
+            self.plain = response_dict['data'].get('plain')
 
 
 class SteamReview:
@@ -152,14 +142,16 @@ class GetInfoAboutGameEndpoint(IsThereAnyDealErrorResponse):
         self.is_dlc = None
         self.steam_review = None
 
-        if 'data' in response_dict:
-            for game in response_dict['data'].values():  # assumes only one game
+        if 'data' in response_dict and response_dict['data']:
+            data = response_dict['data']
+            for game in data.values():  # assumes only one game
                 self.title = game.get('title')
                 self.image_url = game.get('image')
                 self.is_dlc = game.get('is_dlc')
 
-                if 'reviews' in game:
+                if 'reviews' in game and game['reviews']:
                     self.steam_review = SteamReview(game['reviews'].get('steam'))
+                break
 
 
 class ShopInfo:
@@ -202,18 +194,23 @@ class ShopInfo:
         self.price_percent_discount = None
         self.drm = None
 
-        if 'shop' in game_shop_dict:
+        if 'shop' in game_shop_dict and game_shop_dict['shop']:
             shop = game_shop_dict['shop']
             self.id = shop.get('id')
             self.name = shop.get('name')
 
         self.game_url = game_shop_dict.get('url')
-        self.price_full = game_shop_dict.get('price_old')
-        self.price_discounted = game_shop_dict.get('price_new')
         self.price_percent_discount = game_shop_dict.get('price_cut')
 
+        self.price_full = game_shop_dict.get('price_old')
+        if self.price_full:
+            self.price_full = round(self.price_full, 2)
+        self.price_discounted = game_shop_dict.get('price_new')
+        if self.price_discounted:
+            self.price_discounted = round(self.price_discounted, 2)
+
         drm_list = game_shop_dict.get('drm')
-        if drm_list is not None:
+        if drm_list:
             self.drm = []
             for drms in drm_list:
                 self.drm += drms.split('; ')
@@ -247,14 +244,17 @@ class GetCurrentPricesEndpoint(IsThereAnyDealErrorResponse):
         self.shops = None
         self.currency = '€'
 
-        if 'data' in response_dict:
-            for shop_list in response_dict['data'].values():  # assumes only one game
-                if 'list' in shop_list:
+        if 'data' in response_dict and response_dict['data']:
+            data = response_dict['data']
+            for shop_list in data.values():  # assumes only one game
+                if 'list' in shop_list and shop_list['list']:
                     shops = shop_list['list']
 
                     self.shops = []
                     for shop in shops:
                         self.shops.append(ShopInfo(shop))
+
+                break
 
 
 class GetHistoricalLowEndpoint(IsThereAnyDealErrorResponse):
@@ -291,10 +291,16 @@ class GetHistoricalLowEndpoint(IsThereAnyDealErrorResponse):
         self.price = None
         self.currency = '€'
 
-        if 'data' in response_dict:
-            for shop_info in response_dict['data'].values():  # assumes only one shop
-                if 'shop' in shop_info:
+        if 'data' in response_dict and response_dict['data']:
+            data = response_dict['data']
+            for shop_info in data.values():  # assumes only one shop
+                if 'shop' in shop_info and shop_info['shop']:
                     shop = shop_info['shop']
                     self.id = shop.get('id')
                     self.store = shop.get('name')
+
                 self.price = shop_info.get('price')
+                if self.price:
+                    self.price = round(self.price, 2)
+
+                break
