@@ -84,28 +84,33 @@ class Gaming(Cog):
 
         # game prices per store
         embed_value = ''
-        for shop in game_prices.shops:
-            price_current = f'{shop.price_full}{game_prices.currency}'
-            if shop.price_percent_discount != 0:
-                price_current = f'~~{price_current}~~'
-                price_cut = f'{shop.price_discounted}{game_prices.currency} ' \
-                            f'(-{shop.price_percent_discount}%) '
-            else:
-                price_cut = ''
 
-            shop_price_info = f'{price_current} {price_cut}[{shop.name}]({shop.game_url})\n'
+        if game_prices.shops:
+            for shop in game_prices.shops:
+                price_current = f'{shop.price_full}{game_prices.currency}'
+                if shop.price_percent_discount != 0:
+                    price_current = f'~~{price_current}~~'
+                    price_cut = f'{shop.price_discounted}{game_prices.currency} ' \
+                                f'(-{shop.price_percent_discount}%) '
+                else:
+                    price_cut = ''
 
-            if len(embed_value) + len(shop_price_info) < 1024:  # embed.field.value size limit
-                embed_value += shop_price_info
-            else:
-                embed.add_field(name='\u200b', value=embed_value, inline=False)
-                embed_value = shop_price_info
+                shop_price_info = f'{price_current} {price_cut}[{shop.name}]({shop.game_url})\n'
 
-        embed.add_field(name='\u200b', value=embed_value, inline=False)
+                if len(embed_value) + len(shop_price_info) < 1024:  # embed.field.value size limit
+                    embed_value += shop_price_info
+                else:
+                    embed.add_field(name='\u200b', value=embed_value, inline=False)
+                    embed_value = shop_price_info
+
+            embed.add_field(name='\u200b', value=embed_value, inline=False)
+
+        else:
+            embed.description = f'{game_info.title} is currently not available for purchase'
 
         # historical low price and store
         embed.add_field(name='\u200b\nHistorical Low',
-                        value=f'__{game_historical_low_price.price}{game_prices.currency}__ '
+                        value=f'{game_historical_low_price.price}{game_prices.currency} '
                               f'on {game_historical_low_price.store}',
                         inline=True)
 
