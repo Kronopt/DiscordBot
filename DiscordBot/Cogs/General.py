@@ -24,22 +24,20 @@ class General(Cog):
         self.emoji = '🎛️'
         self.greetings = ['Hi', 'Hello', 'Hey', 'Sup', 'What\'s up', 'Greetings', 'Howdy']
         self.greeting_emojis = ['👋', '🤙', '🖖', '🤟', '👊', '🙌']
-        self.poll_numbers = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+        self.poll_options = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯',
+                             '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹']
 
     def create_poll_embed(self, name, options):
-        embed = discord.Embed(colour=self.embed_colour, description=f'📊 **{name}**\n')
-
-        if options:
-            embed.description += "\n"
-            for i, option in enumerate(options):
-                embed.description += f'{self.poll_numbers[i]} {option}\n'
+        embed = discord.Embed(colour=self.embed_colour, description=f'📊 **{name}**\n\n')
+        for i, option in enumerate(options):
+            embed.description += f'{self.poll_options[i]} {option}\n'
 
         return embed
 
     async def react_with_options(self, message, options):
         if options:
             for i in range(len(options)):
-                await message.add_reaction(self.poll_numbers[i])
+                await message.add_reaction(self.poll_options[i])
         else:
             await message.add_reaction('👍')
             await message.add_reaction('👎')
@@ -94,19 +92,19 @@ class General(Cog):
         """
         Starts a poll
 
-        Use quotation marks to use whole phrases as name/options.
+        Use quotation marks if you want whole phrases as name/options.
         If just the poll name is given, options will be yes/no/maybe, otherwise
-        each option will have a number associated.
+        each option will have a letter associated.
 
         ex:
         `<prefix>poll` "Is this a cool poll command?"
-        `<prefix>poll` "Favourite icecream?" chocolat strawberry banana concrete
+        `<prefix>poll` "Favourite icecream?" chocolate strawberry banana concrete
         """
-        if len(options) <= 10:
+        if len(options) <= 20:
             message = await context.send(embed=self.create_poll_embed(name, options))
             await self.react_with_options(message, options)
         else:
-            raise commands.TooManyArguments("There are more than 10 options")
+            raise commands.TooManyArguments("Maximum number of options is 20")
 
     ################
     # ERROR HANDLING
@@ -137,7 +135,7 @@ class General(Cog):
     async def poll_on_error(self, context, error):
         missing_argument = f'`{context.prefix}{context.invoked_with}` ' \
                            f'requires a poll name/description'
-        bot_message = f'`{context.prefix}{context.invoked_with}` takes a maximum of 10 options'
+        bot_message = f'`{context.prefix}{context.invoked_with}` takes a maximum of 20 options'
         await self.generic_error_handler(
             context, error,
             (commands.CommandOnCooldown, commands.NoPrivateMessage, commands.CheckFailure),
