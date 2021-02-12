@@ -113,7 +113,7 @@ class Gaming(Cog):
             embed.description = f'{game_info.title} is currently not available for purchase'
 
         # historical low price, if any
-        if game_historical_low_price.price:
+        if game_historical_low_price.price is not None:
             embed.add_field(name='\u200b\nHistorical Low',
                             value=f'{game_historical_low_price.store}: '
                                   f'**{game_historical_low_price.price}{game_prices.currency}**\n'
