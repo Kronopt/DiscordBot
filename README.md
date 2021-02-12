@@ -37,6 +37,7 @@ note: on linux you might need to pass an extra parameter to DiscordBot.py: `-gam
 | command | descripion |
 | ------- | ---------- |
 | `!awesomenaut rank <str player_name>` | Displays rank information of an Awesomenaut's player |
+| `!gamedeal <str game_name>` | Displays game pricing info |
 
 ### General
 

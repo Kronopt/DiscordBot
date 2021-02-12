@@ -34,35 +34,64 @@ class HttpError(Exception):
 class APICommunicationHandler:
     """
     External API communication handler
+
+    Attributes
+    ----------
+    name : str
+        API name
+    base_url : str
+        API base url
+    headers : list
+        Headers to send with http request
+    json_parser : class/function
+        Class/Function which parses the json response dict
+    error_parser : class/function or None
+        Class/function which parses the error json response dict.
+        If set, it will be called when an http code != 200 occurs and no HttpError will be raised,
+        otherwise an HttpError will be raised
     """
 
-    def __init__(self, api_name, base_url, headers, joke_container):
+    def __init__(self, api_name, base_url, headers, json_parser, error_parser=None):
         self.name = api_name
-        self.url = base_url
+        self.base_url = base_url if not base_url.endswith("/") else base_url[:-1]
         self.headers = headers
-        self.joke_container = joke_container
+        self.json_parser = json_parser
+        self.error_parser = error_parser
 
-    async def random_joke(self):
+    async def call_api(self, endpoint_url=None):
         """
-        Retrieves a random joke
+        Calls the API endpoint
+
+        Attributes
+        ----------
+        endpoint_url : str
+            endpoint to add to base_url
 
         Returns
         -------
-        self.joke_container
-            joke container class
+        Output of json_parser
         """
-        response = await self._request()
-        joke = await self._parse_response(response)
-        return joke
+        response, http_status_code, http_status_reason = await self._request(endpoint_url)
+        parsed_response = await self._parse_response(response, http_status_code, http_status_reason)
+        return parsed_response
 
-    async def _request(self):
+    async def _request(self, endpoint_url=None):
         """
         Handles asynchronous http requests with the external API
+
+        Attributes
+        ----------
+        endpoint_url : str
+            endpoint to add to base_url
 
         Returns
         -------
         str
             external API json response as str
+        int
+            http status code
+        str
+            http status reason
 
         Raises
         ------
@@ -71,29 +100,51 @@ class APICommunicationHandler:
         HttpError
             If an http code different from 200 is returned
         """
+        url = self.base_url
+
+        if endpoint_url:
+            url += endpoint_url
+
         async with aiohttp.ClientSession(headers=self.headers) as session:
-            async with session.get(self.url) as response:
-                if response.status != 200:
+            async with session.get(url) as response:
+                if response.status != 200 and not self.error_parser:
                     raise HttpError(response.status, response.reason)
                 response_json = await response.text()
 
-        return response_json
+        return response_json, response.status, response.reason
 
-    async def _parse_response(self, response_json):
+    async def _parse_response(self, response_json, http_status_code, http_status_reason):
         """
-        Parses the external API response into a joke container object
+        Parses the external API response using the json_parser
 
         Parameters
         ----------
         response_json : str
             external API json response as str
+        http_status_code : int
+            http status code
+        http_status_reason : str
+            http status reason
 
         Returns
         -------
-        self.joke_container
-            joke container class
+        Output of json_parser
         """
-        return json.loads(response_json, object_hook=self.joke_container)
+        try:
+            response = json.loads(response_json)
+
+        except json.JSONDecodeError as err:
+            if http_status_code != 200:
+                raise HttpError(http_status_code, http_status_reason)
+            else:
+                raise err
+
+        if http_status_code == 200:
+            parser = self.json_parser
+        else:
+            parser = self.error_parser
+
+        return parser(response)
 
     def __repr__(self):
         return self.name
