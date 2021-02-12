@@ -108,11 +108,13 @@ class Gaming(Cog):
         else:
             embed.description = f'{game_info.title} is currently not available for purchase'
 
-        # historical low price and store
-        embed.add_field(name='\u200b\nHistorical Low',
-                        value=f'{game_historical_low_price.price}{game_prices.currency} '
-                              f'on {game_historical_low_price.store}',
-                        inline=True)
+        # historical low price, if any
+        if game_historical_low_price.price:
+            embed.add_field(name='\u200b\nHistorical Low',
+                            value=f'{game_historical_low_price.store}: '
+                                  f'**{game_historical_low_price.price}{game_prices.currency}**\n'
+                                  f'on {game_historical_low_price.date}',
+                            inline=True)
 
         # steam review, if any
         if game_info.steam_review:

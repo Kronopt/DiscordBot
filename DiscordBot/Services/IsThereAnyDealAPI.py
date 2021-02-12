@@ -7,6 +7,9 @@ IsThereAnyDeal API response parsers
 """
 
 
+import datetime
+
+
 class IsThereAnyDealError(Exception):
     """
     IsThereAnyDeal error
@@ -271,6 +274,8 @@ class GetHistoricalLowEndpoint(IsThereAnyDealErrorResponse):
         Store name
     price : float or None
         Lowest historical price
+    date : str or None
+        Date of lowest price
     currency : str
         Currency of price
     """
@@ -289,6 +294,7 @@ class GetHistoricalLowEndpoint(IsThereAnyDealErrorResponse):
         self.id = None
         self.store = None
         self.price = None
+        self.date = None
         self.currency = '€'
 
         if 'data' in response_dict and response_dict['data']:
@@ -302,5 +308,8 @@ class GetHistoricalLowEndpoint(IsThereAnyDealErrorResponse):
                 self.price = shop_info.get('price')
                 if self.price:
                     self.price = round(self.price, 2)
+                self.date = shop_info.get('added')
+                if self.date:
+                    self.date = datetime.date.fromtimestamp(self.date).isoformat()
 
                 break
