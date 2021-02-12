@@ -25,7 +25,7 @@ class IsThereAnyDealError(Exception):
         self.error_description = error_description
 
     def __str__(self):
-        return f'Received IsThereAnyDeal error "{self.error}": {self.error_description}'
+        return f'Received IsThereAnyDeal API error "{self.error}": {self.error_description}'
 
 
 class IsThereAnyDealErrorResponse:
@@ -183,8 +183,7 @@ class ShopInfo:
         Game's price with discount
     price_percent_discount : int or None
         Game's price discount percentage
-    drm : list[str]
-        DRM for this game in this store
+
     """
 
     def __init__(self, game_shop_dict):
@@ -203,7 +202,6 @@ class ShopInfo:
         self.price_full = None
         self.price_discounted = None
         self.price_percent_discount = None
-        self.drm = None
 
         if 'shop' in game_shop_dict and game_shop_dict['shop']:
             shop = game_shop_dict['shop']
@@ -219,12 +217,6 @@ class ShopInfo:
         self.price_discounted = game_shop_dict.get('price_new')
         if self.price_discounted:
             self.price_discounted = round(self.price_discounted, 2)
-
-        drm_list = game_shop_dict.get('drm')
-        if drm_list:
-            self.drm = []
-            for drms in drm_list:
-                self.drm += drms.split('; ')
 
 
 class GetCurrentPricesEndpoint(IsThereAnyDealErrorResponse):
