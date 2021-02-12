@@ -287,14 +287,18 @@ class Gaming(Cog):
             (NoBrowserError, timeout_message),
             (pyppeteer.errors.TimeoutError, timeout_message))
 
-    # TODO error handling
     @command_gamedeal.error
     async def gamedeal_on_error(self, context, error):
-        bot_message = f'`{context.prefix}{context.command.qualified_name}` error'
+        bot_message = f'`{context.prefix}{context.command.qualified_name}` bad argument'
+        http_error_message = f'`{context.prefix}{context.command.qualified_name}` couldn\'t ' \
+                             'reach IsThereAnyDeal.com'
+        itad_message = f'`{context.prefix}{context.command.qualified_name}` got an error ' \
+                       'from IsThereAnyDeal.com'
 
         await self.generic_error_handler(
             context, error,
             (commands.CommandOnCooldown, commands.NoPrivateMessage, commands.CheckFailure),
-            (commands.TooManyArguments, bot_message),
             (commands.BadArgument, bot_message),
-            (commands.MissingRequiredArgument, bot_message))
+            (commands.MissingRequiredArgument, bot_message),
+            (ExternalAPIHandler.HttpError, http_error_message),
+            (IsThereAnyDealAPI.IsThereAnyDealError, itad_message))
