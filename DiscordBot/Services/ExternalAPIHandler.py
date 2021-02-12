@@ -45,13 +45,18 @@ class APICommunicationHandler:
         Headers to send with http request
     json_parser : class/function
         Class/Function which parses the json response dict
+    error_parser : class/function or None
+        Class/function which parses the error json response dict.
+        If set, it will be called when an http code != 200 occurs and no HttpError will be raised,
+        otherwise an HttpError will be raised
     """
 
-    def __init__(self, api_name, base_url, headers, json_parser):
+    def __init__(self, api_name, base_url, headers, json_parser, error_parser=None):
         self.name = api_name
         self.base_url = base_url if not base_url.endswith("/") else base_url[:-1]
         self.headers = headers
         self.json_parser = json_parser
+        self.error_parser = error_parser
 
     async def call_api(self, endpoint_url=None):
         """
@@ -66,8 +71,8 @@ class APICommunicationHandler:
         -------
         Output of json_parser
         """
-        response = await self._request(endpoint_url)
-        parsed_response = await self._parse_response(response)
+        response, http_status_code, http_status_reason = await self._request(endpoint_url)
+        parsed_response = await self._parse_response(response, http_status_code, http_status_reason)
         return parsed_response
 
     async def _request(self, endpoint_url=None):
@@ -83,6 +88,10 @@ class APICommunicationHandler:
         -------
         str
             external API json response as str
+        int
+            http status code
+        str
+            http status reason
 
         Raises
         ------
@@ -98,13 +107,13 @@ class APICommunicationHandler:
 
         async with aiohttp.ClientSession(headers=self.headers) as session:
             async with session.get(url) as response:
-                if response.status != 200:
+                if response.status != 200 and not self.error_parser:
                     raise HttpError(response.status, response.reason)
                 response_json = await response.text()
 
-        return response_json
+        return response_json, response.status, response.reason
 
-    async def _parse_response(self, response_json):
+    async def _parse_response(self, response_json, http_status_code, http_status_reason):
         """
         Parses the external API response using the json_parser
 
@@ -112,12 +121,30 @@ class APICommunicationHandler:
         ----------
         response_json : str
             external API json response as str
+        http_status_code : int
+            http status code
+        http_status_reason : str
+            http status reason
 
         Returns
         -------
         Output of json_parser
         """
-        return self.json_parser(json.loads(response_json))
+        try:
+            response = json.loads(response_json)
+
+        except json.JSONDecodeError as err:
+            if http_status_code != 200:
+                raise HttpError(http_status_code, http_status_reason)
+            else:
+                raise err
+
+        if http_status_code == 200:
+            parser = self.json_parser
+        else:
+            parser = self.error_parser
+
+        return parser(response)
 
     def __repr__(self):
         return self.name

@@ -44,25 +44,29 @@ class Gaming(Cog):
             base_url=f'{self.isthereanydeal_base_url}/v02/game/plain/?key='
                      f'{self.bot.cog_args["isthereanydeal_token"]}',
             headers=headers,
-            json_parser=IsThereAnyDealAPI.IdentifierEndpoint)
+            json_parser=IsThereAnyDealAPI.IdentifierEndpoint,
+            error_parser=IsThereAnyDealAPI.IsThereAnyDealErrorResponse)
         self.isthereanydeal_game_info_api = ExternalAPIHandler.APICommunicationHandler(
             api_name='IsThereAnyDeal API, Get Info About Game endpoint',
             base_url=f'{self.isthereanydeal_base_url}/v01/game/info/?key='
                      f'{self.bot.cog_args["isthereanydeal_token"]}',
             headers=headers,
-            json_parser=IsThereAnyDealAPI.GetInfoAboutGameEndpoint)
+            json_parser=IsThereAnyDealAPI.GetInfoAboutGameEndpoint,
+            error_parser=IsThereAnyDealAPI.IsThereAnyDealErrorResponse)
         self.isthereanydeal_game_prices_api = ExternalAPIHandler.APICommunicationHandler(
             api_name='IsThereAnyDeal API, Get Current Game Prices endpoint',
             base_url=f'{self.isthereanydeal_base_url}/v01/game/prices/?key='
                      f'{self.bot.cog_args["isthereanydeal_token"]}&region=eu2&country=PT',
             headers=headers,
-            json_parser=IsThereAnyDealAPI.GetCurrentPricesEndpoint)
+            json_parser=IsThereAnyDealAPI.GetCurrentPricesEndpoint,
+            error_parser=IsThereAnyDealAPI.IsThereAnyDealErrorResponse)
         self.isthereanydeal_historical_price_api = ExternalAPIHandler.APICommunicationHandler(
             api_name='IsThereAnyDeal API, Get Historical Price endpoint',
             base_url=f'{self.isthereanydeal_base_url}/v01/game/lowest/?key='
                      f'{self.bot.cog_args["isthereanydeal_token"]}&region=eu2&country=PT',
             headers=headers,
-            json_parser=IsThereAnyDealAPI.GetHistoricalLowEndpoint)
+            json_parser=IsThereAnyDealAPI.GetHistoricalLowEndpoint,
+            error_parser=IsThereAnyDealAPI.IsThereAnyDealErrorResponse)
 
     async def setup_cog(self):
         # init browser
