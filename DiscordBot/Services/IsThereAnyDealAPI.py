@@ -123,6 +123,8 @@ class GetInfoAboutGameEndpoint(IsThereAnyDealErrorResponse):
         Game name
     image_url : str or None
         Game image url
+    game_itad_url : str or None
+        IsThereAnyDeal game page url
     is_dlc : bool or None
         If game is a DLC
     steam_review: SteamReview or None
@@ -142,6 +144,7 @@ class GetInfoAboutGameEndpoint(IsThereAnyDealErrorResponse):
 
         self.title = None
         self.image_url = None
+        self.game_itad_url = None
         self.is_dlc = None
         self.steam_review = None
 
@@ -154,6 +157,11 @@ class GetInfoAboutGameEndpoint(IsThereAnyDealErrorResponse):
 
                 if 'reviews' in game and game['reviews']:
                     self.steam_review = SteamReview(game['reviews'].get('steam'))
+
+                if 'urls' in game and game['urls']:
+                    urls = game['urls']
+                    self.game_itad_url = urls.get('game')
+
                 break
 
 

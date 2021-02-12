@@ -80,7 +80,7 @@ class Gaming(Cog):
 
         # game title
         dlc = ' (DLC)' if game_info.is_dlc else ''
-        embed.set_author(name=game_info.title + dlc)
+        embed.set_author(name=game_info.title + dlc, url=game_info.game_itad_url)
 
         # game prices per store
         embed_value = ''
@@ -222,7 +222,8 @@ class Gaming(Cog):
         await page.close()
 
     # GAMEDEAL
-    @commands.command(name='gamedeal', ignore_extra=False, aliases=['gameprice'])
+    @commands.command(name='gamedeal', ignore_extra=False,
+                      aliases=['gamedeals', 'gameprice', 'gameprices'])
     async def command_gamedeal(self, context, *game_name):
         """
         Displays game pricing info
