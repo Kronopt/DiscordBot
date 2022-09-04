@@ -34,10 +34,10 @@ class OfficialJoke:
         response_dict : dict
             parsed json obtained from OfficialJokeApi API
         """
-        self.id = response_dict.get('id')
-        self.type = response_dict.get('type')
-        self.setup = response_dict.get('setup')
-        self.punchline = response_dict.get('punchline')
+        self.id = response_dict.get("id")
+        self.type = response_dict.get("type")
+        self.setup = response_dict.get("setup")
+        self.punchline = response_dict.get("punchline")
 
     def text(self):
         """
@@ -48,4 +48,4 @@ class OfficialJoke:
         srt
             joke
         """
-        return f'{self.setup}\n{self.punchline}'
+        return f"{self.setup}\n{self.punchline}"

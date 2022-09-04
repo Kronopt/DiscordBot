@@ -1,5 +1,6 @@
 # DiscordBot
 [![build status](https://github.com/Kronopt/DiscordBot/workflows/CI/badge.svg "build status")](https://github.com/Kronopt/DiscordBot/actions?query=workflow%3ACI)
+[![code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![license](https://img.shields.io/github/license/Kronopt/DiscordBot)](https://github.com/Kronopt/DiscordBot/blob/master/LICENSE)
 [![known vulnerabilities](https://snyk.io/test/github/Kronopt/DiscordBot/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/Kronopt/DiscordBot?targetFile=requirements.txt)
 

@@ -21,16 +21,44 @@ class General(Cog):
 
     def __init__(self, bot):
         super().__init__(bot)
-        self.emoji = '🎛️'
-        self.greetings = ['Hi', 'Hello', 'Hey', 'Sup', 'What\'s up', 'Greetings', 'Howdy']
-        self.greeting_emojis = ['👋', '🤙', '🖖', '🤟', '👊', '🙌']
-        self.poll_options = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯',
-                             '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹']
+        self.emoji = "🎛️"
+        self.greetings = [
+            "Hi",
+            "Hello",
+            "Hey",
+            "Sup",
+            "What's up",
+            "Greetings",
+            "Howdy",
+        ]
+        self.greeting_emojis = ["👋", "🤙", "🖖", "🤟", "👊", "🙌"]
+        self.poll_options = [
+            "🇦",
+            "🇧",
+            "🇨",
+            "🇩",
+            "🇪",
+            "🇫",
+            "🇬",
+            "🇭",
+            "🇮",
+            "🇯",
+            "🇰",
+            "🇱",
+            "🇲",
+            "🇳",
+            "🇴",
+            "🇵",
+            "🇶",
+            "🇷",
+            "🇸",
+            "🇹",
+        ]
 
     def create_poll_embed(self, name, options):
-        embed = discord.Embed(colour=self.embed_colour, description=f'📊 **{name}**\n\n')
+        embed = discord.Embed(colour=self.embed_colour, description=f"📊 **{name}**\n\n")
         for i, option in enumerate(options):
-            embed.description += f'{self.poll_options[i]} {option}\n'
+            embed.description += f"{self.poll_options[i]} {option}\n"
 
         return embed
 
@@ -39,17 +67,20 @@ class General(Cog):
             for i in range(len(options)):
                 await message.add_reaction(self.poll_options[i])
         else:
-            await message.add_reaction('👍')
-            await message.add_reaction('👎')
-            await message.add_reaction('🤷')
+            await message.add_reaction("👍")
+            await message.add_reaction("👎")
+            await message.add_reaction("🤷")
 
     ##########
     # COMMANDS
     ##########
 
     # HI
-    @commands.command(name='hi', ignore_extra=False,
-                      aliases=['hello', 'hey', 'sup', 'greetings', 'howdy'])
+    @commands.command(
+        name="hi",
+        ignore_extra=False,
+        aliases=["hello", "hey", "sup", "greetings", "howdy"],
+    )
     async def command_hi(self, context):
         """
         Greets user
@@ -60,10 +91,10 @@ class General(Cog):
         """
         greeting = random.choice(self.greetings)
         emoji = random.choice(self.greeting_emojis)
-        await context.send(f'{greeting}, {context.author.display_name}! {emoji}')
+        await context.send(f"{greeting}, {context.author.display_name}! {emoji}")
 
     # DICE
-    @commands.command(name='dice', ignore_extra=False)
+    @commands.command(name="dice", ignore_extra=False)
     async def command_dice(self, context, *dice: Converters.dice):
         """
         Rolls a die
@@ -74,20 +105,20 @@ class General(Cog):
         `<prefix>dice`
         `<prefix>dice` d20
         """
-        if len(dice) > 1:    # At most one argument
+        if len(dice) > 1:  # At most one argument
             raise commands.TooManyArguments
 
         if len(dice) == 0:
-            dice = 'd6'  # default
+            dice = "d6"  # default
         else:
             dice = dice[0]
 
         dice_number = int(dice[1:])
         dice_roll = random.randint(1, dice_number)
-        await context.send('Rolled a **' + str(dice_roll) + '** with a ' + dice)
+        await context.send("Rolled a **" + str(dice_roll) + "** with a " + dice)
 
     # POLL
-    @commands.command(name='poll')
+    @commands.command(name="poll")
     async def command_poll(self, context, name, *options):
         """
         Starts a poll
@@ -112,33 +143,57 @@ class General(Cog):
 
     @command_hi.error
     async def hi_on_error(self, context, error):
-        bot_message = f'`{context.prefix}{context.invoked_with}` takes no arguments'
+        bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
         await self.generic_error_handler(
-            context, error,
-            (commands.MissingRequiredArgument, commands.CommandOnCooldown,
-             commands.NoPrivateMessage, commands.CheckFailure),
+            context,
+            error,
+            (
+                commands.MissingRequiredArgument,
+                commands.CommandOnCooldown,
+                commands.NoPrivateMessage,
+                commands.CheckFailure,
+            ),
             (commands.TooManyArguments, bot_message),
-            (commands.BadArgument, bot_message))
+            (commands.BadArgument, bot_message),
+        )
 
     @command_dice.error
     async def dice_on_error(self, context, error):
-        bot_message = f'`{context.prefix}{context.invoked_with}` either takes no arguments or' \
-                          ' one of the following: %s' % (', '.join(Converters.DICES))
+        bot_message = (
+            f"`{context.prefix}{context.invoked_with}` either takes no arguments or"
+            " one of the following: %s" % (", ".join(Converters.DICES))
+        )
         await self.generic_error_handler(
-            context, error,
-            (commands.MissingRequiredArgument, commands.CommandOnCooldown,
-             commands.NoPrivateMessage, commands.CheckFailure),
+            context,
+            error,
+            (
+                commands.MissingRequiredArgument,
+                commands.CommandOnCooldown,
+                commands.NoPrivateMessage,
+                commands.CheckFailure,
+            ),
             (commands.TooManyArguments, bot_message),
-            (commands.BadArgument, bot_message))
+            (commands.BadArgument, bot_message),
+        )
 
     @command_poll.error
     async def poll_on_error(self, context, error):
-        missing_argument = f'`{context.prefix}{context.invoked_with}` ' \
-                           f'requires a poll name/description'
-        bot_message = f'`{context.prefix}{context.invoked_with}` takes a maximum of 20 options'
+        missing_argument = (
+            f"`{context.prefix}{context.invoked_with}` "
+            f"requires a poll name/description"
+        )
+        bot_message = (
+            f"`{context.prefix}{context.invoked_with}` takes a maximum of 20 options"
+        )
         await self.generic_error_handler(
-            context, error,
-            (commands.CommandOnCooldown, commands.NoPrivateMessage, commands.CheckFailure),
+            context,
+            error,
+            (
+                commands.CommandOnCooldown,
+                commands.NoPrivateMessage,
+                commands.CheckFailure,
+            ),
             (commands.TooManyArguments, bot_message),
             (commands.BadArgument, bot_message),
-            (commands.MissingRequiredArgument, missing_argument))
+            (commands.MissingRequiredArgument, missing_argument),
+        )

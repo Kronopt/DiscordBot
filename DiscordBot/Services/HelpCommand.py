@@ -24,11 +24,11 @@ class Paginator:
     max_size: int
         The maximum amount of characters allowed in a page
     """
+
     def __init__(self, embed_colour):
         self.max_size = 2048
         self.embed_colour = embed_colour
-        self._current_page = discord.Embed(colour=self.embed_colour,
-                                           description='')
+        self._current_page = discord.Embed(colour=self.embed_colour, description="")
         self._pages = []
 
     @property
@@ -65,7 +65,7 @@ class Paginator:
         list(Embed)
             Rendered list of pages
         """
-        if self.current_page != '':
+        if self.current_page != "":
             self.close_page()
         return self._pages
 
@@ -73,7 +73,7 @@ class Paginator:
         """
         Clears the paginator of all pages
         """
-        self.current_page = ''
+        self.current_page = ""
         self._pages = []
 
     def add_line(self, line=None, *, empty=False):
@@ -95,23 +95,22 @@ class Paginator:
         """
         if line is not None:
             if len(line) + 1 > self.max_size:
-                raise RuntimeError(f'Line exceeds maximum page size of {self.max_size}')
+                raise RuntimeError(f"Line exceeds maximum page size of {self.max_size}")
 
             if len(line) + 1 + len(self.current_page) > self.max_size:
                 self.close_page()
 
-            self.current_page += line + '\n'
+            self.current_page += line + "\n"
 
             if empty and len(self.current_page) + 1 <= self.max_size:
-                self.current_page += '\n'
+                self.current_page += "\n"
 
     def close_page(self):
         """
         Terminate a page
         """
         self._pages.append(self._current_page)
-        self._current_page = discord.Embed(colour=self.embed_colour,
-                                           description='')
+        self._current_page = discord.Embed(colour=self.embed_colour, description="")
 
     def __len__(self):
         """
@@ -124,13 +123,16 @@ class HelpCommand(commands.HelpCommand):
     """
     Help Command
     """
+
     def __init__(self, embed_colour, **options):
         super().__init__(**options)
-        self.command_attrs['help'] = 'Shows command help message'
-        self.logger = logging.getLogger('DiscordBot.Help')
+        self.command_attrs["help"] = "Shows command help message"
+        self.logger = logging.getLogger("DiscordBot.Help")
         self.paginator = Paginator(embed_colour=embed_colour)
-        self.no_category = collections.namedtuple('NoCategory', ['qualified_name', 'emoji'])
-        self.command_indent = '  '
+        self.no_category = collections.namedtuple(
+            "NoCategory", ["qualified_name", "emoji"]
+        )
+        self.command_indent = "  "
 
     async def send_bot_help(self, mapping):
         """
@@ -144,10 +146,10 @@ class HelpCommand(commands.HelpCommand):
             Both cogs and commands are ordered by name (None 'cog' is at the end)
         """
         self.format_opening_note()
-        self.paginator.add_line('__**Commands**__:', empty=True)
+        self.paginator.add_line("__**Commands**__:", empty=True)
 
         if None in mapping:
-            mapping[self.no_category('No Category', '🤷')] = mapping[None]
+            mapping[self.no_category("No Category", "🤷")] = mapping[None]
             del mapping[None]
 
         for cog, _commands in mapping.items():
@@ -166,7 +168,7 @@ class HelpCommand(commands.HelpCommand):
         ----------
         cog: commands.Cog
         """
-        self.paginator.add_line(f'**{cog.description}**', empty=True)
+        self.paginator.add_line(f"**{cog.description}**", empty=True)
         self.format_cog_commands(cog, cog.get_commands())
 
         await self.send_pages()
@@ -193,14 +195,16 @@ class HelpCommand(commands.HelpCommand):
             if command has subcommands
         """
         command_signature = self.get_command_signature(command)
-        self.paginator.add_line(f'**{command_signature}**', empty=True)
+        self.paginator.add_line(f"**{command_signature}**", empty=True)
         self.format_command_help_message(command.help)
 
         if subcommands:
-            self.paginator.add_line('__**Subcommands**__:')
-            self.paginator.add_line('```')
-            self.format_command_and_subcommands(command, len(command.qualified_name), False)
-            self.paginator.add_line('```')
+            self.paginator.add_line("__**Subcommands**__:")
+            self.paginator.add_line("```")
+            self.format_command_and_subcommands(
+                command, len(command.qualified_name), False
+            )
+            self.paginator.add_line("```")
 
         await self.send_pages()
 
@@ -208,7 +212,7 @@ class HelpCommand(commands.HelpCommand):
         """
         Log help command calls
         """
-        CommandLogging.log_command_call(ctx, self.logger, 'help')
+        CommandLogging.log_command_call(ctx, self.logger, "help")
         await super().command_callback(ctx, command=command)
 
     async def prepare_help_command(self, ctx, command=None):
@@ -232,7 +236,7 @@ class HelpCommand(commands.HelpCommand):
             await self.get_destination().send(embed=page)
 
     async def on_help_command_error(self, ctx, error):
-        CommandLogging.log_command_exception(self.logger, 'help')
+        CommandLogging.log_command_exception(self.logger, "help")
 
     def command_not_found(self, command_name):
         """
@@ -248,7 +252,7 @@ class HelpCommand(commands.HelpCommand):
         str
             info message to be sent
         """
-        return f'Command `{command_name}` not found'
+        return f"Command `{command_name}` not found"
 
     def subcommand_not_found(self, command, command_name):
         """
@@ -267,8 +271,10 @@ class HelpCommand(commands.HelpCommand):
             info message to be sent
         """
         if isinstance(command, commands.Group) and len(command.all_commands) > 0:
-            return f'Command `{command.qualified_name}` has no subcommand `{command_name}`'
-        return f'Command `{command.qualified_name}` has no subcommands'
+            return (
+                f"Command `{command.qualified_name}` has no subcommand `{command_name}`"
+            )
+        return f"Command `{command.qualified_name}` has no subcommands"
 
     def get_bot_mapping(self):
         """
@@ -302,13 +308,13 @@ class HelpCommand(commands.HelpCommand):
         str
             Formatted command signature
         """
-        parent = command.full_parent_name + ' ' if command.full_parent_name else ''
-        alias = f'{parent}{command.name}'
+        parent = command.full_parent_name + " " if command.full_parent_name else ""
+        alias = f"{parent}{command.name}"
         if len(command.aliases) > 0:
-            aliases = ' | '.join(command.aliases)
-            alias = f'{parent}[{command.name} | {aliases}]'
+            aliases = " | ".join(command.aliases)
+            alias = f"{parent}[{command.name} | {aliases}]"
 
-        return f'{self.clean_prefix}{alias} {command.signature}'
+        return f"{self.clean_prefix}{alias} {command.signature}"
 
     def format_opening_note(self):
         """
@@ -316,10 +322,12 @@ class HelpCommand(commands.HelpCommand):
         """
         prefix_simple = self.context.bot.prefix_simple
         prefix_mention = self.context.bot.user.display_name
-        opening_note = f'Commands can be called with the prefix `{prefix_simple}` ' \
-                       'or by mentioning the bot. Ex:\n' \
-                       f'> `{prefix_simple}`info\n' \
-                       f'> `@{prefix_mention}` info'
+        opening_note = (
+            f"Commands can be called with the prefix `{prefix_simple}` "
+            "or by mentioning the bot. Ex:\n"
+            f"> `{prefix_simple}`info\n"
+            f"> `@{prefix_mention}` info"
+        )
 
         self.paginator.add_line(opening_note, empty=True)
 
@@ -329,10 +337,12 @@ class HelpCommand(commands.HelpCommand):
         """
         help_command_name = self.invoked_with
         prefix_simple = self.context.bot.prefix_simple
-        ending_note = f'For more info on a command use `{prefix_simple}{help_command_name} ' \
-                      '[command] [subcommand]`\n' \
-                      f'You can also use `{prefix_simple}{help_command_name} [category]` ' \
-                      'for more info on a category'
+        ending_note = (
+            f"For more info on a command use `{prefix_simple}{help_command_name} "
+            "[command] [subcommand]`\n"
+            f"You can also use `{prefix_simple}{help_command_name} [category]` "
+            "for more info on a category"
+        )
         self.paginator.add_line(ending_note, empty=True)
 
     def format_command_help_message(self, command_help):
@@ -345,7 +355,7 @@ class HelpCommand(commands.HelpCommand):
             original command help message (command docstring)
         """
         if command_help is not None:
-            command_help = command_help.replace('<prefix>', self.clean_prefix)
+            command_help = command_help.replace("<prefix>", self.clean_prefix)
             self.paginator.add_line(command_help, empty=True)
 
     def format_cog_commands(self, cog, cog_commands):
@@ -359,13 +369,13 @@ class HelpCommand(commands.HelpCommand):
         """
         if cog_commands:
             self.format_cog_header(cog)
-            self.paginator.add_line('```')
+            self.paginator.add_line("```")
 
             max_size = self.get_max_size(cog_commands)
             for command in cog_commands:
                 self.format_command_and_subcommands(command, max_size)
 
-            self.paginator.add_line('```')
+            self.paginator.add_line("```")
 
     def format_cog_header(self, cog):
         """
@@ -375,10 +385,11 @@ class HelpCommand(commands.HelpCommand):
         ----------
         cog : DiscordBot.BaseCog.Cog
         """
-        self.paginator.add_line(f'{cog.emoji} __**{cog.qualified_name}**__')
+        self.paginator.add_line(f"{cog.emoji} __**{cog.qualified_name}**__")
 
     def format_command_and_subcommands(
-            self, command, max_size, show_main=True, prefix_spacer_size=0):
+        self, command, max_size, show_main=True, prefix_spacer_size=0
+    ):
         """
         Formats a command and all its subcommands, recursively
 
@@ -399,13 +410,18 @@ class HelpCommand(commands.HelpCommand):
             prefix_spacer_size -= 1
 
         if isinstance(command, commands.Group):
-            ordered_subcommands = sorted(command.commands, key=lambda c: c.qualified_name)
+            ordered_subcommands = sorted(
+                command.commands, key=lambda c: c.qualified_name
+            )
             for subcommand in ordered_subcommands:
                 max_size = self.get_max_size(command.commands)
                 self.format_command_and_subcommands(
-                    subcommand, max_size, True, prefix_spacer_size + 1)
+                    subcommand, max_size, True, prefix_spacer_size + 1
+                )
 
-    def format_single_command(self, command, max_size=None, starting_spacer='', spacer=None):
+    def format_single_command(
+        self, command, max_size=None, starting_spacer="", spacer=None
+    ):
         """
         Formats a single command.
         Name and description
@@ -422,9 +438,11 @@ class HelpCommand(commands.HelpCommand):
         """
         max_size = max_size if max_size is not None else len(command.name)
         spacer = spacer if spacer is not None else self.command_indent
-        indent = ' ' * (max_size - len(command.name)) + spacer
-        line = self.handle_line_size(f'{starting_spacer}{command.name}{indent}{command.short_doc}',
-                                     ' ' * max_size + spacer)
+        indent = " " * (max_size - len(command.name)) + spacer
+        line = self.handle_line_size(
+            f"{starting_spacer}{command.name}{indent}{command.short_doc}",
+            " " * max_size + spacer,
+        )
         self.paginator.add_line(line)
 
     @staticmethod
@@ -449,16 +467,16 @@ class HelpCommand(commands.HelpCommand):
         if len(line) <= char_number:
             return line
 
-        new_line = line[:char_number] + '\n'
+        new_line = line[:char_number] + "\n"
         line = line[char_number:]
 
         still_line = True
         while still_line:
             if len(line) > char_number:
-                new_line += spacer + line[:char_number - len(spacer)] + '\n'
-                line = line[char_number - len(spacer):]
+                new_line += spacer + line[: char_number - len(spacer)] + "\n"
+                line = line[char_number - len(spacer) :]
             else:
-                new_line += spacer + line[:char_number - len(spacer)]
+                new_line += spacer + line[: char_number - len(spacer)]
                 still_line = False
 
         return new_line

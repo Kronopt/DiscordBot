@@ -19,6 +19,7 @@ class IsThereAnyDealError(Exception):
     error : str
     error_description : str or None
     """
+
     def __init__(self, error, error_description):
         super().__init__()
         self.error = error
@@ -47,8 +48,8 @@ class IsThereAnyDealErrorResponse:
         response_dict : dict
             parsed json obtained from IsThereAnyDeal API (any endpoint)
         """
-        self.error = response_dict.get('error')
-        self.error_description = response_dict.get('error_description', '')
+        self.error = response_dict.get("error")
+        self.error_description = response_dict.get("error_description", "")
 
         if self.error:
             raise IsThereAnyDealError(self.error, self.error_description)
@@ -79,8 +80,8 @@ class IdentifierEndpoint(IsThereAnyDealErrorResponse):
 
         self.plain = None
 
-        if 'data' in response_dict and response_dict['data']:
-            self.plain = response_dict['data'].get('plain')
+        if "data" in response_dict and response_dict["data"]:
+            self.plain = response_dict["data"].get("plain")
 
 
 class SteamReview:
@@ -106,9 +107,9 @@ class SteamReview:
         steam_review_dict : dict
             parsed json obtained from IsThereAnyDeal API GetInfoAboutGame endpoint, reviews field
         """
-        self.text = steam_review_dict.get('text')
-        self.total_reviews = steam_review_dict.get('total')
-        self.positive_reviews_percent = steam_review_dict.get('perc_positive')
+        self.text = steam_review_dict.get("text")
+        self.total_reviews = steam_review_dict.get("total")
+        self.positive_reviews_percent = steam_review_dict.get("perc_positive")
 
 
 class GetInfoAboutGameEndpoint(IsThereAnyDealErrorResponse):
@@ -148,19 +149,19 @@ class GetInfoAboutGameEndpoint(IsThereAnyDealErrorResponse):
         self.is_dlc = None
         self.steam_review = None
 
-        if 'data' in response_dict and response_dict['data']:
-            data = response_dict['data']
+        if "data" in response_dict and response_dict["data"]:
+            data = response_dict["data"]
             for game in data.values():  # assumes only one game
-                self.title = game.get('title')
-                self.image_url = game.get('image')
-                self.is_dlc = game.get('is_dlc')
+                self.title = game.get("title")
+                self.image_url = game.get("image")
+                self.is_dlc = game.get("is_dlc")
 
-                if 'reviews' in game and game['reviews']:
-                    self.steam_review = SteamReview(game['reviews'].get('steam'))
+                if "reviews" in game and game["reviews"]:
+                    self.steam_review = SteamReview(game["reviews"].get("steam"))
 
-                if 'urls' in game and game['urls']:
-                    urls = game['urls']
-                    self.game_itad_url = urls.get('game')
+                if "urls" in game and game["urls"]:
+                    urls = game["urls"]
+                    self.game_itad_url = urls.get("game")
 
                 break
 
@@ -203,18 +204,18 @@ class ShopInfo:
         self.price_discounted = None
         self.price_percent_discount = None
 
-        if 'shop' in game_shop_dict and game_shop_dict['shop']:
-            shop = game_shop_dict['shop']
-            self.id = shop.get('id')
-            self.name = shop.get('name')
+        if "shop" in game_shop_dict and game_shop_dict["shop"]:
+            shop = game_shop_dict["shop"]
+            self.id = shop.get("id")
+            self.name = shop.get("name")
 
-        self.game_url = game_shop_dict.get('url')
-        self.price_percent_discount = game_shop_dict.get('price_cut')
+        self.game_url = game_shop_dict.get("url")
+        self.price_percent_discount = game_shop_dict.get("price_cut")
 
-        self.price_full = game_shop_dict.get('price_old')
+        self.price_full = game_shop_dict.get("price_old")
         if self.price_full:
             self.price_full = round(self.price_full, 2)
-        self.price_discounted = game_shop_dict.get('price_new')
+        self.price_discounted = game_shop_dict.get("price_new")
         if self.price_discounted:
             self.price_discounted = round(self.price_discounted, 2)
 
@@ -245,13 +246,13 @@ class GetCurrentPricesEndpoint(IsThereAnyDealErrorResponse):
         super().__init__(response_dict)
 
         self.shops = None
-        self.currency = '€'
+        self.currency = "€"
 
-        if 'data' in response_dict and response_dict['data']:
-            data = response_dict['data']
+        if "data" in response_dict and response_dict["data"]:
+            data = response_dict["data"]
             for shop_list in data.values():  # assumes only one game
-                if 'list' in shop_list and shop_list['list']:
-                    shops = shop_list['list']
+                if "list" in shop_list and shop_list["list"]:
+                    shops = shop_list["list"]
 
                     self.shops = []
                     for shop in shops:
@@ -295,20 +296,20 @@ class GetHistoricalLowEndpoint(IsThereAnyDealErrorResponse):
         self.store = None
         self.price = None
         self.date = None
-        self.currency = '€'
+        self.currency = "€"
 
-        if 'data' in response_dict and response_dict['data']:
-            data = response_dict['data']
+        if "data" in response_dict and response_dict["data"]:
+            data = response_dict["data"]
             for shop_info in data.values():  # assumes only one shop
-                if 'shop' in shop_info and shop_info['shop']:
-                    shop = shop_info['shop']
-                    self.id = shop.get('id')
-                    self.store = shop.get('name')
+                if "shop" in shop_info and shop_info["shop"]:
+                    shop = shop_info["shop"]
+                    self.id = shop.get("id")
+                    self.store = shop.get("name")
 
-                self.price = shop_info.get('price')
+                self.price = shop_info.get("price")
                 if self.price:
                     self.price = round(self.price, 2)
-                self.date = shop_info.get('added')
+                self.date = shop_info.get("added")
                 if self.date:
                     self.date = datetime.date.fromtimestamp(self.date).isoformat()
 

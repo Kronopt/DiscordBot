@@ -25,16 +25,19 @@ class JokeApiError(Exception):
     additional_info : str or None
         More information regarding the error
     """
+
     def __init__(self, error_code, error_message, caused_by, additional_info):
         super().__init__()
         self.error_code = error_code
         self.error_message = error_message
-        self.caused_by = '; '.join(caused_by)
+        self.caused_by = "; ".join(caused_by)
         self.additional_info = additional_info
 
     def __str__(self):
-        return f'Received JokeAPI error {self.error_code}: {self.error_message}. Caused by: ' \
-               f'{self.caused_by}. Additional info: {self.additional_info}'
+        return (
+            f"Received JokeAPI error {self.error_code}: {self.error_message}. Caused by: "
+            f"{self.caused_by}. Additional info: {self.additional_info}"
+        )
 
 
 class JokeApiJoke:
@@ -86,31 +89,35 @@ class JokeApiJoke:
         response_dict : dict
             parsed json obtained from JokeApi API
         """
-        self.id = response_dict.get('id')
-        self.category = response_dict.get('category')
-        self.type = response_dict.get('type')
-        self.joke = response_dict.get('joke')
-        self.setup = response_dict.get('setup')
-        self.delivery = response_dict.get('delivery')
-        self.flags = response_dict.get('flags')
-        self.lang = response_dict.get('lang')
+        self.id = response_dict.get("id")
+        self.category = response_dict.get("category")
+        self.type = response_dict.get("type")
+        self.joke = response_dict.get("joke")
+        self.setup = response_dict.get("setup")
+        self.delivery = response_dict.get("delivery")
+        self.flags = response_dict.get("flags")
+        self.lang = response_dict.get("lang")
 
         # error related
-        self.error = response_dict.get('error')
-        self.internal_error = response_dict.get('internalError')
-        self.error_code = response_dict.get('code')
-        self.error_message = response_dict.get('message')
-        self.caused_by = response_dict.get('causedBy')
-        self.additional_info = response_dict.get('additionalInfo')
-        self.timestamp = self._parse_unix_timestamp(response_dict.get('timestamp'))
+        self.error = response_dict.get("error")
+        self.internal_error = response_dict.get("internalError")
+        self.error_code = response_dict.get("code")
+        self.error_message = response_dict.get("message")
+        self.caused_by = response_dict.get("causedBy")
+        self.additional_info = response_dict.get("additionalInfo")
+        self.timestamp = self._parse_unix_timestamp(response_dict.get("timestamp"))
 
         if self.error is True:
-            raise JokeApiError(self.error_code, self.error_message,
-                               self.caused_by, self.additional_info)
+            raise JokeApiError(
+                self.error_code,
+                self.error_message,
+                self.caused_by,
+                self.additional_info,
+            )
 
     @staticmethod
     def _parse_unix_timestamp(timestamp):
-        return datetime.fromtimestamp(timestamp/1000) if timestamp else timestamp
+        return datetime.fromtimestamp(timestamp / 1000) if timestamp else timestamp
 
     def text(self):
         """
@@ -121,4 +128,4 @@ class JokeApiJoke:
         srt
             joke
         """
-        return f'{self.setup}\n{self.delivery}' if self.type == 'twopart' else self.joke
+        return f"{self.setup}\n{self.delivery}" if self.type == "twopart" else self.joke

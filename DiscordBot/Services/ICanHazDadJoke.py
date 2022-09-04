@@ -35,12 +35,12 @@ class DadJoke:
         response_dict : dict
             parsed json obtained from icanhazdadjoke API
         """
-        self.id = response_dict.get('id')
-        self.joke = response_dict.get('joke')
-        self.status = response_dict.get('status')
+        self.id = response_dict.get("id")
+        self.joke = response_dict.get("joke")
+        self.status = response_dict.get("status")
 
         if self.status != 200:
-            raise HttpError(self.status, '-')
+            raise HttpError(self.status, "-")
 
     def text(self):
         """

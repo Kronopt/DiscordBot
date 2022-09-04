@@ -22,13 +22,14 @@ class HttpError(Exception):
     message : str
         http text corresponding to status code
     """
+
     def __init__(self, status_code, message):
         super().__init__()
         self.status_code = status_code
         self.message = message
 
     def __str__(self):
-        return f'Received HTTP status code {self.status_code}: {self.message}. Expected 200: OK'
+        return f"Received HTTP status code {self.status_code}: {self.message}. Expected 200: OK"
 
 
 class APICommunicationHandler:
@@ -71,8 +72,12 @@ class APICommunicationHandler:
         -------
         Output of json_parser
         """
-        response, http_status_code, http_status_reason = await self._request(endpoint_url)
-        parsed_response = await self._parse_response(response, http_status_code, http_status_reason)
+        response, http_status_code, http_status_reason = await self._request(
+            endpoint_url
+        )
+        parsed_response = await self._parse_response(
+            response, http_status_code, http_status_reason
+        )
         return parsed_response
 
     async def _request(self, endpoint_url=None):
@@ -113,7 +118,9 @@ class APICommunicationHandler:
 
         return response_json, response.status, response.reason
 
-    async def _parse_response(self, response_json, http_status_code, http_status_reason):
+    async def _parse_response(
+        self, response_json, http_status_code, http_status_reason
+    ):
         """
         Parses the external API response using the json_parser
 
