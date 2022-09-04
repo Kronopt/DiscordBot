@@ -1,6 +1,7 @@
 # DiscordBot
-[![License](https://img.shields.io/github/license/Kronopt/DiscordBot)](https://github.com/Kronopt/DiscordBot/blob/master/LICENSE)
-[![Known Vulnerabilities](https://snyk.io/test/github/Kronopt/DiscordBot/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/Kronopt/DiscordBot?targetFile=requirements.txt)
+[![build status](https://github.com/Kronopt/DiscordBot/workflows/CI/badge.svg "build status")](https://github.com/Kronopt/DiscordBot/actions?query=workflow%3ACI)
+[![license](https://img.shields.io/github/license/Kronopt/DiscordBot)](https://github.com/Kronopt/DiscordBot/blob/master/LICENSE)
+[![known vulnerabilities](https://snyk.io/test/github/Kronopt/DiscordBot/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/Kronopt/DiscordBot?targetFile=requirements.txt)
 
 A Discord Bot
 
