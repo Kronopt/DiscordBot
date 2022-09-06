@@ -23,7 +23,7 @@ class CogMeta(commands.CogMeta):
     forces implementation of command error handler
     """
 
-    def __new__(mcs, name, bases, body):
+    def __new__(cls, name, bases, body):
         logger = logging.getLogger(f"DiscordBot.Cog.{name}")
         body["logger"] = logger
 
@@ -39,7 +39,7 @@ class CogMeta(commands.CogMeta):
 
                 attribute.callback = CommandLogging.logging_wrapper(attribute, logger)
 
-        return super().__new__(mcs, name, bases, body)
+        return super().__new__(cls, name, bases, body)
 
 
 class Cog(commands.Cog, metaclass=CogMeta):
@@ -76,13 +76,6 @@ class Cog(commands.Cog, metaclass=CogMeta):
         self.logger.info(f"Loaded commands:")
         for command in self.commands.values():
             self.logger.info(f"    {command.qualified_name}")
-
-    async def setup_cog(self):
-        """
-        Basically an async __init__
-        Bot handles this method when it is initializing
-        """
-        pass
 
     @staticmethod
     def format_cooldown_time(seconds):

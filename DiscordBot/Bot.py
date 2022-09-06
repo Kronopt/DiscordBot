@@ -39,24 +39,22 @@ class Bot(commands.Bot):
             **kwargs,
         )
 
+    async def setup_hook(self):
+        """
+        Called to setup the bot.
+        To perform asynchronous setup after the bot is logged in
+        but before it has connected to the Websocket.
+        This is only called once, in login(), and will be called before any events are dispatched,
+        making it a better solution than doing such setup in the on_ready() event.
+        Sets up Cogs.
+        """
         # add cogs dynamically
+        self.logger.info("Setting up Cogs...")
         for cog_name in DiscordBot.Cogs.__all__:
             cog_module = __import__(f"DiscordBot.Cogs.{cog_name}", fromlist=[cog_name])
             if hasattr(cog_module, cog_name):  # ignores "work in progress" cogs
                 cog = getattr(cog_module, cog_name)(self)
-                self.add_cog(cog)
-
-    async def on_connect(self):
-        """
-        Called when the client has successfully connected to Discord
-        This is not the same as the client being fully prepared
-        Sets up Cogs
-        """
-        self.logger.info("Setting up Cogs...")
-        for cog in self.cogs.values():
-            await cog.setup_cog()
-
-        self.logger.info("Cogs are ready")
+                await self.add_cog(cog)
 
     async def on_ready(self):
         """

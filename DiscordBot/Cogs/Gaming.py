@@ -79,7 +79,7 @@ class Gaming(Cog):
             )
         )
 
-    async def setup_cog(self):
+    async def cog_load(self):
         # init browser
         chromium_args = self.bot.cog_args["chromium_args"]
         launcher = pyppeteer.launcher.Launcher({"args": chromium_args})
@@ -89,6 +89,9 @@ class Gaming(Cog):
         # os.system(' '.join(launcher.cmd))
 
         self.browser = await launcher.launch()
+
+    async def cog_unload(self):
+        await self.browser.close()
 
     async def create_gamedeal_embed(
         self, game_info, game_prices, game_historical_low_price
