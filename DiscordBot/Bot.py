@@ -29,7 +29,10 @@ class Bot(commands.Bot):
         prefix = (
             commands.when_mentioned_or(prefix) if prefix else commands.when_mentioned
         )
-        intents = intents if intents else discord.Intents.default()
+
+        if not intents:
+            intents = discord.Intents.default()
+            intents.message_content = True
 
         super().__init__(
             command_prefix=prefix,
