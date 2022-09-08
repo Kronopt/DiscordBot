@@ -41,7 +41,7 @@ class Paginator:
         str
             current page
         """
-        return self._current_page.description
+        return self._current_page.description if self._current_page.description else ""
 
     @current_page.setter
     def current_page(self, description):
@@ -314,7 +314,7 @@ class HelpCommand(commands.HelpCommand):
             aliases = " | ".join(command.aliases)
             alias = f"{parent}[{command.name} | {aliases}]"
 
-        return f"{self.clean_prefix}{alias} {command.signature}"
+        return f"{self.context.clean_prefix}{alias} {command.signature}"
 
     def format_opening_note(self):
         """
@@ -355,7 +355,7 @@ class HelpCommand(commands.HelpCommand):
             original command help message (command docstring)
         """
         if command_help is not None:
-            command_help = command_help.replace("<prefix>", self.clean_prefix)
+            command_help = command_help.replace("<prefix>", self.context.clean_prefix)
             self.paginator.add_line(command_help, empty=True)
 
     def format_cog_commands(self, cog, cog_commands):
