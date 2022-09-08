@@ -59,6 +59,10 @@ class Bot(commands.Bot):
                 cog = getattr(cog_module, cog_name)(self)
                 await self.add_cog(cog)
 
+        # sync commands
+        self.logger.info("Syncing commands...")
+        await self.tree.sync()
+
     async def on_ready(self):
         """
         Called when bot finishes preparing data received from Discord

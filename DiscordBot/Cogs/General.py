@@ -76,7 +76,7 @@ class General(Cog):
     ##########
 
     # HI
-    @commands.command(
+    @commands.hybrid_command(
         name="hi",
         ignore_extra=False,
         aliases=["hello", "hey", "sup", "greetings", "howdy"],
@@ -94,8 +94,8 @@ class General(Cog):
         await context.send(f"{greeting}, {context.author.display_name}! {emoji}")
 
     # DICE
-    @commands.command(name="dice", ignore_extra=False)
-    async def command_dice(self, context, *dice: Converters.dice):
+    @commands.hybrid_command(name="dice", ignore_extra=False)
+    async def command_dice(self, context, dice: Converters.dice):
         """
         Rolls a die
 
@@ -105,21 +105,13 @@ class General(Cog):
         `<prefix>dice`
         `<prefix>dice` d20
         """
-        if len(dice) > 1:  # At most one argument
-            raise commands.TooManyArguments
-
-        if len(dice) == 0:
-            dice = "d6"  # default
-        else:
-            dice = dice[0]
-
         dice_number = int(dice[1:])
         dice_roll = random.randint(1, dice_number)
         await context.send("Rolled a **" + str(dice_roll) + "** with a " + dice)
 
     # POLL
-    @commands.command(name="poll")
-    async def command_poll(self, context, name, *options):
+    @commands.hybrid_command(name="poll")
+    async def command_poll(self, context, name, options):
         """
         Starts a poll
 
@@ -129,8 +121,9 @@ class General(Cog):
 
         ex:
         `<prefix>poll` "Is this a cool poll command?"
-        `<prefix>poll` "Favourite icecream?" chocolate strawberry banana concrete
+        `<prefix>poll` "Favourite icecream?" "chocolate strawberry banana concrete"
         """
+        options = options.split()
         if len(options) <= 20:
             message = await context.send(embed=self.create_poll_embed(name, options))
             await self.react_with_options(message, options)

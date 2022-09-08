@@ -94,7 +94,7 @@ class Info(Cog):
     ##########
 
     # INFO
-    @commands.command(name="info", ignore_extra=False, aliases=["information"])
+    @commands.hybrid_command(name="info", ignore_extra=False, aliases=["information"])
     async def command_info(self, context):
         """
         Shows author, github page and framework
@@ -106,7 +106,7 @@ class Info(Cog):
         await context.send(embed=self.info_embed)
 
     # SYSTEM
-    @commands.command(name="system", ignore_extra=False, aliases=["sys"])
+    @commands.hybrid_command(name="system", ignore_extra=False, aliases=["sys"])
     async def command_system(self, context):
         """
         Shows bot host system information

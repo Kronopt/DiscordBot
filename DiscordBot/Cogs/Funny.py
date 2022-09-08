@@ -138,8 +138,10 @@ class Funny(Cog):
     ##########
 
     # 8BALL
-    @commands.command(name="8ball", ignore_extra=False, aliases=["eightball", "8b"])
-    async def command_eightball(self, context, *phrase):
+    @commands.hybrid_command(
+        name="8ball", ignore_extra=False, aliases=["eightball", "8b"]
+    )
+    async def command_eightball(self, context, phrase):
         """
         Predicts the outcome of a question
 
@@ -147,13 +149,9 @@ class Funny(Cog):
         Ask a question and get one of the classic magic 8 ball answers.
 
         ex:
-        `<prefix>8ball` is it going to be sunny today?
-        `<prefix>8b` are you going to answer correctly?
+        `<prefix>8ball` "is it going to be sunny today?"
+        `<prefix>8b` "are you going to answer correctly?"
         """
-        if len(phrase) == 0:  # at least one argument
-            param = collections.namedtuple("param", "name")
-            raise commands.MissingRequiredArgument(param("phrase"))
-
         answer = random.randint(0, len(self.eightball_answers) - 1)
         if answer <= 9:  # Affirmative answer
             emoji = self.eightball_emojis[0]
@@ -162,13 +160,10 @@ class Funny(Cog):
         else:  # Negative answer
             emoji = self.eightball_emojis[2]
 
-        message_without_command = context.message.clean_content.split(maxsplit=1)[1]
-        await context.send(
-            f"`{message_without_command}`: {self.eightball_answers[answer]} {emoji}"
-        )
+        await context.send(f"`{phrase}`: {self.eightball_answers[answer]} {emoji}")
 
     # DICK
-    @commands.command(name="dick", ignore_extra=False, aliases=["penis"])
+    @commands.hybrid_command(name="dick", ignore_extra=False, aliases=["penis"])
     async def command_dick(self, context):
         """
         Reveals user's dick size
@@ -185,8 +180,8 @@ class Funny(Cog):
         await context.send(f"{context.author.display_name}'s dick: {dick}")
 
     # POOP
-    @commands.command(name="poop", ignore_extra=False)
-    async def command_poop(self, context, *n: Converters.positive_int):
+    @commands.hybrid_command(name="poop", ignore_extra=False)
+    async def command_poop(self, context, n: Converters.positive_int):
         """
         Sends poops
 
@@ -196,17 +191,16 @@ class Funny(Cog):
         `<prefix>poop`
         `<prefix>poop` 10
         """
-        if len(n) > 1:  # At most one argument
-            raise commands.TooManyArguments
-        if len(n) == 0:
-            n = 1  # default
-        else:
-            n = n[0] if n[0] <= 198 else 198  # character limit
+        n = n if n <= 198 else 198  # character limit
         await context.send("💩" * n)
 
     # JOKE
-    @commands.group(
-        name="joke", ignore_extra=False, aliases=["jk"], invoke_without_command=True
+    @commands.hybrid_group(
+        name="joke",
+        ignore_extra=False,
+        aliases=["jk"],
+        invoke_without_command=True,
+        fallback="random",
     )
     async def command_joke(self, context):
         """

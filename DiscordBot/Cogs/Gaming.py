@@ -173,16 +173,16 @@ class Gaming(Cog):
     ##########
 
     # AWESOMENAUTS
-    @commands.group(
+    @commands.hybrid_group(
         name="awesomenauts", ignore_extra=False, invoke_without_command=True
     )
-    async def command_awesomenauts(self, context, *subcommand):
+    async def command_awesomenauts(self, context):
         await context.send("Please specify a known subcommand")
         await context.send_help(self.command_awesomenauts)
 
     # AWESOMENAUTS RANK
     @command_awesomenauts.command(name="rank", ignore_extra=False, aliases=["r", "-r"])
-    async def command_awesomenauts_rank(self, context, *player_name):
+    async def command_awesomenauts_rank(self, context, player_name):
         """
         Displays rank of an Awesomenaut's player
 
@@ -191,13 +191,8 @@ class Gaming(Cog):
 
         ex:
         `<prefix>awesomenauts rank` niki
-        `<prefix>awesomenauts r` game is broken
+        `<prefix>awesomenauts r` "game is broken"
         """
-        if len(player_name) == 0:  # at least one argument
-            param = collections.namedtuple("param", "name")
-            raise commands.MissingRequiredArgument(param("player_name"))
-
-        player_name = " ".join(player_name)
         player_name_quoted = urllib.parse.quote(player_name)
 
         if self.browser is None:
@@ -264,26 +259,21 @@ class Gaming(Cog):
         await page.close()
 
     # GAMEDEAL
-    @commands.command(
+    @commands.hybrid_command(
         name="gamedeal",
         ignore_extra=False,
         aliases=["gamedeals", "gameprice", "gameprices"],
     )
-    async def command_gamedeal(self, context, *game_name):
+    async def command_gamedeal(self, context, game_name):
         """
         Displays game pricing info
 
         Info pertains to all stores in which the game is available for purchase
 
         ex:
-        `<prefix>gamedeal` Assassin's Creed Odyssey
-        `<prefix>gameprice` Cyberpunk 2077
+        `<prefix>gamedeal` "Assassin's Creed Odyssey"
+        `<prefix>gameprice` "Cyberpunk 2077"
         """
-        if len(game_name) == 0:  # at least one argument
-            param = collections.namedtuple("param", "name")
-            raise commands.MissingRequiredArgument(param("game_name"))
-
-        game_name = " ".join(game_name)
         game_name_quoted = urllib.parse.quote(game_name)
 
         game = await self.isthereanydeal_identifier_api.call_api(

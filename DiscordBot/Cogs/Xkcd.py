@@ -56,7 +56,9 @@ class Xkcd(Cog):
     ##########
 
     # XKCD
-    @commands.group(name="xkcd", ignore_extra=False, invoke_without_command=True)
+    @commands.hybrid_group(
+        name="xkcd", ignore_extra=False, invoke_without_command=True, fallback="random"
+    )
     async def command_xkcd(self, context):
         """
         Shows a random xkcd comic
