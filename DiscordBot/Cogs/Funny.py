@@ -261,7 +261,7 @@ class Funny(Cog):
         )
 
     @command_dick.error
-    async def joke_on_error(self, context, error):
+    async def dick_on_error(self, context, error):
         bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
         await self.generic_error_handler(
             context,
