@@ -1,4 +1,10 @@
+"""
+Cogs
+"""
+
+
 import pathlib
+
 
 __all__ = [
     cog_file.stem

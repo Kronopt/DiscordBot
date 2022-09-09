@@ -10,7 +10,7 @@ A small command line utility is available so that the bot's token is not hardcod
 
 import argparse
 import logging
-from DiscordBot.Bot import Bot
+from discord_bot.bot import Bot
 
 
 if __name__ == "__main__":
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s:%(levelname)s:%(name)s: %(message)s"
     )
-    logger = logging.getLogger("DiscordBot.main")
+    logger = logging.getLogger("discord_bot.main")
 
     # run bot
     logger.info("Starting bot")

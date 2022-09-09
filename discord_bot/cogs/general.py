@@ -10,8 +10,8 @@ General Commands
 import random
 import discord
 from discord.ext import commands
-from DiscordBot.BaseCog import Cog
-from DiscordBot.Services import Converters
+from discord_bot.base_cog import Cog
+from discord_bot.services import converters
 
 
 class General(Cog):
@@ -56,6 +56,7 @@ class General(Cog):
         ]
 
     def create_poll_embed(self, name, options):
+        """poll embed"""
         embed = discord.Embed(colour=self.embed_colour, description=f"📊 **{name}**\n\n")
         for i, option in enumerate(options):
             embed.description += f"{self.poll_options[i]} {option}\n"
@@ -63,6 +64,7 @@ class General(Cog):
         return embed
 
     async def react_with_options(self, message, options):
+        "add voting options as reactions to message"
         if options:
             for i in range(len(options)):
                 await message.add_reaction(self.poll_options[i])
@@ -95,7 +97,7 @@ class General(Cog):
 
     # DICE
     @commands.command(name="dice", ignore_extra=False)
-    async def command_dice(self, context, *dice: Converters.dice):
+    async def command_dice(self, context, *dice: converters.dice):
         """
         Rolls a die
 
@@ -143,6 +145,7 @@ class General(Cog):
 
     @command_hi.error
     async def hi_on_error(self, context, error):
+        """command_hi error handling"""
         bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
         await self.generic_error_handler(
             context,
@@ -159,9 +162,10 @@ class General(Cog):
 
     @command_dice.error
     async def dice_on_error(self, context, error):
+        """command_dice error handling"""
         bot_message = (
             f"`{context.prefix}{context.invoked_with}` either takes no arguments or"
-            " one of the following: %s" % (", ".join(Converters.DICES))
+            " one of the following: %s" % (", ".join(converters.DICES))
         )
         await self.generic_error_handler(
             context,
@@ -178,6 +182,7 @@ class General(Cog):
 
     @command_poll.error
     async def poll_on_error(self, context, error):
+        """command_poll error handling"""
         missing_argument = (
             f"`{context.prefix}{context.invoked_with}` "
             f"requires a poll name/description"

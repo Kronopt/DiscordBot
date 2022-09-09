@@ -7,8 +7,8 @@ External API communication handler
 """
 
 
-import aiohttp
 import json
+import aiohttp
 
 
 class HttpError(Exception):
@@ -142,9 +142,8 @@ class APICommunicationHandler:
 
         except json.JSONDecodeError as err:
             if http_status_code != 200:
-                raise HttpError(http_status_code, http_status_reason)
-            else:
-                raise err
+                raise HttpError(http_status_code, http_status_reason) from err
+            raise err
 
         if http_status_code == 200:
             parser = self.json_parser
