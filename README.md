@@ -7,7 +7,7 @@
 A Discord Bot
 
 #### Install Dependencies
-* Python 3.9
+* Python 3.10
 * `pip install -r requirements.txt`
 * `pyppeteer-install` (command becomes available after installing python dependencies)
 
