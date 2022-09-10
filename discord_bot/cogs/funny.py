@@ -7,7 +7,6 @@ Funny Commands
 """
 
 
-import collections
 import random
 import aiohttp
 from discord.ext import commands

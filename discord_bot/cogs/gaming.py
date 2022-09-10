@@ -8,7 +8,6 @@ Gaming related Commands
 
 
 import asyncio
-import collections
 import urllib
 import discord
 import pyppeteer
