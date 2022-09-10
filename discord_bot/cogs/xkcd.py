@@ -11,8 +11,8 @@ import aiohttp
 import discord
 import xkcd_wrapper
 from discord.ext import commands
-from DiscordBot.Services import Converters
-from DiscordBot.BaseCog import Cog
+from discord_bot.services import converters
+from discord_bot.base_cog import Cog
 
 
 class Xkcd(Cog):
@@ -92,7 +92,7 @@ class Xkcd(Cog):
 
     # XKCD ID
     @command_xkcd.command(name="id", ignore_extra=False, aliases=["n", "-n", "number"])
-    async def command_xkcd_id(self, context, comic_id: Converters.positive_int):
+    async def command_xkcd_id(self, context, comic_id: converters.positive_int):
         """
         Shows the selected xkcd comic
 
@@ -128,10 +128,9 @@ class Xkcd(Cog):
 
         if context.command.callback is self.command_xkcd.callback:
             bot_message = (
-                "`{0}{1}` either takes no arguments or takes one subcommand "
-                "(use `{0}help {1}` for more information)".format(
-                    context.prefix, context.invoked_with
-                )
+                f"`{context.prefix}{context.invoked_with}` either takes no arguments "
+                f"or takes one subcommand (use `{context.prefix}help {context.invoked_with}` "
+                "for more information)"
             )
         elif context.command.callback is self.command_xkcd_latest.callback:
             bot_message = (

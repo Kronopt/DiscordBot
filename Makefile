@@ -20,11 +20,11 @@ install-extra-dependencies:
 	pyppeteer-install
 
 lint:
-	python -m pylint DiscordBot DiscordBot.py
+	python -m pylint discord_bot discord_bot.py
 	python -m black --check .
 
 test-bot:
-	python DiscordBot.py ${DISCORD_BOT_TEST_TOKEN} -isthereanydeal_token=${ISTHEREANYDEAL_TOKEN}
+	python discord_bot.py ${DISCORD_BOT_TEST_TOKEN} -isthereanydeal_token=${ISTHEREANYDEAL_TOKEN}
 
 bot:
-	python DiscordBot.py ${DISCORD_BOT_TOKEN} -chromium_args=--no-sandbox -isthereanydeal_token=${ISTHEREANYDEAL_TOKEN}
+	python discord_bot.py ${DISCORD_BOT_TOKEN} -chromium_args=--no-sandbox -isthereanydeal_token=${ISTHEREANYDEAL_TOKEN}

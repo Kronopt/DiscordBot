@@ -11,8 +11,8 @@ import logging
 import sys
 import discord
 from discord.ext import commands
-import DiscordBot.Cogs
-from DiscordBot.Services import HelpCommand, CommandLogging
+import discord_bot.cogs
+from discord_bot.services import command_logging, help_command
 
 
 class Bot(commands.Bot):
@@ -21,7 +21,7 @@ class Bot(commands.Bot):
     """
 
     def __init__(self, prefix, intents, *args, **kwargs):
-        self.logger = logging.getLogger("DiscordBot.Bot")
+        self.logger = logging.getLogger("discord_bot.bot")
         self.prefix_simple = prefix
         self.embed_colour = 16777215  # colour of discord embed used in some messages
         self.cog_args = kwargs
@@ -37,7 +37,7 @@ class Bot(commands.Bot):
         super().__init__(
             command_prefix=prefix,
             intents=intents,
-            help_command=HelpCommand.HelpCommand(self.embed_colour),
+            help_command=help_command.HelpCommand(self.embed_colour),
             *args,
             **kwargs,
         )
@@ -53,10 +53,11 @@ class Bot(commands.Bot):
         """
         # add cogs dynamically
         self.logger.info("Setting up Cogs...")
-        for cog_name in DiscordBot.Cogs.__all__:
-            cog_module = __import__(f"DiscordBot.Cogs.{cog_name}", fromlist=[cog_name])
-            if hasattr(cog_module, cog_name):  # ignores "work in progress" cogs
-                cog = getattr(cog_module, cog_name)(self)
+        for cog_name in discord_bot.cogs.__all__:
+            cog_module = __import__(f"discord_bot.cogs.{cog_name}", fromlist=[cog_name])
+            class_name = cog_name.capitalize()
+            if hasattr(cog_module, class_name):  # ignores "work in progress" cogs
+                cog = getattr(cog_module, class_name)(self)
                 await self.add_cog(cog)
 
         # sync commands
@@ -67,12 +68,15 @@ class Bot(commands.Bot):
         """
         Called when bot finishes preparing data received from Discord
         """
-        self.logger.info(f"Logged in as: {self.user.name}, (id: {self.user.id})")
+        self.logger.info("Logged in as: %s, (id: %s)", self.user.name, self.user.id)
         self.logger.info("Channels connected to:")
         for channel in self.get_all_channels():
             self.logger.info(
-                f"    {channel.guild.name}.{channel.name} "
-                f"({str(channel.type)}) (id: {channel.id})"
+                "    %s.%s (%s) (id: %s)",
+                channel.guild.name,
+                channel.name,
+                channel.type,
+                channel.id,
             )
 
         # set presence message ("Watching for !help")
@@ -89,8 +93,11 @@ class Bot(commands.Bot):
         Called when an uncaught/unhandled exception occurs
         """
         self.logger.exception(
-            f"When handling event: {event}, with arguments: {args}\n"
-            f"{sys.exc_info()[2]}"
+            "When handling event: %s\nargs: %s\nkwargs:%s\n%s",
+            event,
+            args,
+            kwargs,
+            sys.exc_info()[2],
         )
 
     async def on_command_error(self, ctx, exception):
@@ -104,13 +111,12 @@ class Bot(commands.Bot):
         # original on_command_error logic but with logging
         if self.extra_events.get("on_command_error", None):
             return
-        if hasattr(ctx.command, "on_error"):
-            return
-        if (
-            ctx.cog
-            and commands.Cog._get_overridden_method(ctx.cog.cog_command_error)
-            is not None
-        ):
+        command = ctx.command
+        if command and command.has_error_handler():
             return
 
-        CommandLogging.log_command_exception(self.logger, ctx.command.qualified_name)
+        cog = ctx.cog
+        if cog and cog.has_error_handler():
+            return
+
+        command_logging.log_command_exception(self.logger, ctx.command.qualified_name)

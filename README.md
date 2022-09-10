@@ -7,7 +7,7 @@
 A Discord Bot
 
 #### Install Dependencies
-* Python 3.9
+* Python 3.10
 * `pip install -r requirements.txt`
 * `pyppeteer-install` (command becomes available after installing python dependencies)
 
@@ -17,10 +17,10 @@ A Discord Bot
 * Create a `bot` [here](https://discordapp.com/developers/applications/me) and then create an `app bot user`
 (on the same page)
 * Use the `BOT_TOKEN` provided there
-* Run `python DiscordBot.py <BOT_TOKEN>` on the root of the repo
+* Run `python discord_bot.py <BOT_TOKEN>` on the root of the repo
 * Add the bot to a server using discord
 
-note: on linux you might need to pass an extra parameter to DiscordBot.py: `-gaming_cog=--no-sandbox`
+note: on linux you might need to pass an extra parameter to discord_bot.py: `-gaming_cog=--no-sandbox`
 
 ## Commands
 

@@ -11,7 +11,7 @@ import collections
 import logging
 import discord
 from discord.ext import commands
-from DiscordBot.Services import CommandLogging
+from discord_bot.services import command_logging
 
 
 class Paginator:
@@ -127,7 +127,7 @@ class HelpCommand(commands.HelpCommand):
     def __init__(self, embed_colour, **options):
         super().__init__(**options)
         self.command_attrs["help"] = "Shows command help message"
-        self.logger = logging.getLogger("DiscordBot.Help")
+        self.logger = logging.getLogger("discord_bot.Help")
         self.paginator = Paginator(embed_colour=embed_colour)
         self.no_category = collections.namedtuple(
             "NoCategory", ["qualified_name", "emoji"]
@@ -212,7 +212,7 @@ class HelpCommand(commands.HelpCommand):
         """
         Log help command calls
         """
-        CommandLogging.log_command_call(ctx, self.logger, "help")
+        command_logging.log_command_call(ctx, self.logger, "help")
         await super().command_callback(ctx, command=command)
 
     async def prepare_help_command(self, ctx, command=None):
@@ -236,7 +236,7 @@ class HelpCommand(commands.HelpCommand):
             await self.get_destination().send(embed=page)
 
     async def on_help_command_error(self, ctx, error):
-        CommandLogging.log_command_exception(self.logger, "help")
+        command_logging.log_command_exception(self.logger, "help")
 
     def command_not_found(self, command_name):
         """
@@ -364,7 +364,7 @@ class HelpCommand(commands.HelpCommand):
 
         Parameters
         ----------
-        cog : DiscordBot.BaseCog.Cog or self.no_category
+        cog : discord_bot.base_cog.Cog or self.no_category
         cog_commands: List[commands.Command]
         """
         if cog_commands:
@@ -383,7 +383,7 @@ class HelpCommand(commands.HelpCommand):
 
         Parameters
         ----------
-        cog : DiscordBot.BaseCog.Cog
+        cog : discord_bot.base_cog.Cog
         """
         self.paginator.add_line(f"{cog.emoji} __**{cog.qualified_name}**__")
 

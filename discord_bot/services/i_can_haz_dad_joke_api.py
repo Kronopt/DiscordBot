@@ -7,7 +7,7 @@ ICanHazDadJoke Joke container
 """
 
 
-from DiscordBot.Services.ExternalAPIHandler import HttpError
+from discord_bot.services.external_api_handler import HttpError
 
 
 class DadJoke:

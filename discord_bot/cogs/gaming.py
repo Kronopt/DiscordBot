@@ -13,8 +13,12 @@ import urllib
 import discord
 import pyppeteer
 from discord.ext import commands
-from DiscordBot.BaseCog import Cog
-from DiscordBot.Services import AwesomenautsRank, ExternalAPIHandler, IsThereAnyDealAPI
+from discord_bot.base_cog import Cog
+from discord_bot.services import (
+    awesomenauts_rank,
+    external_api_handler,
+    is_there_any_deal_api,
+)
 
 
 class NoBrowserError(Exception):
@@ -42,40 +46,44 @@ class Gaming(Cog):
             "Accept": "application/json",
             "User-Agent": "DiscordBot (https://github.com/Kronopt/DiscordBot)",
         }
-        self.isthereanydeal_identifier_api = ExternalAPIHandler.APICommunicationHandler(
-            api_name="IsThereAnyDeal API, Identifier endpoint",
-            base_url=f"{self.isthereanydeal_base_url}/v02/game/plain/?key="
-            f'{self.bot.cog_args["isthereanydeal_token"]}',
-            headers=headers,
-            json_parser=IsThereAnyDealAPI.IdentifierEndpoint,
-            error_parser=IsThereAnyDealAPI.IsThereAnyDealErrorResponse,
+        self.isthereanydeal_identifier_api = (
+            external_api_handler.APICommunicationHandler(
+                api_name="IsThereAnyDeal API, Identifier endpoint",
+                base_url=f"{self.isthereanydeal_base_url}/v02/game/plain/?key="
+                f'{self.bot.cog_args["isthereanydeal_token"]}',
+                headers=headers,
+                json_parser=is_there_any_deal_api.IdentifierEndpoint,
+                error_parser=is_there_any_deal_api.IsThereAnyDealErrorResponse,
+            )
         )
-        self.isthereanydeal_game_info_api = ExternalAPIHandler.APICommunicationHandler(
-            api_name="IsThereAnyDeal API, Get Info About Game endpoint",
-            base_url=f"{self.isthereanydeal_base_url}/v01/game/info/?key="
-            f'{self.bot.cog_args["isthereanydeal_token"]}',
-            headers=headers,
-            json_parser=IsThereAnyDealAPI.GetInfoAboutGameEndpoint,
-            error_parser=IsThereAnyDealAPI.IsThereAnyDealErrorResponse,
+        self.isthereanydeal_game_info_api = (
+            external_api_handler.APICommunicationHandler(
+                api_name="IsThereAnyDeal API, Get Info About Game endpoint",
+                base_url=f"{self.isthereanydeal_base_url}/v01/game/info/?key="
+                f'{self.bot.cog_args["isthereanydeal_token"]}',
+                headers=headers,
+                json_parser=is_there_any_deal_api.GetInfoAboutGameEndpoint,
+                error_parser=is_there_any_deal_api.IsThereAnyDealErrorResponse,
+            )
         )
         self.isthereanydeal_game_prices_api = (
-            ExternalAPIHandler.APICommunicationHandler(
+            external_api_handler.APICommunicationHandler(
                 api_name="IsThereAnyDeal API, Get Current Game Prices endpoint",
                 base_url=f"{self.isthereanydeal_base_url}/v01/game/prices/?key="
                 f'{self.bot.cog_args["isthereanydeal_token"]}&region=eu2&country=PT',
                 headers=headers,
-                json_parser=IsThereAnyDealAPI.GetCurrentPricesEndpoint,
-                error_parser=IsThereAnyDealAPI.IsThereAnyDealErrorResponse,
+                json_parser=is_there_any_deal_api.GetCurrentPricesEndpoint,
+                error_parser=is_there_any_deal_api.IsThereAnyDealErrorResponse,
             )
         )
         self.isthereanydeal_historical_price_api = (
-            ExternalAPIHandler.APICommunicationHandler(
+            external_api_handler.APICommunicationHandler(
                 api_name="IsThereAnyDeal API, Get Historical Price endpoint",
                 base_url=f"{self.isthereanydeal_base_url}/v01/game/lowest/?key="
                 f'{self.bot.cog_args["isthereanydeal_token"]}&region=eu2&country=PT',
                 headers=headers,
-                json_parser=IsThereAnyDealAPI.GetHistoricalLowEndpoint,
-                error_parser=IsThereAnyDealAPI.IsThereAnyDealErrorResponse,
+                json_parser=is_there_any_deal_api.GetHistoricalLowEndpoint,
+                error_parser=is_there_any_deal_api.IsThereAnyDealErrorResponse,
             )
         )
 
@@ -96,6 +104,7 @@ class Gaming(Cog):
     async def create_gamedeal_embed(
         self, game_info, game_prices, game_historical_low_price
     ):
+        """gamedeal embed"""
         embed = discord.Embed(colour=self.embed_colour)
 
         # game title
@@ -193,14 +202,12 @@ class Gaming(Cog):
         `<prefix>awesomenauts rank` niki
         `<prefix>awesomenauts r` "game is broken"
         """
-        player_name_quoted = urllib.parse.quote(player_name)
-
         if self.browser is None:
             raise NoBrowserError()
 
         page = await self.browser.newPage()
         await page.goto(
-            self.awesomenauts_rank_url.format(player_name_quoted),
+            self.awesomenauts_rank_url.format(urllib.parse.quote(player_name)),
             options={"timeout": 5000},
         )
 
@@ -210,16 +217,15 @@ class Gaming(Cog):
         no_result_selector = page.waitForSelector(
             "#content-container #no-result:not(.hidden)"
         )
-        _, pending = await asyncio.wait(
+        _, pending_futures = await asyncio.wait(
             [rank_selector, no_result_selector],
             return_when=asyncio.FIRST_COMPLETED,
             timeout=5,
         )
-        for c in pending:
-            c.cancel()
+        for future in pending_futures:
+            future.cancel()
 
         players = await page.querySelectorAll("#leaderboard tbody tr")
-
         if players:
             player = players[1]  # zeroth element is the header
             text_fields = await player.querySelectorAllEval(
@@ -233,7 +239,7 @@ class Gaming(Cog):
                 "td img", "(nodes => nodes.map(n => n.title))"
             )
 
-            awesomenaut_rank = AwesomenautsRank.AwesomenautsRank(
+            awesomenaut_rank = awesomenauts_rank.AwesomenautsRank(
                 self.embed_colour,
                 {
                     "player_name": text_fields[1].rstrip(),
@@ -307,6 +313,7 @@ class Gaming(Cog):
 
     @command_awesomenauts.error
     async def awesomenauts_on_error(self, context, error):
+        "command_awesomenauts error handling"
         await self.generic_error_handler(
             context,
             error,
@@ -319,6 +326,7 @@ class Gaming(Cog):
 
     @command_awesomenauts_rank.error
     async def awesomenauts_rank_on_error(self, context, error):
+        "command_awesomenauts_rank error handling"
         bot_message = (
             f"`{context.prefix}{context.command.qualified_name}` expects an "
             "Awesomenauts player name as argument"
@@ -342,6 +350,7 @@ class Gaming(Cog):
 
     @command_gamedeal.error
     async def gamedeal_on_error(self, context, error):
+        "command_gamedeal error handling"
         bot_message = f"`{context.prefix}{context.command.qualified_name}` bad argument"
         http_error_message = (
             f"`{context.prefix}{context.command.qualified_name}` couldn't "
@@ -362,6 +371,6 @@ class Gaming(Cog):
             ),
             (commands.BadArgument, bot_message),
             (commands.MissingRequiredArgument, bot_message),
-            (ExternalAPIHandler.HttpError, http_error_message),
-            (IsThereAnyDealAPI.IsThereAnyDealError, itad_message),
+            (external_api_handler.HttpError, http_error_message),
+            (is_there_any_deal_api.IsThereAnyDealError, itad_message),
         )

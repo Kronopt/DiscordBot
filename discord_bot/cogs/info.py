@@ -13,7 +13,7 @@ import time
 import discord
 import psutil
 from discord.ext import commands
-from DiscordBot.BaseCog import Cog
+from discord_bot.base_cog import Cog
 
 
 class Info(Cog):
@@ -30,6 +30,7 @@ class Info(Cog):
 
     @staticmethod
     def os_name():
+        """OS name"""
         os = platform.system()
         version = platform.version()
         architecture = platform.architecture()
@@ -38,28 +39,35 @@ class Info(Cog):
 
     @staticmethod
     def cpu_info():
+        """CPU info"""
         cores = psutil.cpu_count()
-        cores = f"{cores} cores" if cores > 1 else f"{cores} core"
-        return cores + " ({:.2f}GHz)".format(psutil.cpu_freq().current / 1000)
+        cores = f"{cores} core{'s' if cores > 1 else ''}"
+        ghz = psutil.cpu_freq().current / 1000
+        return f"{cores} ({ghz:.2f}GHz)"
 
     @staticmethod
     def ram():
+        """RAM info"""
         return psutil._common.bytes2human(psutil.virtual_memory().total)
 
     @staticmethod
     def python_version():
+        """Python version"""
         return platform.python_version()
 
     @staticmethod
     def discord_version():
+        """Discord version"""
         return discord.__version__
 
     async def uptime(self):
+        """Uptime"""
         now = datetime.datetime.fromtimestamp(time.time())
         up_time = now - self.start_time
         return str(up_time).rsplit(".", maxsplit=1)[0]
 
     def create_info_embed(self):
+        """info embed"""
         embed = discord.Embed(colour=self.embed_colour, title="\u200b")
         embed.set_author(name="📓 Information")
         embed.add_field(
@@ -78,6 +86,7 @@ class Info(Cog):
         return embed
 
     def create_system_embed(self):
+        """sytem embed"""
         embed = discord.Embed(colour=self.embed_colour, title="\u200b")
         embed.set_author(name="🖥️ Host System Information")
         embed.add_field(name="📟  OS", value=(self.os_name()) + "\n\u200b")
@@ -131,6 +140,7 @@ class Info(Cog):
     @command_info.error
     @command_system.error
     async def info_system_on_error(self, context, error):
+        """command_info and command_system error handling"""
         bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
         await self.generic_error_handler(
             context,

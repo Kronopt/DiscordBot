@@ -81,6 +81,7 @@ class AwesomenautsRank:
         self.embed = self.create_awesomenauts_rank_embed(embed_colour)
 
     def create_awesomenauts_rank_embed(self, embed_colour):
+        """awesomenauts rank embed"""
         embed = discord.Embed(colour=embed_colour)
         embed.set_author(name=self.player_name, url=self.steam_profile_url)
         embed.set_thumbnail(url=self.league_img_url)

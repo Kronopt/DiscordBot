@@ -7,17 +7,17 @@ Funny Commands
 """
 
 
-import aiohttp
 import collections
 import random
+import aiohttp
 from discord.ext import commands
-from DiscordBot.BaseCog import Cog
-from DiscordBot.Services import (
-    Converters,
-    ExternalAPIHandler,
-    ICanHazDadJoke,
-    OfficialJokeAPI,
-    JokeApi,
+from discord_bot.base_cog import Cog
+from discord_bot.services import (
+    converters,
+    external_api_handler,
+    i_can_haz_dad_joke_api,
+    joke_api,
+    official_joke_api,
 )
 
 
@@ -73,25 +73,25 @@ class Funny(Cog):
             "Accept": "application/json",
             "User-Agent": "DiscordBot (https://github.com/Kronopt/DiscordBot)",
         }
-        icanhazdadjoke_api = ExternalAPIHandler.APICommunicationHandler(
+        icanhazdadjoke_api = external_api_handler.APICommunicationHandler(
             api_name="ICanHazDadJoke (icanhazdadjoke.com)",
             base_url="https://icanhazdadjoke.com",
             headers=headers,
-            json_parser=ICanHazDadJoke.DadJoke,
+            json_parser=i_can_haz_dad_joke_api.DadJoke,
         )
-        officialjoke_api = ExternalAPIHandler.APICommunicationHandler(
+        officialjoke_api = external_api_handler.APICommunicationHandler(
             api_name="OfficialJokeAPI (github.com/15Dkatz/official_joke_api)",
             base_url="https://official-joke-api.appspot.com/random_joke",
             headers=headers,
-            json_parser=OfficialJokeAPI.OfficialJoke,
+            json_parser=official_joke_api.OfficialJoke,
         )
-        joke_api = ExternalAPIHandler.APICommunicationHandler(
+        jokeapi_api = external_api_handler.APICommunicationHandler(
             api_name="JokeAPI (sv443.net/jokeapi/v2)",
             base_url="https://sv443.net/jokeapi/v2/joke/Any",
             headers=headers,
-            json_parser=JokeApi.JokeApiJoke,
+            json_parser=joke_api.JokeApiJoke,
         )
-        self.apis = [icanhazdadjoke_api, officialjoke_api, joke_api]
+        self.apis = [icanhazdadjoke_api, officialjoke_api, jokeapi_api]
 
     async def get_joke(self):
         """
@@ -115,7 +115,7 @@ class Funny(Cog):
                 joke = await jokeapi.call_api()
                 joke_text = joke.text()
 
-            except ExternalAPIHandler.HttpError as error:
+            except external_api_handler.HttpError as error:
                 self.logger.error(
                     f"Invalid HTTP status code on command joke: {error.status_code}"
                 )
@@ -181,7 +181,7 @@ class Funny(Cog):
 
     # POOP
     @commands.hybrid_command(name="poop", ignore_extra=False)
-    async def command_poop(self, context, n: Converters.positive_int):
+    async def command_poop(self, context, n: converters.positive_int):
         """
         Sends poops
 
@@ -237,6 +237,7 @@ class Funny(Cog):
 
     @command_eightball.error
     async def eightball_on_error(self, context, error):
+        """command_eightball error handling"""
         bot_message = (
             f"`{context.prefix}{context.invoked_with}` "
             "needs a phrase on which to apply its fortune-telling powers"
@@ -256,6 +257,7 @@ class Funny(Cog):
 
     @command_dick.error
     async def dick_on_error(self, context, error):
+        """command_dick error handling"""
         bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
         await self.generic_error_handler(
             context,
@@ -272,6 +274,7 @@ class Funny(Cog):
 
     @command_poop.error
     async def poop_on_error(self, context, error):
+        """command_poop error handling"""
         bot_message = (
             f"`{context.prefix}{context.invoked_with}` "
             "takes no arguments or 1 positive number"
@@ -292,6 +295,7 @@ class Funny(Cog):
     @command_joke.error
     @command_joke_tts.error
     async def joke_on_error(self, context, error):
+        """command_joke error handling"""
         bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
         bot_message_api_error = "Can't retrieve a joke from the server at the moment"
         await self.generic_error_handler(
@@ -306,5 +310,5 @@ class Funny(Cog):
             (commands.TooManyArguments, bot_message),
             (commands.BadArgument, bot_message),
             (NoJokeError, bot_message_api_error),
-            (JokeApi.JokeApiError, bot_message_api_error),
+            (joke_api.JokeApiError, bot_message_api_error),
         )
