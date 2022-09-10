@@ -8,6 +8,7 @@ External API communication handler
 
 
 import json
+from typing import Callable, Mapping, Any
 import aiohttp
 
 
@@ -23,7 +24,7 @@ class HttpError(Exception):
         http text corresponding to status code
     """
 
-    def __init__(self, status_code, message):
+    def __init__(self, status_code: int, message: str):
         super().__init__()
         self.status_code = status_code
         self.message = message
@@ -52,14 +53,21 @@ class APICommunicationHandler:
         otherwise an HttpError will be raised
     """
 
-    def __init__(self, api_name, base_url, headers, json_parser, error_parser=None):
+    def __init__(
+        self,
+        api_name: str,
+        base_url: str,
+        headers: Mapping[str, str],
+        json_parser: Callable,
+        error_parser: Callable | None = None,
+    ):
         self.name = api_name
         self.base_url = base_url if not base_url.endswith("/") else base_url[:-1]
         self.headers = headers
         self.json_parser = json_parser
         self.error_parser = error_parser
 
-    async def call_api(self, endpoint_url=None):
+    async def call_api(self, endpoint_url: str | None = None) -> Any:
         """
         Calls the API endpoint
 
@@ -80,13 +88,13 @@ class APICommunicationHandler:
         )
         return parsed_response
 
-    async def _request(self, endpoint_url=None):
+    async def _request(self, endpoint_url: str | None = None) -> tuple[str, int, str]:
         """
         Handles asynchronous http requests with the external API
 
         Attributes
         ----------
-        endpoint_url : str
+        endpoint_url : str or None
             endpoint to add to base_url
 
         Returns
@@ -112,15 +120,16 @@ class APICommunicationHandler:
 
         async with aiohttp.ClientSession(headers=self.headers) as session:
             async with session.get(url) as response:
+                reason = response.reason if response.reason is not None else ""
                 if response.status != 200 and not self.error_parser:
-                    raise HttpError(response.status, response.reason)
+                    raise HttpError(response.status, reason)
                 response_json = await response.text()
 
-        return response_json, response.status, response.reason
+        return response_json, response.status, reason
 
     async def _parse_response(
-        self, response_json, http_status_code, http_status_reason
-    ):
+        self, response_json: str, http_status_code: int, http_status_reason: str
+    ) -> Any:
         """
         Parses the external API response using the json_parser
 
@@ -146,11 +155,9 @@ class APICommunicationHandler:
             raise err
 
         if http_status_code == 200:
-            parser = self.json_parser
-        else:
-            parser = self.error_parser
-
-        return parser(response)
+            return self.json_parser(response)
+        if self.error_parser:
+            return self.error_parser(response)
 
     def __repr__(self):
         return self.name

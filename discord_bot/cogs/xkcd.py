@@ -7,6 +7,7 @@ XKCD webcomic Commands
 """
 
 
+from typing import TYPE_CHECKING
 import aiohttp
 import discord
 import xkcd_wrapper
@@ -14,25 +15,30 @@ from discord.ext import commands
 from discord_bot.services import converters
 from discord_bot.base_cog import Cog
 
+if TYPE_CHECKING:
+    from discord_bot.bot import Bot
+
 
 class Xkcd(Cog):
     """
     Commands that deal with XKCD webcomics
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: "Bot"):
         super().__init__(bot)
         self.emoji = "🗨️"
         self.xkcd_api_client = xkcd_wrapper.AsyncClient()
 
-    def embed_comic(self, xkcd_comic, colour=None):
+    def embed_comic(
+        self, xkcd_comic: xkcd_wrapper.Comic, colour: int | discord.Colour | None = None
+    ) -> discord.Embed:
         """
         Creates the embed object to be sent by the bot
 
         Parameters
         ----------
         xkcd_comic: xkcd_wrapper.Comic
-        colour: int
+        colour: int or discord.Colour
             an int or hex representing a valid colour (optional)
 
         Returns
@@ -59,7 +65,7 @@ class Xkcd(Cog):
     @commands.hybrid_group(
         name="xkcd", ignore_extra=False, invoke_without_command=True, fallback="random"
     )
-    async def command_xkcd(self, context):
+    async def command_xkcd(self, context: commands.Context):
         """
         Shows a random xkcd comic
 
@@ -76,7 +82,7 @@ class Xkcd(Cog):
     @command_xkcd.command(
         name="latest", ignore_extra=False, aliases=["l", "-l", "last"]
     )
-    async def command_xkcd_latest(self, context):
+    async def command_xkcd_latest(self, context: commands.Context):
         """
         Shows the latest xkcd comic
 
@@ -92,7 +98,9 @@ class Xkcd(Cog):
 
     # XKCD ID
     @command_xkcd.command(name="id", ignore_extra=False, aliases=["n", "-n", "number"])
-    async def command_xkcd_id(self, context, comic_id: converters.positive_int):
+    async def command_xkcd_id(
+        self, context: commands.Context, comic_id: converters.positive_int
+    ):
         """
         Shows the selected xkcd comic
 
@@ -113,7 +121,9 @@ class Xkcd(Cog):
     @command_xkcd.error
     @command_xkcd_latest.error
     @command_xkcd_id.error
-    async def xkcd_xkcd_latest_xkcd_id_on_error(self, context, error):
+    async def xkcd_xkcd_latest_xkcd_id_on_error(
+        self, context: commands.Context, error: commands.CommandError
+    ):
         """
         Handles errors for all xkcd commands
 

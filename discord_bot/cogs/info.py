@@ -7,6 +7,7 @@ Info Commands
 """
 
 
+from typing import TYPE_CHECKING
 import datetime
 import platform
 import time
@@ -15,13 +16,16 @@ import psutil
 from discord.ext import commands
 from discord_bot.base_cog import Cog
 
+if TYPE_CHECKING:
+    from discord_bot.bot import Bot
+
 
 class Info(Cog):
     """
     Commands that show information about the bot
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: "Bot"):
         super().__init__(bot)
         self.emoji = "ℹ️"
         self.start_time = datetime.datetime.fromtimestamp(time.time())
@@ -29,7 +33,7 @@ class Info(Cog):
         self.system_embed = self.create_system_embed()
 
     @staticmethod
-    def os_name():
+    def os_name() -> str:
         """OS name"""
         os = platform.system()
         version = platform.version()
@@ -38,7 +42,7 @@ class Info(Cog):
         return f"{os} {version} {architecture}"
 
     @staticmethod
-    def cpu_info():
+    def cpu_info() -> str:
         """CPU info"""
         cores = psutil.cpu_count()
         cores = f"{cores} core{'s' if cores > 1 else ''}"
@@ -46,27 +50,27 @@ class Info(Cog):
         return f"{cores} ({ghz:.2f}GHz)"
 
     @staticmethod
-    def ram():
+    def ram() -> str:
         """RAM info"""
         return psutil._common.bytes2human(psutil.virtual_memory().total)
 
     @staticmethod
-    def python_version():
+    def python_version() -> str:
         """Python version"""
         return platform.python_version()
 
     @staticmethod
-    def discord_version():
+    def discord_version() -> str:
         """Discord version"""
         return discord.__version__
 
-    async def uptime(self):
+    async def uptime(self) -> str:
         """Uptime"""
         now = datetime.datetime.fromtimestamp(time.time())
         up_time = now - self.start_time
         return str(up_time).rsplit(".", maxsplit=1)[0]
 
-    def create_info_embed(self):
+    def create_info_embed(self) -> discord.Embed:
         """info embed"""
         embed = discord.Embed(colour=self.embed_colour, title="\u200b")
         embed.set_author(name="📓 Information")
@@ -85,7 +89,7 @@ class Info(Cog):
         )
         return embed
 
-    def create_system_embed(self):
+    def create_system_embed(self) -> discord.Embed:
         """sytem embed"""
         embed = discord.Embed(colour=self.embed_colour, title="\u200b")
         embed.set_author(name="🖥️ Host System Information")
@@ -104,7 +108,7 @@ class Info(Cog):
 
     # INFO
     @commands.hybrid_command(name="info", ignore_extra=False, aliases=["information"])
-    async def command_info(self, context):
+    async def command_info(self, context: commands.Context):
         """
         Shows author, github page and framework
 
@@ -116,7 +120,7 @@ class Info(Cog):
 
     # SYSTEM
     @commands.hybrid_command(name="system", ignore_extra=False, aliases=["sys"])
-    async def command_system(self, context):
+    async def command_system(self, context: commands.Context):
         """
         Shows bot host system information
 
@@ -139,7 +143,9 @@ class Info(Cog):
 
     @command_info.error
     @command_system.error
-    async def info_system_on_error(self, context, error):
+    async def info_system_on_error(
+        self, context: commands.Context, error: commands.CommandError
+    ):
         """command_info and command_system error handling"""
         bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
         await self.generic_error_handler(

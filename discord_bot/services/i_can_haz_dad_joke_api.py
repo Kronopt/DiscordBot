@@ -26,7 +26,7 @@ class DadJoke:
         http status code
     """
 
-    def __init__(self, response_dict):
+    def __init__(self, response_dict: dict):
         """
         DadJoke init
 
@@ -39,10 +39,10 @@ class DadJoke:
         self.joke = response_dict.get("joke")
         self.status = response_dict.get("status")
 
-        if self.status != 200:
+        if self.status is not None and self.status != 200:
             raise HttpError(self.status, "-")
 
-    def text(self):
+    def text(self) -> str | None:
         """
         Returns just the joke text
 

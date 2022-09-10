@@ -10,9 +10,17 @@ Wraps commands in a logging call
 
 import functools
 import sys
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import logging
+    from typing import Callable
+    from discord.ext import commands
 
 
-def logging_wrapper(command, logger):
+def logging_wrapper(
+    command: "commands.Command", logger: "logging.Logger"
+) -> "Callable":
     """
     Logging wrapper for command callbacks
     Every command in a Cog should be wrapped in a logging call
@@ -38,7 +46,9 @@ def logging_wrapper(command, logger):
     return wrapper
 
 
-def log_command_call(context, logger, command_name):
+def log_command_call(
+    context: "commands.Context", logger: "logging.Logger", command_name: str
+):
     """
     Logs a command call
 
@@ -65,7 +75,7 @@ def log_command_call(context, logger, command_name):
     )
 
 
-def log_command_exception(logger, command_name):
+def log_command_exception(logger: "logging.Logger", command_name: str):
     """
     Logs command error
 

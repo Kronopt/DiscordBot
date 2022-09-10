@@ -25,7 +25,7 @@ class OfficialJoke:
         joke punchline
     """
 
-    def __init__(self, response_dict):
+    def __init__(self, response_dict: dict):
         """
         OfficialJoke init
 
@@ -39,7 +39,7 @@ class OfficialJoke:
         self.setup = response_dict.get("setup")
         self.punchline = response_dict.get("punchline")
 
-    def text(self):
+    def text(self) -> str:
         """
         Returns just the joke text
 

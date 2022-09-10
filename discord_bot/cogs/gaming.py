@@ -7,10 +7,12 @@ Gaming related Commands
 """
 
 
+from typing import TYPE_CHECKING
 import asyncio
 import urllib
 import discord
 import pyppeteer
+import pyppeteer.errors
 from discord.ext import commands
 from discord_bot.base_cog import Cog
 from discord_bot.services import (
@@ -18,6 +20,9 @@ from discord_bot.services import (
     external_api_handler,
     is_there_any_deal_api,
 )
+
+if TYPE_CHECKING:
+    from discord_bot.bot import Bot
 
 
 class NoBrowserError(Exception):
@@ -34,7 +39,7 @@ class Gaming(Cog):
     Commands that deal with games/gaming (player rank, high scores, characters, etc)
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: "Bot"):
         super().__init__(bot)
         self.emoji = "🎮"
         self.browser = None
@@ -101,8 +106,11 @@ class Gaming(Cog):
         await self.browser.close()
 
     async def create_gamedeal_embed(
-        self, game_info, game_prices, game_historical_low_price
-    ):
+        self,
+        game_info: is_there_any_deal_api.GetInfoAboutGameEndpoint,
+        game_prices: is_there_any_deal_api.GetCurrentPricesEndpoint,
+        game_historical_low_price: is_there_any_deal_api.GetHistoricalLowEndpoint,
+    ) -> discord.Embed:
         """gamedeal embed"""
         embed = discord.Embed(colour=self.embed_colour)
 
@@ -184,13 +192,15 @@ class Gaming(Cog):
     @commands.hybrid_group(
         name="awesomenauts", ignore_extra=False, invoke_without_command=True
     )
-    async def command_awesomenauts(self, context):
+    async def command_awesomenauts(self, context: commands.Context):
         await context.send("Please specify a known subcommand")
         await context.send_help(self.command_awesomenauts)
 
     # AWESOMENAUTS RANK
     @command_awesomenauts.command(name="rank", ignore_extra=False, aliases=["r", "-r"])
-    async def command_awesomenauts_rank(self, context, player_name):
+    async def command_awesomenauts_rank(
+        self, context: commands.Context, player_name: str
+    ):
         """
         Displays rank of an Awesomenaut's player
 
@@ -269,7 +279,7 @@ class Gaming(Cog):
         ignore_extra=False,
         aliases=["gamedeals", "gameprice", "gameprices"],
     )
-    async def command_gamedeal(self, context, game_name):
+    async def command_gamedeal(self, context: commands.Context, game_name: str):
         """
         Displays game pricing info
 
@@ -311,7 +321,9 @@ class Gaming(Cog):
     ################
 
     @command_awesomenauts.error
-    async def awesomenauts_on_error(self, context, error):
+    async def awesomenauts_on_error(
+        self, context: commands.Context, error: commands.CommandError
+    ):
         "command_awesomenauts error handling"
         await self.generic_error_handler(
             context,
@@ -324,7 +336,9 @@ class Gaming(Cog):
         )
 
     @command_awesomenauts_rank.error
-    async def awesomenauts_rank_on_error(self, context, error):
+    async def awesomenauts_rank_on_error(
+        self, context: commands.Context, error: commands.CommandError
+    ):
         "command_awesomenauts_rank error handling"
         bot_message = (
             f"`{context.prefix}{context.command.qualified_name}` expects an "
@@ -348,7 +362,9 @@ class Gaming(Cog):
         )
 
     @command_gamedeal.error
-    async def gamedeal_on_error(self, context, error):
+    async def gamedeal_on_error(
+        self, context: commands.Context, error: commands.CommandError
+    ):
         "command_gamedeal error handling"
         bot_message = f"`{context.prefix}{context.command.qualified_name}` bad argument"
         http_error_message = (

@@ -20,30 +20,28 @@ class Bot(commands.Bot):
     Main Bot class
     """
 
-    def __init__(self, prefix, intents, *args, **kwargs):
+    def __init__(self, prefix: str, intents: discord.Intents, *args, **kwargs):
         self.logger = logging.getLogger("discord_bot.bot")
         self.prefix_simple = prefix
         self.embed_colour = 16777215  # colour of discord embed used in some messages
         self.cog_args = kwargs
 
-        prefix = (
+        command_prefix = (
             commands.when_mentioned_or(prefix) if prefix else commands.when_mentioned
         )
 
-        if not intents:
-            intents = discord.Intents.default()
-            intents.message_content = True
-
         super().__init__(
-            command_prefix=prefix,
+            command_prefix=command_prefix,
             intents=intents,
             help_command=help_command.HelpCommand(self.embed_colour),
             *args,
             **kwargs,
         )
 
-    async def setup_hook(self):
+    async def setup_hook(self) -> None:
         """
+        (Overridden)
+
         Called to setup the bot.
         To perform asynchronous setup after the bot is logged in
         but before it has connected to the Websocket.
@@ -64,8 +62,10 @@ class Bot(commands.Bot):
         self.logger.info("Syncing commands...")
         await self.tree.sync()
 
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         """
+        (Overridden)
+
         Called when bot finishes preparing data received from Discord
         """
         self.logger.info("Logged in as: %s, (id: %s)", self.user.name, self.user.id)
@@ -88,8 +88,10 @@ class Bot(commands.Bot):
 
         self.logger.info("Bot is ready")
 
-    async def on_error(self, event, *args, **kwargs):
+    async def on_error(self, event: str, *args, **kwargs) -> None:
         """
+        (Overridden)
+
         Called when an uncaught/unhandled exception occurs
         """
         self.logger.exception(
@@ -100,8 +102,12 @@ class Bot(commands.Bot):
             sys.exc_info()[2],
         )
 
-    async def on_command_error(self, ctx, exception):
+    async def on_command_error(
+        self, ctx: commands.Context, exception: commands.errors.CommandError
+    ) -> None:
         """
+        (Overridden)
+
         Called when an exception occurs when executing a command
         """
         # ignore non-existent commands

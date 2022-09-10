@@ -11,9 +11,13 @@ Each bot command should be decorated with a @command decorator
 
 import inspect
 import logging
+from typing import TYPE_CHECKING, Type
 from collections import OrderedDict
 from discord.ext import commands
 from discord_bot.services import command_logging
+
+if TYPE_CHECKING:
+    from .bot import Bot
 
 
 class CogMeta(commands.CogMeta):
@@ -29,7 +33,7 @@ class CogMeta(commands.CogMeta):
         attrs["logger"] = logger
 
         for attribute in attrs.values():
-            if isinstance(attribute, commands.core.Command):
+            if isinstance(attribute, commands.Command):
 
                 # Force implementation of command error handler
                 if not hasattr(attribute, "on_error"):
@@ -52,7 +56,7 @@ class Cog(commands.Cog, metaclass=CogMeta):
     # {Cog_object: {command_function_name: command_object, ...}, ...}
     all_commands = OrderedDict()
 
-    def __init__(self, bot):
+    def __init__(self, bot: "Bot"):
         """
         Parameters
         ----------
@@ -79,7 +83,7 @@ class Cog(commands.Cog, metaclass=CogMeta):
             self.logger.info(f"    {command.qualified_name}")
 
     @staticmethod
-    def format_cooldown_time(seconds):
+    def format_cooldown_time(seconds: float) -> str:
         """
         Format cooldown time
         To be used in the handling of commands.CommandOnCooldown exception
@@ -106,7 +110,12 @@ class Cog(commands.Cog, metaclass=CogMeta):
             )
         return time
 
-    def unhandled_exceptions(self, context, error, *unhandled_exceptions):
+    def unhandled_exceptions(
+        self,
+        context: commands.Context,
+        error: Exception | commands.CommandInvokeError,
+        *unhandled_exceptions: Type[commands.errors.CommandError],
+    ) -> bool:
         """
         Warn about unhandled exceptions
         To be used on each command's error handler
@@ -116,7 +125,7 @@ class Cog(commands.Cog, metaclass=CogMeta):
         ----------
         context: commands.context.Context
         error: Exception or commands.CommandInvokeError
-        unhandled_exceptions: iter(commands.errors.CommandError)
+        unhandled_exceptions: tuple(type(commands.errors.CommandError))
 
         Returns
         -------
@@ -126,7 +135,7 @@ class Cog(commands.Cog, metaclass=CogMeta):
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
 
-        if isinstance(error, (*unhandled_exceptions,)):
+        if isinstance(error, unhandled_exceptions):
             exceptions = ", ".join([e.__name__ for e in unhandled_exceptions])
             self.logger.warning(
                 f"Unhandled Exception '{error.__class__.__name__}': "
@@ -138,8 +147,12 @@ class Cog(commands.Cog, metaclass=CogMeta):
         return True
 
     async def generic_error_handler(
-        self, context, error, unhandled_exceptions, *handled_exceptions
-    ):
+        self,
+        context: commands.Context,
+        error: Exception | commands.CommandInvokeError,
+        unhandled_exceptions: tuple[Type[commands.errors.CommandError], ...],
+        *handled_exceptions: tuple[Type[Exception], str],
+    ) -> None:
         """
         Base error handler function
         Warning will be logged if an unhandled exception is thrown
@@ -148,8 +161,8 @@ class Cog(commands.Cog, metaclass=CogMeta):
         ----------
         context: commands.context.Context
         error: Exception or commands.CommandInvokeError
-        unhandled_exceptions: tuple of commands.errors.CommandError
-        handled_exceptions: (type of Exception, str)
+        unhandled_exceptions: tuple(type(commands.errors.CommandError))
+        handled_exceptions: tuple(type(Exception), str)
         """
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
@@ -163,7 +176,7 @@ class Cog(commands.Cog, metaclass=CogMeta):
                 await context.send(bot_message)
                 await context.send_help(context.command)
                 return
-        if self.unhandled_exceptions(context, error, unhandled_exceptions):
+        if self.unhandled_exceptions(context, error, *unhandled_exceptions):
             command_logging.log_command_exception(
                 self.logger, context.command.qualified_name
             )

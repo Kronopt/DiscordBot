@@ -7,6 +7,7 @@ Funny Commands
 """
 
 
+from typing import TYPE_CHECKING
 import random
 import aiohttp
 from discord.ext import commands
@@ -19,13 +20,16 @@ from discord_bot.services import (
     official_joke_api,
 )
 
+if TYPE_CHECKING:
+    from discord_bot.bot import Bot
+
 
 class NoJokeError(Exception):
     """
     Could not retrieve a joke from any API
     """
 
-    def __init__(self, apis):
+    def __init__(self, apis: list[external_api_handler.APICommunicationHandler]):
         super().__init__()
         self.apis = [str(api) for api in apis]
 
@@ -40,7 +44,7 @@ class Funny(Cog):
     Funny commands (debatable)
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: "Bot"):
         super().__init__(bot)
         self.emoji = "😂"
         self.eightball_emojis = ["✅", "🔅", "❌"]
@@ -92,7 +96,7 @@ class Funny(Cog):
         )
         self.apis = [icanhazdadjoke_api, officialjoke_api, jokeapi_api]
 
-    async def get_joke(self):
+    async def get_joke(self) -> str:
         """
         joke command implementation
 
@@ -140,7 +144,7 @@ class Funny(Cog):
     @commands.hybrid_command(
         name="8ball", ignore_extra=False, aliases=["eightball", "8b"]
     )
-    async def command_eightball(self, context, phrase):
+    async def command_eightball(self, context: commands.Context, phrase: str):
         """
         Predicts the outcome of a question
 
@@ -163,7 +167,7 @@ class Funny(Cog):
 
     # DICK
     @commands.hybrid_command(name="dick", ignore_extra=False, aliases=["penis"])
-    async def command_dick(self, context):
+    async def command_dick(self, context: commands.Context):
         """
         Reveals user's dick size
 
@@ -180,7 +184,7 @@ class Funny(Cog):
 
     # POOP
     @commands.hybrid_command(name="poop", ignore_extra=False)
-    async def command_poop(self, context, n: converters.positive_int):
+    async def command_poop(self, context: commands.Context, n: converters.positive_int):
         """
         Sends poops
 
@@ -201,7 +205,7 @@ class Funny(Cog):
         invoke_without_command=True,
         fallback="random",
     )
-    async def command_joke(self, context):
+    async def command_joke(self, context: commands.Context):
         """
         Tells a random (bad) joke
 
@@ -219,7 +223,7 @@ class Funny(Cog):
 
     # JOKE TTS
     @command_joke.command(name="tts", ignore_extra=False, aliases=["-tts", "-t"])
-    async def command_joke_tts(self, context):
+    async def command_joke_tts(self, context: commands.Context):
         """
         Reads joke using tts
 
@@ -235,7 +239,9 @@ class Funny(Cog):
     ################
 
     @command_eightball.error
-    async def eightball_on_error(self, context, error):
+    async def eightball_on_error(
+        self, context: commands.Context, error: commands.CommandError
+    ):
         """command_eightball error handling"""
         bot_message = (
             f"`{context.prefix}{context.invoked_with}` "
@@ -255,7 +261,9 @@ class Funny(Cog):
         )
 
     @command_dick.error
-    async def dick_on_error(self, context, error):
+    async def dick_on_error(
+        self, context: commands.Context, error: commands.CommandError
+    ):
         """command_dick error handling"""
         bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
         await self.generic_error_handler(
@@ -272,7 +280,9 @@ class Funny(Cog):
         )
 
     @command_poop.error
-    async def poop_on_error(self, context, error):
+    async def poop_on_error(
+        self, context: commands.Context, error: commands.CommandError
+    ):
         """command_poop error handling"""
         bot_message = (
             f"`{context.prefix}{context.invoked_with}` "
@@ -293,7 +303,9 @@ class Funny(Cog):
 
     @command_joke.error
     @command_joke_tts.error
-    async def joke_on_error(self, context, error):
+    async def joke_on_error(
+        self, context: commands.Context, error: commands.CommandError
+    ):
         """command_joke error handling"""
         bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
         bot_message_api_error = "Can't retrieve a joke from the server at the moment"

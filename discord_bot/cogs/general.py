@@ -7,11 +7,15 @@ General Commands
 """
 
 
+from typing import TYPE_CHECKING
 import random
 import discord
 from discord.ext import commands
 from discord_bot.base_cog import Cog
 from discord_bot.services import converters
+
+if TYPE_CHECKING:
+    from discord_bot.bot import Bot
 
 
 class General(Cog):
@@ -19,7 +23,7 @@ class General(Cog):
     General commands that don't fit in other, more specific, categories
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: "Bot"):
         super().__init__(bot)
         self.emoji = "🎛️"
         self.greetings = [
@@ -55,7 +59,7 @@ class General(Cog):
             "🇹",
         ]
 
-    def create_poll_embed(self, name, options):
+    def create_poll_embed(self, name: str, options: list[str]) -> discord.Embed:
         """poll embed"""
         embed = discord.Embed(colour=self.embed_colour, description=f"📊 **{name}**\n\n")
         for i, option in enumerate(options):
@@ -63,7 +67,7 @@ class General(Cog):
 
         return embed
 
-    async def react_with_options(self, message, options):
+    async def react_with_options(self, message: discord.Message, options: list[str]):
         "add voting options as reactions to message"
         if options:
             for i in range(len(options)):
@@ -83,7 +87,7 @@ class General(Cog):
         ignore_extra=False,
         aliases=["hello", "hey", "sup", "greetings", "howdy"],
     )
-    async def command_hi(self, context):
+    async def command_hi(self, context: commands.Context):
         """
         Greets user
 
@@ -97,7 +101,7 @@ class General(Cog):
 
     # DICE
     @commands.hybrid_command(name="dice", ignore_extra=False)
-    async def command_dice(self, context, dice: converters.dice):
+    async def command_dice(self, context: commands.Context, dice: converters.dice):
         """
         Rolls a die
 
@@ -113,7 +117,7 @@ class General(Cog):
 
     # POLL
     @commands.hybrid_command(name="poll")
-    async def command_poll(self, context, name, options):
+    async def command_poll(self, context: commands.Context, name: str, options: str):
         """
         Starts a poll
 
@@ -125,10 +129,12 @@ class General(Cog):
         `<prefix>poll` "Is this a cool poll command?"
         `<prefix>poll` "Favourite icecream?" "chocolate strawberry banana concrete"
         """
-        options = options.split()
-        if len(options) <= 20:
-            message = await context.send(embed=self.create_poll_embed(name, options))
-            await self.react_with_options(message, options)
+        embed_options = options.split()
+        if len(embed_options) <= 20:
+            message = await context.send(
+                embed=self.create_poll_embed(name, embed_options)
+            )
+            await self.react_with_options(message, embed_options)
         else:
             raise commands.TooManyArguments("Maximum number of options is 20")
 
@@ -137,7 +143,9 @@ class General(Cog):
     ################
 
     @command_hi.error
-    async def hi_on_error(self, context, error):
+    async def hi_on_error(
+        self, context: commands.Context, error: commands.CommandError
+    ):
         """command_hi error handling"""
         bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
         await self.generic_error_handler(
@@ -154,7 +162,9 @@ class General(Cog):
         )
 
     @command_dice.error
-    async def dice_on_error(self, context, error):
+    async def dice_on_error(
+        self, context: commands.Context, error: commands.CommandError
+    ):
         """command_dice error handling"""
         bot_message = (
             f"`{context.prefix}{context.invoked_with}` either takes no arguments or"
@@ -174,7 +184,9 @@ class General(Cog):
         )
 
     @command_poll.error
-    async def poll_on_error(self, context, error):
+    async def poll_on_error(
+        self, context: commands.Context, error: commands.CommandError
+    ):
         """command_poll error handling"""
         missing_argument = (
             f"`{context.prefix}{context.invoked_with}` "
