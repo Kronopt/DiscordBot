@@ -131,7 +131,7 @@ class HelpCommand(commands.HelpCommand):
     def __init__(self, embed_colour: int | discord.Colour, **options):
         super().__init__(**options)
         self.command_attrs["help"] = "Shows command help message"
-        self.logger = logging.getLogger("discord_bot.Help")
+        self.logger = logging.getLogger("discord_bot.cog.Help")
         self.paginator = Paginator(embed_colour=embed_colour)
         self.no_category = collections.namedtuple(
             "NoCategory", ["qualified_name", "emoji"]

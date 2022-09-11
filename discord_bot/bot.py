@@ -21,10 +21,12 @@ class Bot(commands.Bot):
     """
 
     def __init__(self, prefix: str, intents: discord.Intents, *args, **kwargs):
-        self.logger = logging.getLogger("discord_bot.bot")
+        self.logger = logging.getLogger(__name__)
         self.prefix_simple = prefix
         self.embed_colour = 16777215  # colour of discord embed used in some messages
         self.cog_args = kwargs
+
+        self.logger.info("Starting Bot")
 
         command_prefix = (
             commands.when_mentioned_or(prefix) if prefix else commands.when_mentioned
@@ -68,11 +70,11 @@ class Bot(commands.Bot):
 
         Called when bot finishes preparing data received from Discord
         """
-        self.logger.info("Logged in as: %s, (id: %s)", self.user.name, self.user.id)
+        self.logger.info("Logged in as: %s (id: %s)", self.user.name, self.user.id)
         self.logger.info("Channels connected to:")
         for channel in self.get_all_channels():
             self.logger.info(
-                "    %s.%s (%s) (id: %s)",
+                " • %s.%s (%s) (id: %s)",
                 channel.guild.name,
                 channel.name,
                 channel.type,

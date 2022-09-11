@@ -80,7 +80,7 @@ class Cog(commands.Cog, metaclass=CogMeta):
 
         self.logger.info("Loaded commands:")
         for command in self.commands.values():
-            self.logger.info(f"    {command.qualified_name}")
+            self.logger.info(f" • {command.qualified_name}")
 
     @staticmethod
     def format_cooldown_time(seconds: float) -> str:
