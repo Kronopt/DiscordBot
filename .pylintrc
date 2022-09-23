@@ -25,4 +25,6 @@ disable=no-member,
         no-name-in-module,
         arguments-differ,
         duplicate-code,
-        missing-function-docstring
+        missing-function-docstring,
+        too-many-locals,
+        abstract-method

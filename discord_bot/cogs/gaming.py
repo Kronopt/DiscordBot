@@ -272,7 +272,8 @@ class Gaming(Cog):
         else:
             message = await interaction.original_response()
             await message.edit(
-                content=f"Can't retrieve player `{player_name}`, because he's not on the leaderboard"
+                content=f"Can't retrieve player `{player_name}`, "
+                + "because he's not on the leaderboard"
             )
 
         await page.close()

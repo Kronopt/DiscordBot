@@ -6,7 +6,6 @@ Converters convert the arguments of a command
 """
 
 
-from typing import Any
 import discord
 from discord import app_commands
 

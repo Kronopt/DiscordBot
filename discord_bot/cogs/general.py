@@ -13,7 +13,6 @@ import discord
 from discord import app_commands, Interaction
 from discord.ext import commands
 from discord_bot.base_cog import Cog
-from discord_bot.services import transformers
 
 if TYPE_CHECKING:
     from discord_bot.bot import Bot
@@ -142,7 +141,7 @@ class General(Cog):
 
         ex:
         `<prefix>poll` Is this a cool poll command?
-        `<prefix>poll` Favourite icecream? options="chocolate and vanilla, strawberry, banana, concrete"
+        `<prefix>poll` Favourite icecream? options="chocolate and vanilla, strawberry, banana"
         """
         if not options:
             options = ""

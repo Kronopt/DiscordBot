@@ -82,7 +82,7 @@ class Bot(commands.Bot):
         # set presence message ("Watching for /hi")
         await self.change_presence(
             activity=discord.Activity(
-                type=discord.ActivityType.watching, name=f"for /hi"
+                type=discord.ActivityType.watching, name="for /hi"
             )
         )
 
