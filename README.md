@@ -28,44 +28,37 @@ note: on linux you might need to pass an extra parameter to discord_bot.py: `-ga
 
 | command | descripion |
 | ------- | ---------- |
-| `!8ball <str phrase>` | "Predicts" the outcome of a question |
-| `!dick` | Reveals user's dick size |
-| `!joke` | Tells a random (bad) joke |
-| `!joke tts` | Reads joke using tts |
-| `!poop [int n]` | Sends n poops |
+| `/8ball <str question>` | "Predicts" the outcome of a question |
+| `/dick` | Reveals user's dick size |
+| `/poop [int n]` | Sends n poops |
+| `/joke [bool tts]` | Tells a random (bad) joke |
 
 ### Gaming
 
 | command | descripion |
 | ------- | ---------- |
-| `!awesomenaut rank <str player_name>` | Displays rank information of an Awesomenaut's player |
-| `!gamedeal <str game_name>` | Displays game pricing info |
+| `/awesomenaut rank <str player>` | Displays rank information of an Awesomenaut's player |
+| `/gamedeal <str name>` | Displays game pricing info |
 
 ### General
 
 | command | descripion |
 | ------- | ---------- |
-| `!dice [str dice]` | Rolls one of the following dices: d4, d6, d8, d10, d12 and d20 |
-| `!hi` | Greets user |
-| `!poll` | Starts a poll|
+| `/hi` | Greets user |
+| `/dice [str die]` | Rolls a die |
+| `/poll <str name> [str options]` | Starts a poll |
 
 ### Info
 
 | command | descripion |
 | ------- | ---------- |
-| `!info` | Shows bot author, relevant frameworks used and github page |
-| `!system` | Shows bot host system information |
+| `/info` | Shows author, github page and framework |
+| `/system` | Shows bot host system information |
 
 ### XKCD Comics
 
 | command | descripion |
 | ------- | ---------- |
-| `!xkcd` | Shows a random xkcd comic |
-| `!xkcd id <number id>` | Shows the selected xkcd comic |
-| `!xkcd latest` | Shows the latest xkcd comic |
-
-### Help
-
-| command | descripion |
-| ------- | ---------- |
-| `!help [command] [subcommand]` | Shows command help message |
+| `/xkcd random` | Shows a random xkcd comic |
+| `/xkcd latest` | Shows the latest xkcd comic |
+| `/xkcd id <int id>` | Shows the selected xkcd comic |

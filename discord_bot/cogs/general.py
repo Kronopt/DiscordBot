@@ -7,12 +7,13 @@ General Commands
 """
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 import random
 import discord
+from discord import app_commands, Interaction
 from discord.ext import commands
 from discord_bot.base_cog import Cog
-from discord_bot.services import converters
+from discord_bot.services import transformers
 
 if TYPE_CHECKING:
     from discord_bot.bot import Bot
@@ -82,58 +83,82 @@ class General(Cog):
     ##########
 
     # HI
-    @commands.hybrid_command(
-        name="hi",
-        ignore_extra=False,
-        aliases=["hello", "hey", "sup", "greetings", "howdy"],
-    )
-    async def command_hi(self, context: commands.Context):
+    @app_commands.command(name="hi")
+    async def command_hi(self, interaction: Interaction):
         """
         Greets user
 
         ex:
         `<prefix>hi`
-        `<prefix>hey`
         """
         greeting = random.choice(self.greetings)
         emoji = random.choice(self.greeting_emojis)
-        await context.send(f"{greeting}, {context.author.display_name}! {emoji}")
+        await interaction.response.send_message(
+            f"{greeting}, {interaction.user.display_name}! {emoji}"
+        )
 
     # DICE
-    @commands.hybrid_command(name="dice", ignore_extra=False)
-    async def command_dice(self, context: commands.Context, dice: converters.dice):
+    @app_commands.command(name="dice")
+    @app_commands.describe(die="die to roll")
+    @app_commands.choices(
+        die=[
+            app_commands.Choice(name="d4", value=4),
+            app_commands.Choice(name="d6", value=6),
+            app_commands.Choice(name="d8", value=8),
+            app_commands.Choice(name="d10", value=10),
+            app_commands.Choice(name="d12", value=12),
+            app_commands.Choice(name="d20", value=20),
+        ]
+    )
+    async def command_dice(
+        self, interaction: Interaction, die: app_commands.Choice[int]
+    ):
         """
         Rolls a die
 
         Possible dices: `d4`, `d6`, `d8`, `d10`, `d12` and `d20`
 
         ex:
-        `<prefix>dice`
         `<prefix>dice` d20
         """
-        dice_number = int(dice[1:])
-        dice_roll = random.randint(1, dice_number)
-        await context.send("Rolled a **" + str(dice_roll) + "** with a " + dice)
+        dice_roll = random.randint(1, die.value)
+        await interaction.response.send_message(
+            f"Rolled a **{dice_roll}** with a {die.name}"
+        )
 
     # POLL
-    @commands.hybrid_command(name="poll")
-    async def command_poll(self, context: commands.Context, name: str, options: str):
+    @app_commands.command(name="poll")
+    @app_commands.describe(
+        name="poll name", options="comma-separated options to include in the poll"
+    )
+    async def command_poll(
+        self, interaction: Interaction, name: str, options: Optional[str]
+    ):
         """
         Starts a poll
 
-        Use quotation marks if you want whole phrases as name/options.
         If just the poll name is given, options will be yes/no/maybe, otherwise
         each option will have a letter associated.
 
         ex:
-        `<prefix>poll` "Is this a cool poll command?"
-        `<prefix>poll` "Favourite icecream?" "chocolate strawberry banana concrete"
+        `<prefix>poll` Is this a cool poll command?
+        `<prefix>poll` Favourite icecream? options="chocolate and vanilla, strawberry, banana, concrete"
         """
-        embed_options = options.split()
+        if not options:
+            options = ""
+        options = options.split(",")
+
+        embed_options = []
+        for option in options:
+            option = option.strip()
+            if len(option) > 0:
+                embed_options.append(option)
+
         if len(embed_options) <= 20:
-            message = await context.send(
+            await interaction.response.send_message(
                 embed=self.create_poll_embed(name, embed_options)
             )
+            message = await interaction.original_response()
             await self.react_with_options(message, embed_options)
         else:
             raise commands.TooManyArguments("Maximum number of options is 20")
@@ -143,67 +168,29 @@ class General(Cog):
     ################
 
     @command_hi.error
-    async def hi_on_error(
-        self, context: commands.Context, error: commands.CommandError
-    ):
-        """command_hi error handling"""
-        bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
-        await self.generic_error_handler(
-            context,
-            error,
-            (
-                commands.MissingRequiredArgument,
-                commands.CommandOnCooldown,
-                commands.NoPrivateMessage,
-                commands.CheckFailure,
-            ),
-            (commands.TooManyArguments, bot_message),
-            (commands.BadArgument, bot_message),
-        )
-
     @command_dice.error
-    async def dice_on_error(
-        self, context: commands.Context, error: commands.CommandError
+    async def hi_dice_on_error(
+        self, interaction: Interaction, error: app_commands.AppCommandError
     ):
-        """command_dice error handling"""
-        bot_message = (
-            f"`{context.prefix}{context.invoked_with}` either takes no arguments or"
-            " one of the following: %s" % (", ".join(converters.DICES))
-        )
+        """command_hi and command_dice error handling"""
         await self.generic_error_handler(
-            context,
+            interaction,
             error,
-            (
-                commands.MissingRequiredArgument,
-                commands.CommandOnCooldown,
-                commands.NoPrivateMessage,
-                commands.CheckFailure,
-            ),
-            (commands.TooManyArguments, bot_message),
-            (commands.BadArgument, bot_message),
+            tuple(),
         )
 
     @command_poll.error
     async def poll_on_error(
-        self, context: commands.Context, error: commands.CommandError
+        self, interaction: Interaction, error: app_commands.AppCommandError
     ):
         """command_poll error handling"""
-        missing_argument = (
-            f"`{context.prefix}{context.invoked_with}` "
-            f"requires a poll name/description"
-        )
-        bot_message = (
-            f"`{context.prefix}{context.invoked_with}` takes a maximum of 20 options"
-        )
+        bot_message_error = "maximum number of options is 20"
+        if isinstance(error, app_commands.errors.CommandInvokeError):
+            error = error.original
+
         await self.generic_error_handler(
-            context,
+            interaction,
             error,
-            (
-                commands.CommandOnCooldown,
-                commands.NoPrivateMessage,
-                commands.CheckFailure,
-            ),
-            (commands.TooManyArguments, bot_message),
-            (commands.BadArgument, bot_message),
-            (commands.MissingRequiredArgument, missing_argument),
+            tuple(),
+            (commands.TooManyArguments, bot_message_error),
         )

@@ -20,20 +20,15 @@ class Bot(commands.Bot):
     Main Bot class
     """
 
-    def __init__(self, prefix: str, intents: discord.Intents, *args, **kwargs):
+    def __init__(self, intents: discord.Intents, *args, **kwargs):
         self.logger = logging.getLogger(__name__)
-        self.prefix_simple = prefix
         self.embed_colour = 16777215  # colour of discord embed used in some messages
         self.cog_args = kwargs
 
         self.logger.info("Starting Bot")
 
-        command_prefix = (
-            commands.when_mentioned_or(prefix) if prefix else commands.when_mentioned
-        )
-
         super().__init__(
-            command_prefix=command_prefix,
+            command_prefix=commands.when_mentioned,
             intents=intents,
             help_command=help_command.HelpCommand(self.embed_colour),
             *args,
@@ -51,12 +46,15 @@ class Bot(commands.Bot):
         making it a better solution than doing such setup in the on_ready() event.
         Sets up Cogs.
         """
-        # add cogs dynamically
         self.logger.info("Setting up Cogs...")
+
+        # add cogs dynamically
+        # assumes each Cog is defined in its own file and the name of the Cog class is the name
+        # of the file capitalized (ex: 'funny.py' -> Funny())
         for cog_name in discord_bot.cogs.__all__:
             cog_module = __import__(f"discord_bot.cogs.{cog_name}", fromlist=[cog_name])
             class_name = cog_name.capitalize()
-            if hasattr(cog_module, class_name):  # ignores "work in progress" cogs
+            if hasattr(cog_module, class_name):
                 cog = getattr(cog_module, class_name)(self)
                 await self.add_cog(cog)
 
@@ -81,10 +79,10 @@ class Bot(commands.Bot):
                 channel.id,
             )
 
-        # set presence message ("Watching for !help")
+        # set presence message ("Watching for /hi")
         await self.change_presence(
             activity=discord.Activity(
-                type=discord.ActivityType.watching, name=f"for {self.prefix_simple}help"
+                type=discord.ActivityType.watching, name=f"for /hi"
             )
         )
 

@@ -15,11 +15,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import logging
     from typing import Callable
-    from discord.ext import commands
+    from discord import app_commands, Interaction
 
 
 def logging_wrapper(
-    command: "commands.Command", logger: "logging.Logger"
+    command: "app_commands.Command", logger: "logging.Logger"
 ) -> "Callable":
     """
     Logging wrapper for command callbacks
@@ -27,7 +27,7 @@ def logging_wrapper(
 
     Parameters
     ----------
-    command: commands.Command
+    command: discord.app_commands.Command
         Command whose callback is to be wrapped
     logger: logging.Logger
 
@@ -39,39 +39,36 @@ def logging_wrapper(
 
     @functools.wraps(command_callback)
     async def wrapper(*args, **kwargs):
-        context = args[1]  # self, context, ...
-        log_command_call(context, logger, command.qualified_name)
+        interaction = args[1]  # self, interaction, ...
+        log_command_call(interaction, logger, command.name)
         await command_callback(*args, **kwargs)
 
     return wrapper
 
 
 def log_command_call(
-    context: "commands.Context", logger: "logging.Logger", command_name: str
+    interaction: "Interaction", logger: "logging.Logger", command_name: str
 ):
     """
     Logs a command call
 
     Parameters
     ----------
-    context: discord.ext.commands.Context
+    context: discord.app_commands.Interaction
     logger: logging.logger
     command_name: str
         name of the command whose call is being logged
     """
-    guild = context.message.guild
-    channel = context.message.channel
+    guild = interaction.guild
+    channel = interaction.channel
     channel = (
         f"{guild.name}.{channel.name} ({str(channel.type)})"
         if guild
         else "Private Message"
     )
-    user = f"{context.message.author.name}#{context.message.author.discriminator}"
+    user = f"{interaction.user.name}#{interaction.user.discriminator}"
     logger.info(
-        f"command called: {command_name}; "
-        f"message: {context.message.clean_content}; "
-        f"channel: {channel}; "
-        f"user: {user}"
+        f"command called: {command_name}; " f"channel: {channel}; " f"user: {user}"
     )
 
 

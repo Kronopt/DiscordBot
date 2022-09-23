@@ -11,8 +11,8 @@ from typing import TYPE_CHECKING
 import aiohttp
 import discord
 import xkcd_wrapper
-from discord.ext import commands
-from discord_bot.services import converters
+from discord import app_commands, Interaction
+from discord_bot.services import transformers
 from discord_bot.base_cog import Cog
 
 if TYPE_CHECKING:
@@ -23,6 +23,8 @@ class Xkcd(Cog):
     """
     Commands that deal with XKCD webcomics
     """
+
+    xkcd_group = app_commands.Group(name="xkcd", description="XKCD-related commands")
 
     def __init__(self, bot: "Bot"):
         super().__init__(bot)
@@ -61,28 +63,24 @@ class Xkcd(Cog):
     # COMMANDS
     ##########
 
-    # XKCD
-    @commands.hybrid_group(
-        name="xkcd", ignore_extra=False, invoke_without_command=True, fallback="random"
-    )
-    async def command_xkcd(self, context: commands.Context):
+    # XKCD RANDOM
+    @xkcd_group.command(name="random")
+    async def command_xkcd_random(self, interaction: Interaction):
         """
         Shows a random xkcd comic
 
         Retrieves a random xkcd webcomic from xkcd.com
 
         ex:
-        `<prefix>xkcd`
+        `<prefix>xkcd random`
         """
         random_comic = await self.xkcd_api_client.random(raw_comic_image=False)
         embed_comic = self.embed_comic(random_comic)
-        await context.send(embed=embed_comic)
+        await interaction.response.send_message(embed=embed_comic)
 
     # XKCD LATEST
-    @command_xkcd.command(
-        name="latest", ignore_extra=False, aliases=["l", "-l", "last"]
-    )
-    async def command_xkcd_latest(self, context: commands.Context):
+    @xkcd_group.command(name="latest")
+    async def command_xkcd_latest(self, interaction: Interaction):
         """
         Shows the latest xkcd comic
 
@@ -90,16 +88,17 @@ class Xkcd(Cog):
 
         ex:
         `<prefix>xkcd latest`
-        `<prefix>xkcd l`
         """
         comic = await self.xkcd_api_client.latest(raw_comic_image=False)
         embed_comic = self.embed_comic(comic)
-        await context.send(embed=embed_comic)
+        await interaction.response.send_message(embed=embed_comic)
 
     # XKCD ID
-    @command_xkcd.command(name="id", ignore_extra=False, aliases=["n", "-n", "number"])
+    @xkcd_group.command(name="id")
+    @app_commands.describe(comic_id="XKCD comic ID")
+    @app_commands.rename(comic_id="id")
     async def command_xkcd_id(
-        self, context: commands.Context, comic_id: converters.positive_int
+        self, interaction: Interaction, comic_id: transformers.PositiveInteger
     ):
         """
         Shows the selected xkcd comic
@@ -108,80 +107,64 @@ class Xkcd(Cog):
 
         ex:
         `<prefix>xkcd id` 100
-        `<prefix>xkcd n` 1234
         """
         comic = await self.xkcd_api_client.get(comic_id, raw_comic_image=False)
         embed_comic = self.embed_comic(comic)
-        await context.send(embed=embed_comic)
+        await interaction.response.send_message(embed=embed_comic)
 
     ################
     # ERROR HANDLING
     ################
 
-    @command_xkcd.error
+    @command_xkcd_random.error
     @command_xkcd_latest.error
     @command_xkcd_id.error
     async def xkcd_xkcd_latest_xkcd_id_on_error(
-        self, context: commands.Context, error: commands.CommandError
+        self, interaction: Interaction, error: app_commands.AppCommandError
     ):
-        """
-        Handles errors for all xkcd commands
+        """command_xkcd_random, command_xkcd_latest and command_xkcd_id error handling"""
 
-        Parameters
-        ----------
-        context: commands.Context
-        error: commands.CommandError
-        """
         bot_message_id_not_found = "An xkcd comic with the given `id` was not found"
         bot_message_xkcd_unavailable = "Can't reach xkcd.com right now"
         bot_message_bad_xkcd_response = "Got a bad response from xkcd.com"
 
-        if context.command.callback is self.command_xkcd.callback:
-            bot_message = (
-                f"`{context.prefix}{context.invoked_with}` either takes no arguments "
-                f"or takes one subcommand (use `{context.prefix}help {context.invoked_with}` "
-                "for more information)"
-            )
-        elif context.command.callback is self.command_xkcd_latest.callback:
-            bot_message = (
-                f"`{context.prefix}{context.command.qualified_name}` takes no arguments"
-            )
-        else:
-            bot_message = (
-                f"`{context.prefix}{context.command.qualified_name}` takes exactly 1 "
-                "positive number as argument"
-            )
+        handled_exceptions = []
 
-        await self.generic_error_handler(
-            context,
-            error,
-            (
-                commands.CommandOnCooldown,
-                commands.NoPrivateMessage,
-                commands.CheckFailure,
-            ),
-            (commands.TooManyArguments, bot_message),
-            (commands.BadArgument, bot_message),
-            (commands.MissingRequiredArgument, bot_message),
-        )
+        if isinstance(error, app_commands.CommandInvokeError):
+            error = error.original
 
-        if isinstance(error, commands.CommandInvokeError):
-            self.logger.info(
-                f"{error.original.__class__.__name__} exception in command "
-                f"{context.command.qualified_name}: {context.message.content}"
-            )
-
-            if isinstance(error.original, xkcd_wrapper.exceptions.HttpError):
-                if error.original.status_code == 404:
-                    await context.send(bot_message_id_not_found)
+            if isinstance(error, xkcd_wrapper.exceptions.HttpError):
+                if error.status_code == 404:
+                    message = bot_message_id_not_found
                 else:
-                    await context.send(bot_message_xkcd_unavailable)
+                    message = bot_message_xkcd_unavailable
 
-            elif isinstance(error.original, xkcd_wrapper.exceptions.BadResponseField):
-                await context.send(bot_message_bad_xkcd_response)
+                handled_exceptions.append(
+                    (
+                        xkcd_wrapper.exceptions.HttpError,
+                        message,
+                    )
+                )
+
+            elif isinstance(error, xkcd_wrapper.exceptions.BadResponseField):
+                handled_exceptions.append(
+                    (
+                        xkcd_wrapper.exceptions.BadResponseField,
+                        bot_message_bad_xkcd_response,
+                    )
+                )
 
             elif isinstance(
-                error.original,
+                error,
                 (aiohttp.ClientResponseError, aiohttp.ClientConnectionError),
             ):
-                await context.send(bot_message_xkcd_unavailable)
+                handled_exceptions.extend(
+                    (
+                        (aiohttp.ClientResponseError, bot_message_xkcd_unavailable),
+                        (aiohttp.ClientConnectionError, bot_message_xkcd_unavailable),
+                    ),
+                )
+
+        await self.generic_error_handler(
+            interaction, error, tuple(), *handled_exceptions
+        )

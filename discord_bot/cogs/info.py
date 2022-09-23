@@ -13,7 +13,7 @@ import platform
 import time
 import discord
 import psutil
-from discord.ext import commands
+from discord import app_commands, Interaction
 from discord_bot.base_cog import Cog
 
 if TYPE_CHECKING:
@@ -107,20 +107,19 @@ class Info(Cog):
     ##########
 
     # INFO
-    @commands.hybrid_command(name="info", ignore_extra=False, aliases=["information"])
-    async def command_info(self, context: commands.Context):
+    @app_commands.command(name="info")
+    async def command_info(self, interaction: Interaction):
         """
         Shows author, github page and framework
 
         ex:
         `<prefix>info`
-        `<prefix>information`
         """
-        await context.send(embed=self.info_embed)
+        await interaction.response.send_message(embed=self.info_embed)
 
     # SYSTEM
-    @commands.hybrid_command(name="system", ignore_extra=False, aliases=["sys"])
-    async def command_system(self, context: commands.Context):
+    @app_commands.command(name="system")
+    async def command_system(self, interaction: Interaction):
         """
         Shows bot host system information
 
@@ -128,13 +127,10 @@ class Info(Cog):
 
         ex:
         `<prefix>system`
-        `<prefix>sys`
         """
         embed = self.system_embed
         embed.add_field(name="🕒 Up time", value=(await self.uptime()) + "\n\u200b")
-
-        await context.send(embed=embed)
-
+        await interaction.response.send_message(embed=embed)
         embed.remove_field(-1)
 
     ################
@@ -144,19 +140,11 @@ class Info(Cog):
     @command_info.error
     @command_system.error
     async def info_system_on_error(
-        self, context: commands.Context, error: commands.CommandError
+        self, interaction: Interaction, error: app_commands.AppCommandError
     ):
         """command_info and command_system error handling"""
-        bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
         await self.generic_error_handler(
-            context,
+            interaction,
             error,
-            (
-                commands.MissingRequiredArgument,
-                commands.CommandOnCooldown,
-                commands.NoPrivateMessage,
-                commands.CheckFailure,
-            ),
-            (commands.TooManyArguments, bot_message),
-            (commands.BadArgument, bot_message),
+            tuple(),
         )

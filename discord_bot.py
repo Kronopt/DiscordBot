@@ -32,7 +32,6 @@ if __name__ == "__main__":
     intents = discord.Intents.default()
     intents.message_content = True
     Bot(
-        prefix="!",
         intents=intents,
         chromium_args=cli.chromium_args,
         isthereanydeal_token=cli.isthereanydeal_token,
