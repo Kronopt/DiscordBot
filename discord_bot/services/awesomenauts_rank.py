@@ -46,7 +46,7 @@ class AwesomenautsRank:
         player's steam profile url
     """
 
-    def __init__(self, embed_colour, rank_info):
+    def __init__(self, embed_colour: int | discord.Colour, rank_info: dict[str, str]):
         """
         AwesomenautsRank init
 
@@ -80,7 +80,9 @@ class AwesomenautsRank:
 
         self.embed = self.create_awesomenauts_rank_embed(embed_colour)
 
-    def create_awesomenauts_rank_embed(self, embed_colour):
+    def create_awesomenauts_rank_embed(
+        self, embed_colour: int | discord.Colour
+    ) -> discord.Embed:
         """awesomenauts rank embed"""
         embed = discord.Embed(colour=embed_colour)
         embed.set_author(name=self.player_name, url=self.steam_profile_url)

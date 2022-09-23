@@ -7,18 +7,21 @@ Funny Commands
 """
 
 
-import collections
+from typing import TYPE_CHECKING, Optional
 import random
 import aiohttp
-from discord.ext import commands
+from discord import app_commands, Interaction
 from discord_bot.base_cog import Cog
 from discord_bot.services import (
-    converters,
     external_api_handler,
     i_can_haz_dad_joke_api,
     joke_api,
     official_joke_api,
+    transformers,
 )
+
+if TYPE_CHECKING:
+    from discord_bot.bot import Bot
 
 
 class NoJokeError(Exception):
@@ -26,7 +29,7 @@ class NoJokeError(Exception):
     Could not retrieve a joke from any API
     """
 
-    def __init__(self, apis):
+    def __init__(self, apis: list[external_api_handler.APICommunicationHandler]):
         super().__init__()
         self.apis = [str(api) for api in apis]
 
@@ -41,7 +44,7 @@ class Funny(Cog):
     Funny commands (debatable)
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: "Bot"):
         super().__init__(bot)
         self.emoji = "😂"
         self.eightball_emojis = ["✅", "🔅", "❌"]
@@ -93,7 +96,7 @@ class Funny(Cog):
         )
         self.apis = [icanhazdadjoke_api, officialjoke_api, jokeapi_api]
 
-    async def get_joke(self):
+    async def get_joke(self) -> str:
         """
         joke command implementation
 
@@ -138,22 +141,18 @@ class Funny(Cog):
     ##########
 
     # 8BALL
-    @commands.command(name="8ball", ignore_extra=False, aliases=["eightball", "8b"])
-    async def command_eightball(self, context, *phrase):
+    @app_commands.command(name="8ball")
+    @app_commands.describe(question="question for bot")
+    async def command_eightball(self, interaction: Interaction, question: str):
         """
         Predicts the outcome of a question
 
-        Bot uses its fortune-telling powers to answer your question.
+        Bot uses its fortune-telling powers to predict the outcome of your question.
         Ask a question and get one of the classic magic 8 ball answers.
 
         ex:
         `<prefix>8ball` is it going to be sunny today?
-        `<prefix>8b` are you going to answer correctly?
         """
-        if len(phrase) == 0:  # at least one argument
-            param = collections.namedtuple("param", "name")
-            raise commands.MissingRequiredArgument(param("phrase"))
-
         answer = random.randint(0, len(self.eightball_answers) - 1)
         if answer <= 9:  # Affirmative answer
             emoji = self.eightball_emojis[0]
@@ -162,14 +161,13 @@ class Funny(Cog):
         else:  # Negative answer
             emoji = self.eightball_emojis[2]
 
-        message_without_command = context.message.clean_content.split(maxsplit=1)[1]
-        await context.send(
-            f"`{message_without_command}`: {self.eightball_answers[answer]} {emoji}"
+        await interaction.response.send_message(
+            f"`{question}`: {self.eightball_answers[answer]} {emoji}"
         )
 
     # DICK
-    @commands.command(name="dick", ignore_extra=False, aliases=["penis"])
-    async def command_dick(self, context):
+    @app_commands.command(name="dick")
+    async def command_dick(self, interaction: Interaction):
         """
         Reveals user's dick size
 
@@ -178,15 +176,21 @@ class Funny(Cog):
 
         ex:
         `<prefix>dick`
-        `<prefix>penis`
         """
-        random.seed(context.author.id)
+        random.seed(interaction.user.id)
         dick = self.dick.format("#" * random.randrange(12))
-        await context.send(f"{context.author.display_name}'s dick: {dick}")
+        await interaction.response.send_message(
+            f"{interaction.user.display_name}'s dick: {dick}"
+        )
 
     # POOP
-    @commands.command(name="poop", ignore_extra=False)
-    async def command_poop(self, context, *n: converters.positive_int):
+    @app_commands.command(name="poop")
+    @app_commands.describe(n="number of poops")
+    async def command_poop(
+        self,
+        interaction: Interaction,
+        n: Optional[app_commands.Transform[int, transformers.PositiveInteger]] = 1,
+    ):
         """
         Sends poops
 
@@ -196,19 +200,13 @@ class Funny(Cog):
         `<prefix>poop`
         `<prefix>poop` 10
         """
-        if len(n) > 1:  # At most one argument
-            raise commands.TooManyArguments
-        if len(n) == 0:
-            n = 1  # default
-        else:
-            n = n[0] if n[0] <= 198 else 198  # character limit
-        await context.send("💩" * n)
+        n = n if n <= 198 else 198  # character limit
+        await interaction.response.send_message("💩" * n)
 
     # JOKE
-    @commands.group(
-        name="joke", ignore_extra=False, aliases=["jk"], invoke_without_command=True
-    )
-    async def command_joke(self, context):
+    @app_commands.command(name="joke")
+    @app_commands.describe(tts="if the joke should be read by tts")
+    async def command_joke(self, interaction: Interaction, tts: Optional[bool] = False):
         """
         Tells a random (bad) joke
 
@@ -219,102 +217,52 @@ class Funny(Cog):
 
         ex:
         `<prefix>joke`
-        `<prefix>jk`
+        `<prefix>joke` tts=True
         """
         joke = await self.get_joke()
-        await context.send(joke)
-
-    # JOKE TTS
-    @command_joke.command(name="tts", ignore_extra=False, aliases=["-tts", "-t"])
-    async def command_joke_tts(self, context):
-        """
-        Reads joke using tts
-
-        ex:
-        `<prefix>joke tts`
-        `<prefix>joke -t`
-        """
-        joke = await self.get_joke()
-        await context.send(joke, tts=True)
+        await interaction.response.send_message(joke, tts=tts)
 
     ################
     # ERROR HANDLING
     ################
 
     @command_eightball.error
-    async def eightball_on_error(self, context, error):
-        """command_eightball error handling"""
-        bot_message = (
-            f"`{context.prefix}{context.invoked_with}` "
-            "needs a phrase on which to apply its fortune-telling powers"
-        )
-        await self.generic_error_handler(
-            context,
-            error,
-            (
-                commands.TooManyArguments,
-                commands.CommandOnCooldown,
-                commands.NoPrivateMessage,
-                commands.CheckFailure,
-            ),
-            (commands.MissingRequiredArgument, bot_message),
-            (commands.BadArgument, bot_message),
-        )
-
     @command_dick.error
-    async def dick_on_error(self, context, error):
-        """command_dick error handling"""
-        bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
-        await self.generic_error_handler(
-            context,
-            error,
-            (
-                commands.MissingRequiredArgument,
-                commands.CommandOnCooldown,
-                commands.NoPrivateMessage,
-                commands.CheckFailure,
-            ),
-            (commands.TooManyArguments, bot_message),
-            (commands.BadArgument, bot_message),
-        )
+    async def eightball_dick_on_error(
+        self, interaction: Interaction, error: app_commands.AppCommandError
+    ):
+        """
+        command_eightball and command_dick error handling
+        """
+        await self.generic_error_handler(interaction, error, tuple())
 
     @command_poop.error
-    async def poop_on_error(self, context, error):
-        """command_poop error handling"""
-        bot_message = (
-            f"`{context.prefix}{context.invoked_with}` "
-            "takes no arguments or 1 positive number"
-        )
+    async def eightball_dick_poop_on_error(
+        self, interaction: Interaction, error: app_commands.AppCommandError
+    ):
+        """
+        command_poop error handling
+        """
+        bot_message_error = "argument is not a positive integer"
         await self.generic_error_handler(
-            context,
+            interaction,
             error,
-            (
-                commands.CommandOnCooldown,
-                commands.NoPrivateMessage,
-                commands.CheckFailure,
-                commands.MissingRequiredArgument,
-            ),
-            (commands.BadArgument, bot_message),
-            (commands.TooManyArguments, bot_message),
+            tuple(),
+            (app_commands.errors.TransformerError, bot_message_error),
         )
 
     @command_joke.error
-    @command_joke_tts.error
-    async def joke_on_error(self, context, error):
-        """command_joke error handling"""
-        bot_message = f"`{context.prefix}{context.invoked_with}` takes no arguments"
+    async def joke_on_error(
+        self, interaction: Interaction, error: app_commands.AppCommandError
+    ):
+        """
+        command_joke error handling
+        """
         bot_message_api_error = "Can't retrieve a joke from the server at the moment"
         await self.generic_error_handler(
-            context,
+            interaction,
             error,
-            (
-                commands.MissingRequiredArgument,
-                commands.CommandOnCooldown,
-                commands.NoPrivateMessage,
-                commands.CheckFailure,
-            ),
-            (commands.TooManyArguments, bot_message),
-            (commands.BadArgument, bot_message),
+            tuple(),
             (NoJokeError, bot_message_api_error),
             (joke_api.JokeApiError, bot_message_api_error),
         )

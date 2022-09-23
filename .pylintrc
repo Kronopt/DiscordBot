@@ -1,6 +1,6 @@
 [BASIC]
 # Good variable names which should always be accepted, separated by a comma.
-good-names=i, j, k, id, os
+good-names=i, j, k, n, id, os
 
 
 [FORMAT]
@@ -25,4 +25,6 @@ disable=no-member,
         no-name-in-module,
         arguments-differ,
         duplicate-code,
-        missing-function-docstring
+        missing-function-docstring,
+        too-many-locals,
+        abstract-method

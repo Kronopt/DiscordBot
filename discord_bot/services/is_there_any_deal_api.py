@@ -20,7 +20,7 @@ class IsThereAnyDealError(Exception):
     error_description : str or None
     """
 
-    def __init__(self, error, error_description):
+    def __init__(self, error: str, error_description: str | None):
         super().__init__()
         self.error = error
         self.error_description = error_description
@@ -39,7 +39,7 @@ class IsThereAnyDealErrorResponse:
     error_description : str
     """
 
-    def __init__(self, response_dict):
+    def __init__(self, response_dict: dict):
         """
         IsThereAnyDeal API error response init
 
@@ -67,7 +67,7 @@ class IdentifierEndpoint(IsThereAnyDealErrorResponse):
         IsThereAnyDeal API game identifier
     """
 
-    def __init__(self, response_dict):
+    def __init__(self, response_dict: dict):
         """
         IsThereAnyDeal API Identifier endpoint init
 
@@ -98,7 +98,7 @@ class SteamReview:
         Percentage of all reviews that are positive
     """
 
-    def __init__(self, steam_review_dict):
+    def __init__(self, steam_review_dict: dict):
         """
         SteamReview init
 
@@ -132,7 +132,7 @@ class GetInfoAboutGameEndpoint(IsThereAnyDealErrorResponse):
         Steam review data
     """
 
-    def __init__(self, response_dict):
+    def __init__(self, response_dict: dict):
         """
         IsThereAnyDeal API GetInfoAboutGame endpoint init
 
@@ -187,7 +187,7 @@ class ShopInfo:
 
     """
 
-    def __init__(self, game_shop_dict):
+    def __init__(self, game_shop_dict: dict):
         """
         ShopInfo init
 
@@ -234,7 +234,7 @@ class GetCurrentPricesEndpoint(IsThereAnyDealErrorResponse):
         Currency of prices
     """
 
-    def __init__(self, response_dict):
+    def __init__(self, response_dict: dict):
         """
         IsThereAnyDeal API GetCurrentPrices endpoint init
 
@@ -281,7 +281,7 @@ class GetHistoricalLowEndpoint(IsThereAnyDealErrorResponse):
         Currency of price
     """
 
-    def __init__(self, response_dict):
+    def __init__(self, response_dict: dict):
         """
         IsThereAnyDeal API GetHistoricalLow endpoint init
 

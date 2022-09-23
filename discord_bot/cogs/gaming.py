@@ -7,18 +7,22 @@ Gaming related Commands
 """
 
 
+from typing import TYPE_CHECKING
 import asyncio
-import collections
 import urllib
 import discord
 import pyppeteer
-from discord.ext import commands
+import pyppeteer.errors
+from discord import app_commands, Interaction
 from discord_bot.base_cog import Cog
 from discord_bot.services import (
     awesomenauts_rank,
     external_api_handler,
     is_there_any_deal_api,
 )
+
+if TYPE_CHECKING:
+    from discord_bot.bot import Bot
 
 
 class NoBrowserError(Exception):
@@ -35,7 +39,11 @@ class Gaming(Cog):
     Commands that deal with games/gaming (player rank, high scores, characters, etc)
     """
 
-    def __init__(self, bot):
+    awesomenauts_group = app_commands.Group(
+        name="awesomenauts", description="Awesomenauts-related commands"
+    )
+
+    def __init__(self, bot: "Bot"):
         super().__init__(bot)
         self.emoji = "🎮"
         self.browser = None
@@ -102,8 +110,11 @@ class Gaming(Cog):
         await self.browser.close()
 
     async def create_gamedeal_embed(
-        self, game_info, game_prices, game_historical_low_price
-    ):
+        self,
+        game_info: is_there_any_deal_api.GetInfoAboutGameEndpoint,
+        game_prices: is_there_any_deal_api.GetCurrentPricesEndpoint,
+        game_historical_low_price: is_there_any_deal_api.GetHistoricalLowEndpoint,
+    ) -> discord.Embed:
         """gamedeal embed"""
         embed = discord.Embed(colour=self.embed_colour)
 
@@ -181,40 +192,28 @@ class Gaming(Cog):
     # COMMANDS
     ##########
 
-    # AWESOMENAUTS
-    @commands.group(
-        name="awesomenauts", ignore_extra=False, invoke_without_command=True
-    )
-    async def command_awesomenauts(self, context, *subcommand):
-        subcommand = " ".join(subcommand)
-        unknown_subcommand = (
-            f"Unknown subcommand: {subcommand}. " if len(subcommand) > 0 else ""
-        )
-        await context.send(f"{unknown_subcommand}Please specify a known subcommand")
-        await context.send_help(self.command_awesomenauts)
-
     # AWESOMENAUTS RANK
-    @command_awesomenauts.command(name="rank", ignore_extra=False, aliases=["r", "-r"])
-    async def command_awesomenauts_rank(self, context, *player_name):
+    @awesomenauts_group.command(name="rank")
+    @app_commands.describe(player_name="awesomenauts player name")
+    @app_commands.rename(player_name="player")
+    async def command_awesomenauts_rank(
+        self, interaction: Interaction, player_name: str
+    ):
         """
-        Displays rank of an Awesomenaut's player
+        Displays rank information of an Awesomenaut's player
 
         Matches highest ranked player out of a list of closely named players found
         (ie, retrieves first result obtained from https://orikaru.net/nautsrankings)
 
         ex:
         `<prefix>awesomenauts rank` niki
-        `<prefix>awesomenauts r` game is broken
         """
-        if len(player_name) == 0:  # at least one argument
-            raise commands.MissingRequiredArgument(
-                collections.namedtuple("param", "name")("player_name")
-            )
-
-        player_name = " ".join(player_name)
-
         if self.browser is None:
             raise NoBrowserError()
+
+        await interaction.response.send_message(
+            f"looking for player `{player_name}` ...", ephemeral=True
+        )
 
         page = await self.browser.newPage()
         await page.goto(
@@ -268,34 +267,30 @@ class Gaming(Cog):
                 },
             )
 
-            await context.send(embed=awesomenaut_rank.embed)
+            await interaction.followup.send(embed=awesomenaut_rank.embed)
 
         else:
-            await context.send(f"Can't retrieve player `{player_name}`")
+            message = await interaction.original_response()
+            await message.edit(
+                content=f"Can't retrieve player `{player_name}`, "
+                + "because he's not on the leaderboard"
+            )
 
         await page.close()
 
     # GAMEDEAL
-    @commands.command(
-        name="gamedeal",
-        ignore_extra=False,
-        aliases=["gamedeals", "gameprice", "gameprices"],
-    )
-    async def command_gamedeal(self, context, *game_name):
+    @app_commands.command(name="gamedeal")
+    @app_commands.describe(game_name="name of game to search for deals")
+    @app_commands.rename(game_name="name")
+    async def command_gamedeal(self, interaction: Interaction, game_name: str):
         """
         Displays game pricing info
 
         Info pertains to all stores in which the game is available for purchase
 
         ex:
-        `<prefix>gamedeal` Assassin's Creed Odyssey
-        `<prefix>gameprice` Cyberpunk 2077
+        `<prefix>gamedeal` "Assassin's Creed Odyssey"
         """
-        if len(game_name) == 0:  # at least one argument
-            param = collections.namedtuple("param", "name")
-            raise commands.MissingRequiredArgument(param("game_name"))
-
-        game_name = " ".join(game_name)
         game_name_quoted = urllib.parse.quote(game_name)
 
         game = await self.isthereanydeal_identifier_api.call_api(
@@ -318,75 +313,44 @@ class Gaming(Cog):
             embed = await self.create_gamedeal_embed(
                 game_info, game_prices, game_historical_low_price
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
 
         else:
-            await context.send(f"Could not find game `{game_name}`")
+            await interaction.response.send_message(
+                f"Could not find game `{game_name}`", ephemeral=True
+            )
 
     ################
     # ERROR HANDLING
     ################
 
-    @command_awesomenauts.error
-    async def awesomenauts_on_error(self, context, error):
-        "command_awesomenauts error handling"
-        await self.generic_error_handler(
-            context,
-            error,
-            (
-                commands.CommandOnCooldown,
-                commands.NoPrivateMessage,
-                commands.CheckFailure,
-            ),
-        )
-
     @command_awesomenauts_rank.error
-    async def awesomenauts_rank_on_error(self, context, error):
+    async def awesomenauts_rank_on_error(
+        self, interaction: Interaction, error: app_commands.AppCommandError
+    ):
         "command_awesomenauts_rank error handling"
-        bot_message = (
-            f"`{context.prefix}{context.command.qualified_name}` expects an "
-            "Awesomenauts player name as argument"
-        )
         timeout_message = "Can't retrieve Awesomenauts rankings at the moment"
 
         await self.generic_error_handler(
-            context,
+            interaction,
             error,
-            (
-                commands.CommandOnCooldown,
-                commands.NoPrivateMessage,
-                commands.CheckFailure,
-            ),
-            (commands.TooManyArguments, bot_message),
-            (commands.BadArgument, bot_message),
-            (commands.MissingRequiredArgument, bot_message),
+            tuple(),
             (NoBrowserError, timeout_message),
             (pyppeteer.errors.TimeoutError, timeout_message),
         )
 
     @command_gamedeal.error
-    async def gamedeal_on_error(self, context, error):
+    async def gamedeal_on_error(
+        self, interaction: Interaction, error: app_commands.AppCommandError
+    ):
         "command_gamedeal error handling"
-        bot_message = f"`{context.prefix}{context.command.qualified_name}` bad argument"
-        http_error_message = (
-            f"`{context.prefix}{context.command.qualified_name}` couldn't "
-            "reach IsThereAnyDeal.com"
-        )
-        itad_message = (
-            f"`{context.prefix}{context.command.qualified_name}` got an error "
-            "from IsThereAnyDeal.com"
-        )
+        http_error_message = "couldn't reach IsThereAnyDeal.com"
+        itad_message = "got an error from IsThereAnyDeal.com"
 
         await self.generic_error_handler(
-            context,
+            interaction,
             error,
-            (
-                commands.CommandOnCooldown,
-                commands.NoPrivateMessage,
-                commands.CheckFailure,
-            ),
-            (commands.BadArgument, bot_message),
-            (commands.MissingRequiredArgument, bot_message),
+            tuple(),
             (external_api_handler.HttpError, http_error_message),
             (is_there_any_deal_api.IsThereAnyDealError, itad_message),
         )

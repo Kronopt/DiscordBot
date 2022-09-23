@@ -26,11 +26,17 @@ class JokeApiError(Exception):
         More information regarding the error
     """
 
-    def __init__(self, error_code, error_message, caused_by, additional_info):
+    def __init__(
+        self,
+        error_code: int | None,
+        error_message: str | None,
+        caused_by: list[str] | None,
+        additional_info: str | None,
+    ):
         super().__init__()
         self.error_code = error_code
         self.error_message = error_message
-        self.caused_by = "; ".join(caused_by)
+        self.caused_by = "; ".join(caused_by) if caused_by is not None else ""
         self.additional_info = additional_info
 
     def __str__(self):
@@ -80,7 +86,7 @@ class JokeApiJoke:
         date when the error occurred
     """
 
-    def __init__(self, response_dict):
+    def __init__(self, response_dict: dict):
         """
         JokeApiJoke init
 
@@ -116,10 +122,10 @@ class JokeApiJoke:
             )
 
     @staticmethod
-    def _parse_unix_timestamp(timestamp):
+    def _parse_unix_timestamp(timestamp: float | None) -> float | datetime | None:
         return datetime.fromtimestamp(timestamp / 1000) if timestamp else timestamp
 
-    def text(self):
+    def text(self) -> str | None:
         """
         Returns just the joke text
 

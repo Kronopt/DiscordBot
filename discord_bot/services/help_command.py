@@ -9,9 +9,13 @@ Help Command
 
 import collections
 import logging
+from typing import TYPE_CHECKING
 import discord
 from discord.ext import commands
 from discord_bot.services import command_logging
+
+if TYPE_CHECKING:
+    from discord_bot.base_cog import Cog as BaseCog
 
 
 class Paginator:
@@ -25,14 +29,14 @@ class Paginator:
         The maximum amount of characters allowed in a page
     """
 
-    def __init__(self, embed_colour):
+    def __init__(self, embed_colour: int | discord.Colour):
         self.max_size = 2048
         self.embed_colour = embed_colour
         self._current_page = discord.Embed(colour=self.embed_colour, description="")
         self._pages = []
 
     @property
-    def current_page(self):
+    def current_page(self) -> str:
         """
         Current message embed description
 
@@ -44,7 +48,7 @@ class Paginator:
         return self._current_page.description if self._current_page.description else ""
 
     @current_page.setter
-    def current_page(self, description):
+    def current_page(self, description: str):
         """
         Updates current message embed description
 
@@ -56,7 +60,7 @@ class Paginator:
         self._current_page.description = description
 
     @property
-    def pages(self):
+    def pages(self) -> list[discord.Embed]:
         """
         List of embeds
 
@@ -76,7 +80,7 @@ class Paginator:
         self.current_page = ""
         self._pages = []
 
-    def add_line(self, line=None, *, empty=False):
+    def add_line(self, line: str | None = None, *, empty: bool = False):
         """
         Adds a line to the current page (appends a \n at the end)
         If the line exceeds the max_size limit, an exception is raised
@@ -124,17 +128,22 @@ class HelpCommand(commands.HelpCommand):
     Help Command
     """
 
-    def __init__(self, embed_colour, **options):
+    def __init__(self, embed_colour: int | discord.Colour, **options):
         super().__init__(**options)
         self.command_attrs["help"] = "Shows command help message"
-        self.logger = logging.getLogger("discord_bot.Help")
+        self.logger = logging.getLogger("discord_bot.cog.Help")
         self.paginator = Paginator(embed_colour=embed_colour)
         self.no_category = collections.namedtuple(
             "NoCategory", ["qualified_name", "emoji"]
         )
         self.command_indent = "  "
 
-    async def send_bot_help(self, mapping):
+    async def send_bot_help(
+        self,
+        mapping: collections.OrderedDict[
+            commands.Cog | tuple | None, list[commands.Command]
+        ],
+    ):
         """
         Sends help message when the help command is called without arguments
 
@@ -160,7 +169,7 @@ class HelpCommand(commands.HelpCommand):
 
         await self.send_pages()
 
-    async def send_cog_help(self, cog):
+    async def send_cog_help(self, cog: commands.Cog):
         """
         Sends help message when the help command is called with a Cog as argument
 
@@ -173,7 +182,7 @@ class HelpCommand(commands.HelpCommand):
 
         await self.send_pages()
 
-    async def send_group_help(self, group):
+    async def send_group_help(self, group: commands.Group):
         """
         Sends help message when the help command is called with a command group as argument
         (a command that has subcommands)
@@ -184,7 +193,9 @@ class HelpCommand(commands.HelpCommand):
         """
         await self.send_command_help(group, True)
 
-    async def send_command_help(self, command, subcommands=False):
+    async def send_command_help(
+        self, command: commands.Command, subcommands: bool = False
+    ):
         """
         Sends help message when the help command is called with a command as argument
 
@@ -208,14 +219,18 @@ class HelpCommand(commands.HelpCommand):
 
         await self.send_pages()
 
-    async def command_callback(self, ctx, *, command=None):
+    async def command_callback(
+        self, ctx: commands.Context, *, command: str | None = None
+    ):
         """
         Log help command calls
         """
         command_logging.log_command_call(ctx, self.logger, "help")
         await super().command_callback(ctx, command=command)
 
-    async def prepare_help_command(self, ctx, command=None):
+    async def prepare_help_command(
+        self, ctx: commands.Context, command: str | None = None
+    ):
         """
         Prepares the help command before it does anything
 
@@ -235,10 +250,12 @@ class HelpCommand(commands.HelpCommand):
         for page in self.paginator.pages:
             await self.get_destination().send(embed=page)
 
-    async def on_help_command_error(self, ctx, error):
+    async def on_help_command_error(
+        self, ctx: commands.Context, error: commands.CommandError
+    ):
         command_logging.log_command_exception(self.logger, "help")
 
-    def command_not_found(self, command_name):
+    def command_not_found(self, command_name: str) -> str:
         """
         Called when help is called for a non-existent command
 
@@ -254,7 +271,7 @@ class HelpCommand(commands.HelpCommand):
         """
         return f"Command `{command_name}` not found"
 
-    def subcommand_not_found(self, command, command_name):
+    def subcommand_not_found(self, command: commands.Command, command_name: str) -> str:
         """
         Called when help is called for a subcommand non-existent subcommand
 
@@ -276,7 +293,9 @@ class HelpCommand(commands.HelpCommand):
             )
         return f"Command `{command.qualified_name}` has no subcommands"
 
-    def get_bot_mapping(self):
+    def get_bot_mapping(
+        self,
+    ) -> collections.OrderedDict[commands.Cog | None, list[commands.Command]]:
         """
         Retrieves bot mapping, which is passed to send_bot_help
 
@@ -294,7 +313,7 @@ class HelpCommand(commands.HelpCommand):
         mapping[None] = [c for c in bot.all_commands.values() if c.cog is None]
         return mapping
 
-    def get_command_signature(self, command):
+    def get_command_signature(self, command: commands.Command) -> str:
         """
         Retrieves the signature portion of the help page
 
@@ -345,7 +364,7 @@ class HelpCommand(commands.HelpCommand):
         )
         self.paginator.add_line(ending_note, empty=True)
 
-    def format_command_help_message(self, command_help):
+    def format_command_help_message(self, command_help: str | None):
         """
         Formats command help message
 
@@ -358,7 +377,7 @@ class HelpCommand(commands.HelpCommand):
             command_help = command_help.replace("<prefix>", self.context.clean_prefix)
             self.paginator.add_line(command_help, empty=True)
 
-    def format_cog_commands(self, cog, cog_commands):
+    def format_cog_commands(self, cog: "BaseCog", cog_commands: list[commands.Command]):
         """
         Formats a category, its commands and subcommands
 
@@ -377,7 +396,7 @@ class HelpCommand(commands.HelpCommand):
 
             self.paginator.add_line("```")
 
-    def format_cog_header(self, cog):
+    def format_cog_header(self, cog: "BaseCog"):
         """
         Formats the cog name header for a category section of the help output
 
@@ -388,14 +407,18 @@ class HelpCommand(commands.HelpCommand):
         self.paginator.add_line(f"{cog.emoji} __**{cog.qualified_name}**__")
 
     def format_command_and_subcommands(
-        self, command, max_size, show_main=True, prefix_spacer_size=0
+        self,
+        command: commands.Command,
+        max_size: int,
+        show_main: bool = True,
+        prefix_spacer_size: int = 0,
     ):
         """
         Formats a command and all its subcommands, recursively
 
         Parameters
         ----------
-        command: commands.Command or commands.Group
+        command: commands.Command
         max_size: int
             size of biggest command in the group (for indenting purposes)
         show_main: bool
@@ -420,7 +443,11 @@ class HelpCommand(commands.HelpCommand):
                 )
 
     def format_single_command(
-        self, command, max_size=None, starting_spacer="", spacer=None
+        self,
+        command: commands.Command,
+        max_size: int | None = None,
+        starting_spacer: str = "",
+        spacer: str | None = None,
     ):
         """
         Formats a single command.
@@ -429,11 +456,11 @@ class HelpCommand(commands.HelpCommand):
         Parameters
         ----------
         command: commands.Command
-        max_size: int
+        max_size: int or None
             size of biggest command in the group
         starting_spacer: str
             spacer command name
-        spacer: str
+        spacer: str or None
             space between command name and description
         """
         max_size = max_size if max_size is not None else len(command.name)
@@ -446,7 +473,7 @@ class HelpCommand(commands.HelpCommand):
         self.paginator.add_line(line)
 
     @staticmethod
-    def handle_line_size(line, spacer, char_number=61):
+    def handle_line_size(line: str, spacer: str, char_number: int = 61) -> str:
         """
         Divides a line in multiple lines given the number of characters per line
 

@@ -11,9 +11,14 @@ Each bot command should be decorated with a @command decorator
 
 import inspect
 import logging
+from typing import TYPE_CHECKING, Type
 from collections import OrderedDict
+from discord import app_commands, Interaction
 from discord.ext import commands
 from discord_bot.services import command_logging
+
+if TYPE_CHECKING:
+    from .bot import Bot
 
 
 class CogMeta(commands.CogMeta):
@@ -29,7 +34,7 @@ class CogMeta(commands.CogMeta):
         attrs["logger"] = logger
 
         for attribute in attrs.values():
-            if isinstance(attribute, commands.core.Command):
+            if isinstance(attribute, app_commands.Command):
 
                 # Force implementation of command error handler
                 if not hasattr(attribute, "on_error"):
@@ -38,7 +43,7 @@ class CogMeta(commands.CogMeta):
                         f"{name} has no error handler"
                     )
 
-                attribute.callback = command_logging.logging_wrapper(attribute, logger)
+                attribute._callback = command_logging.logging_wrapper(attribute, logger)
 
         return super().__new__(cls, name, bases, attrs)
 
@@ -52,7 +57,7 @@ class Cog(commands.Cog, metaclass=CogMeta):
     # {Cog_object: {command_function_name: command_object, ...}, ...}
     all_commands = OrderedDict()
 
-    def __init__(self, bot):
+    def __init__(self, bot: "Bot"):
         """
         Parameters
         ----------
@@ -69,44 +74,21 @@ class Cog(commands.Cog, metaclass=CogMeta):
         # {command_function_name: command_object, ...}
         self.commands = OrderedDict(
             inspect.getmembers(
-                self, lambda x: issubclass(x.__class__, commands.core.Command)
+                self, lambda x: issubclass(x.__class__, app_commands.Command)
             )
         )
         Cog.all_commands[self] = self.commands
 
         self.logger.info("Loaded commands:")
         for command in self.commands.values():
-            self.logger.info(f"    {command.qualified_name}")
+            self.logger.info(f" • {command.qualified_name}")
 
-    @staticmethod
-    def format_cooldown_time(seconds):
-        """
-        Format cooldown time
-        To be used in the handling of commands.CommandOnCooldown exception
-
-        Parameters
-        ----------
-        seconds: float
-
-        Returns
-        -------
-        time: str
-            Cooldown remaining time in H:M:S format
-        """
-        seconds = int(seconds)
-        if seconds <= 60:  # only seconds
-            time = f"{seconds}s"
-        elif seconds <= 60 * 60:  # minutes and seconds
-            time = f"{seconds // 60}m {seconds % 60}s"
-        else:  # hours, minutes and seconds
-            time = (
-                f"{seconds // (60 * 60)}h "
-                + f"{seconds % (60 * 60) // 60}m "
-                + f"{seconds % (60 * 60) % 60}s"
-            )
-        return time
-
-    def unhandled_exceptions(self, context, error, *unhandled_exceptions):
+    def unhandled_exceptions(
+        self,
+        interaction: Interaction,
+        error: Exception | app_commands.AppCommandError,
+        *unhandled_exceptions: Type[app_commands.AppCommandError],
+    ) -> bool:
         """
         Warn about unhandled exceptions
         To be used on each command's error handler
@@ -114,59 +96,55 @@ class Cog(commands.Cog, metaclass=CogMeta):
 
         Parameters
         ----------
-        context: commands.context.Context
-        error: Exception or commands.CommandInvokeError
-        unhandled_exceptions: iter(commands.errors.CommandError)
+        interaction: app_commands.Interaction
+        error: Exception or app_commands.AppCommandError
+        unhandled_exceptions: tuple(type(app_commands.AppCommandError))
 
         Returns
         -------
         bool
             True if error wasn't defined as an unhandled exception, False otherwise
         """
-        if isinstance(error, commands.CommandInvokeError):
-            error = error.original
-
-        if isinstance(error, (*unhandled_exceptions,)):
+        if isinstance(error, unhandled_exceptions):
             exceptions = ", ".join([e.__name__ for e in unhandled_exceptions])
             self.logger.warning(
                 f"Unhandled Exception '{error.__class__.__name__}': "
                 f"{exceptions} exceptions are not handled for "
-                f"{context.prefix}{context.invoked_with}"
+                f"{interaction.command.name}"
             )
             return False
 
         return True
 
     async def generic_error_handler(
-        self, context, error, unhandled_exceptions, *handled_exceptions
-    ):
+        self,
+        interaction: Interaction,
+        error: Exception | app_commands.AppCommandError,
+        unhandled_exceptions: tuple[Type[app_commands.AppCommandError], ...],
+        *handled_exceptions: tuple[Type[Exception], str],
+    ) -> None:
         """
         Base error handler function
         Warning will be logged if an unhandled exception is thrown
 
         Parameters
         ----------
-        context: commands.context.Context
-        error: Exception or commands.CommandInvokeError
-        unhandled_exceptions: tuple of commands.errors.CommandError
-        handled_exceptions: (type of Exception, str)
+        interaction: app_commands.Interaction
+        error: Exception or app_commands.AppCommandError
+        unhandled_exceptions: tuple(type(app_commands.AppCommandError))
+        handled_exceptions: tuple(type(Exception), str)
         """
-        if isinstance(error, commands.CommandInvokeError):
-            error = error.original
-
         for handled_exception, bot_message in handled_exceptions:
             if isinstance(error, handled_exception):
                 self.logger.info(
                     f"{error.__class__.__name__} exception in command "
-                    f"{context.command.qualified_name}: {error}"
+                    f"{interaction.command.name}: {error}"
                 )
-                await context.send(bot_message)
-                await context.send_help(context.command)
+                await interaction.response.send_message(bot_message, ephemeral=True)
                 return
-        if self.unhandled_exceptions(context, error, unhandled_exceptions):
-            command_logging.log_command_exception(
-                self.logger, context.command.qualified_name
-            )
+
+        if self.unhandled_exceptions(interaction, error, *unhandled_exceptions):
+            command_logging.log_command_exception(self.logger, interaction.command.name)
 
     def __hash__(self):
         return hash(self.name)
